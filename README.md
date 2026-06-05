@@ -1,16 +1,84 @@
-# React + Vite
+# 纹脉
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+中国传统纹样抽卡与创作 Web 应用。收集、探索、拼合千年纹样之美。
 
-Currently, two official plugins are available:
+## 功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **抽卡系统** — 6 款金线纹样卡牌，3 档稀有度（common / rare / SSR），shake → 光晕 → 3D 翻转动画
+- **纹样图鉴** — 收藏浏览已获得的纹样
+- **拼图创作** — Canvas 画布拖拽拼合纹样块，磁吸吸附，支持固定块与柔性块
+- **程序化生成** — 5 种几何纹样（回纹 / 万字 / 冰裂 / 雷纹 / 绳纹）实时 SVG 生成
+- **3D 产品预览** — 马克杯、手机壳、盘子、丝巾贴纹样实时预览
+- **手势交互展示** — MediaPipe 手势控制纹样碎裂 / 拼合，弹簧物理动画
+- **元素提取流水线** — 颜色阈值 + DBSCAN 聚类，从金线纹样图中批量提取干净元素
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Vite 8 · React 19 · Three.js (R3F) · Framer Motion · Tailwind CSS 4 · MediaPipe
 
-## Expanding the ESLint configuration
+纯前端 SPA，无后端依赖，数据存 localStorage。
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 开发
+
+```bash
+npm install
+npm run dev
+```
+
+构建：
+
+```bash
+npm run build
+npm run preview
+```
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── cards/          # 纹样卡牌
+│   ├── common/         # 导航、路由、金色装饰组件
+│   ├── gacha/          # 抽卡动画
+│   └── products/       # 3D 产品模型
+├── engine/
+│   ├── proceduralPatterns.js   # 程序化纹样生成器
+│   ├── puzzleBlocks.js         # 拼图块定义
+│   ├── puzzleSnap.js           # 磁吸吸附算法
+│   └── symmetry.js             # 对称变换
+├── pages/
+│   ├── Landing.jsx      # 落地页
+│   ├── Home.jsx         # 首页
+│   ├── Library.jsx      # 图鉴
+│   ├── GachaPage.jsx    # 抽卡
+│   ├── PuzzlePage.jsx   # 拼图创作
+│   ├── Showcase.jsx     # 手势展示
+│   ├── Editor.jsx       # 编辑器
+│   └── Composer.jsx     # 组合器
+├── showcase/            # 碎裂物理、丝线、Voronoi 拆解
+├── store/               # 状态管理
+└── styles/              # 设计系统 + 动画样式
+
+scripts/
+├── generate_patterns.py    # 程序化纹样批量生成
+└── process_patterns.py     # 图片处理（去底/合成/多尺寸/WebP）
+
+public/
+├── patterns/           # 纹样图片素材
+└── puzzle/             # 拼图块资源（11 组 block + mask）
+```
+
+## 元素提取
+
+纹样元素 = 金线连通域的空间聚类。详见 [bronze-pattern-decompose](https://github.com/ni XII/bronze-pattern-decompose) 方案：
+
+1. LAB 颜色阈值提取金丝
+2. 连通域拆件
+3. DBSCAN 空间聚类语义分组
+4. 可选 vtracer 矢量化为 SVG
+
+6 张圆形纹样图 → 45 个元素，1 张复合纹样图 → 9 个元素，共 54 个可用元素。
+
+## License
+
+MIT
