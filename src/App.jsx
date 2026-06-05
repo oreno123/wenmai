@@ -9,6 +9,8 @@ import GachaPage from './pages/GachaPage'
 import Editor from './pages/Editor'
 import Composer from './pages/Composer'
 import PuzzlePage from './pages/PuzzlePage'
+import JigsawPage from './pages/JigsawPage'
+import CuratePage from './pages/CuratePage'
 import Showcase from './pages/Showcase'
 
 function Pages() {
@@ -20,6 +22,8 @@ function Pages() {
   if (pathname === '/editor') return <Editor />
   if (pathname === '/composer') return <Composer />
   if (pathname === '/puzzle') return <PuzzlePage />
+  if (pathname === '/jigsaw') return <JigsawPage />
+  if (pathname === '/curate') return <CuratePage />
   return <Landing />
 }
 

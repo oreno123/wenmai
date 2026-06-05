@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../engine/componentLibrary'
+import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -15,6 +16,16 @@ const SYMMETRY_MODES = [
 
 const COLORS = ['#C9A84C', '#8B6914', '#F2D58A', '#FFFFFF', '#E8D5B7', '#5C3D1A']
 
+const PANEL_TABS = [
+  { id: 'math', label: '几何组件' },
+  { id: 'real', label: '纹样碎片' },
+]
+
+const SOURCE_NAMES = {
+  tuanlong: '团龙', yunlei: '云雷', huiwen: '回纹',
+  lianhua: '莲花', juanco2: '卷草',
+}
+
 export default function Composer() {
   const canvasRef = useRef(null)
   const [folds, setFolds] = useState(4)
@@ -25,22 +36,48 @@ export default function Composer() {
   const [strokeColor, setStrokeColor] = useState('#C9A84C')
   const [filter, setFilter] = useState('all')
   const [centerComp, setCenterComp] = useState(null)
+  const [panelTab, setPanelTab] = useState('math')
+  const [sourceFilter, setSourceFilter] = useState('all')
+  const [loadedImages, setLoadedImages] = useState({})
 
   const filtered = (filter === 'all'
     ? COMPONENT_LIBRARY
     : COMPONENT_LIBRARY.filter(c => c.type === filter)
-  ).filter(c => c.type !== 'corner') // 径向对称模式下角花无意义
+  ).filter(c => c.type !== 'corner')
+
+  const realElements = sourceFilter === 'all'
+    ? ELEMENT_MANIFEST.elements
+    : ELEMENT_MANIFEST.elements.filter(e => e.source === sourceFilter)
 
   const sliceAngle = (Math.PI * 2) / folds
 
+  // 预加载元素图片
+  useEffect(() => {
+    realElements.forEach(el => {
+      if (loadedImages[el.id]) return
+      const img = new Image()
+      img.src = `/elements/${el.file}`
+      img.onload = () => setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+    })
+  }, [realElements])
+
   // ── 绘制 ──────────────────────────────────────────
+
+  const drawElementOnCanvas = useCallback((ctx, elementId, x, y, size, rotation = 0) => {
+    const img = loadedImages[elementId]
+    if (!img) return
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.rotate(rotation * Math.PI / 180)
+    ctx.drawImage(img, -size / 2, -size / 2, size, size)
+    ctx.restore()
+  }, [loadedImages])
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
 
-    // 背景
     ctx.fillStyle = '#0A0A0B'
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
@@ -62,7 +99,7 @@ export default function Composer() {
       ctx.stroke()
     }
 
-    // 高亮编辑扇区（第一个切片，淡色填充）
+    // 编辑扇区高亮
     ctx.beginPath()
     ctx.moveTo(CX, CY)
     ctx.arc(CX, CY, CANVAS_SIZE * 0.42, -Math.PI / 2, -Math.PI / 2 + sliceAngle)
@@ -78,28 +115,33 @@ export default function Composer() {
       drawComponentOnCanvas(ctx, centerComp.component, CX, CY, centerComp.size, 0, centerComp.color || strokeColor)
     }
 
-    // 绘制所有扇区（每个 placement 复制 folds 次）
+    // 所有 placement
     placements.forEach((p, idx) => {
       const isSelected = idx === selectedIdx
-      const color = isSelected ? '#F2D58A' : (p.color || strokeColor)
 
       for (let f = 0; f < folds; f++) {
         const angle = sliceAngle * f
-        const mirror = f % 2 === 1 // 奇数扇区做镜像
+        const mirror = f % 2 === 1
 
         ctx.save()
         ctx.translate(CX, CY)
         ctx.rotate(angle)
         if (mirror) ctx.scale(1, -1)
 
-        // 转换 placement 坐标（相对中心的偏移）
         const rx = p.x - CX
         const ry = p.y - CY
-        drawComponentOnCanvas(ctx, p.component, rx, ry, p.size, p.rotation, color)
+
+        if (p.elementId) {
+          // 真实元素（位图）
+          drawElementOnCanvas(ctx, p.elementId, rx, ry, p.size, p.rotation)
+        } else if (p.component) {
+          // 数学组件（SVG）
+          const color = isSelected ? '#F2D58A' : (p.color || strokeColor)
+          drawComponentOnCanvas(ctx, p.component, rx, ry, p.size, p.rotation, color)
+        }
         ctx.restore()
       }
 
-      // 选中标记（只在编辑扇区画）
       if (isSelected) {
         ctx.save()
         ctx.translate(p.x, p.y)
@@ -114,7 +156,7 @@ export default function Composer() {
       }
     })
 
-  }, [placements, selectedIdx, strokeColor, folds, centerComp])
+  }, [placements, selectedIdx, strokeColor, folds, centerComp, drawElementOnCanvas])
 
   useEffect(() => { redraw() }, [redraw])
 
@@ -125,7 +167,6 @@ export default function Composer() {
     return { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
   }
 
-  // 判断点是否在编辑扇区内
   function inEditSlice(x, y) {
     const dx = x - CX, dy = y - CY
     const dist = Math.sqrt(dx * dx + dy * dy)
@@ -142,22 +183,25 @@ export default function Composer() {
     setDragFromPanel({ component })
   }, [])
 
+  const handleElementPointerDown = useCallback((e, element) => {
+    e.preventDefault()
+    setDragFromPanel({ element })
+  }, [])
+
   // ── 画布指针事件 ──────────────────────────────────
 
   const handleCanvasPointerDown = useCallback((e) => {
     const pos = canvasCoords(e)
 
-    // 中心件点击
     if (centerComp) {
       const dx = pos.x - CX, dy = pos.y - CY
       if (Math.sqrt(dx * dx + dy * dy) < centerComp.size * 0.4) {
-        setSelectedIdx(-2) // 特殊标记：中心件被选中
+        setSelectedIdx(-2)
         setDragging({ idx: -2, offsetX: dx, offsetY: dy })
         return
       }
     }
 
-    // 在编辑扇区内查找组件
     let hitIdx = -1
     for (let i = placements.length - 1; i >= 0; i--) {
       const p = placements[i]
@@ -182,10 +226,7 @@ export default function Composer() {
     const newX = pos.x - dragging.offsetX
     const newY = pos.y - dragging.offsetY
 
-    if (dragging.idx === -2) {
-      // 拖中心件 — 永远在正中
-      return
-    }
+    if (dragging.idx === -2) return
 
     setPlacements(prev => {
       const next = [...prev]
@@ -196,7 +237,6 @@ export default function Composer() {
 
   const handleCanvasPointerUp = useCallback(() => {
     setDragging(null)
-    setDragFromPanel(null)
   }, [])
 
   // 全局拖拽（从面板拖入画布）
@@ -210,16 +250,32 @@ export default function Composer() {
 
       if (isOver) {
         const pos = { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
-        const comp = dragFromPanel.component
-        const defaultSize = comp.type === 'center' ? CANVAS_SIZE * 0.28 : CANVAS_SIZE * 0.15
 
-        if (comp.type === 'center') {
-          setCenterComp({ component: comp, size: defaultSize, color: strokeColor })
-        } else {
-          // 如果不在编辑扇区，强制拉到最近的扇区内位置
+        if (dragFromPanel.component) {
+          const comp = dragFromPanel.component
+          const defaultSize = comp.type === 'center' ? CANVAS_SIZE * 0.28 : CANVAS_SIZE * 0.15
+
+          if (comp.type === 'center') {
+            setCenterComp({ component: comp, size: defaultSize, color: strokeColor })
+          } else {
+            let px = pos.x, py = pos.y
+            if (!inEditSlice(px, py)) {
+              const dx = px - CX, dy = py - CY
+              const dist = Math.sqrt(dx * dx + dy * dy)
+              const midAngle = -Math.PI / 2 + sliceAngle / 2
+              px = CX + Math.cos(midAngle) * Math.min(dist, CANVAS_SIZE * 0.3)
+              py = CY + Math.sin(midAngle) * Math.min(dist, CANVAS_SIZE * 0.3)
+            }
+            setPlacements(prev => {
+              const withoutTemp = prev.filter(p => !p._temp)
+              return [...withoutTemp, { component: comp, x: px, y: py, size: defaultSize, rotation: 0, color: strokeColor, _temp: true }]
+            })
+          }
+        } else if (dragFromPanel.element) {
+          const el = dragFromPanel.element
+          const defaultSize = CANVAS_SIZE * 0.15
           let px = pos.x, py = pos.y
           if (!inEditSlice(px, py)) {
-            // 吸附到编辑扇区中心线方向
             const dx = px - CX, dy = py - CY
             const dist = Math.sqrt(dx * dx + dy * dy)
             const midAngle = -Math.PI / 2 + sliceAngle / 2
@@ -228,7 +284,7 @@ export default function Composer() {
           }
           setPlacements(prev => {
             const withoutTemp = prev.filter(p => !p._temp)
-            return [...withoutTemp, { component: comp, x: px, y: py, size: defaultSize, rotation: 0, color: strokeColor, _temp: true }]
+            return [...withoutTemp, { elementId: el.id, x: px, y: py, size: defaultSize, rotation: 0, _temp: true }]
           })
         }
       }
@@ -256,7 +312,6 @@ export default function Composer() {
   }, [selectedIdx])
 
   const rotateSelected = useCallback((deg) => {
-    if (selectedIdx === -2) return
     if (selectedIdx < 0) return
     setPlacements(prev => {
       const next = [...prev]
@@ -266,9 +321,6 @@ export default function Composer() {
   }, [selectedIdx])
 
   const scaleSelected = useCallback((delta) => {
-    const setFn = selectedIdx === -2
-      ? (prev) => ({ ...prev, size: Math.max(40, prev.size + delta) })
-      : (prev) => prev
     if (selectedIdx === -2) {
       setCenterComp(prev => ({ ...prev, size: Math.max(40, prev.size + delta) }))
       return
@@ -375,52 +427,134 @@ export default function Composer() {
         <button onClick={clearCanvas} style={{ ...btnStyle, marginLeft: 8, fontSize: 11 }}>清空</button>
       </div>
 
-      {/* 类型筛选 */}
-      <div style={{ display: 'flex', gap: 6, padding: '6px 16px', overflowX: 'auto' }}>
-        {['all', 'center', 'border', 'corner'].map(t => (
+      {/* 素材面板 Tab */}
+      <div style={{
+        display: 'flex', gap: 0, padding: '8px 16px 4px',
+        background: 'rgba(255,255,255,0.02)', borderRadius: '10px 10px 0 0', margin: '4px 16px 0',
+      }}>
+        {PANEL_TABS.map(t => (
           <button
-            key={t}
-            onClick={() => setFilter(t)}
+            key={t.id}
+            onClick={() => setPanelTab(t.id)}
             style={{
-              padding: '4px 12px', borderRadius: 12, fontSize: 12,
-              background: filter === t ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
-              color: filter === t ? '#F2D58A' : '#6A6A6A',
-              border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
+              flex: 1, padding: '8px', border: 'none', borderRadius: 8,
+              background: panelTab === t.id ? 'rgba(212,175,106,0.12)' : 'transparent',
+              color: panelTab === t.id ? '#F2D58A' : '#6A6A6A',
+              fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
             }}
           >
-            {{ all: '全部', center: '中心', border: '边饰', corner: '角花' }[t]}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {/* 组件面板 */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
-        gap: 8, padding: '0 16px',
-        maxHeight: '32vh', overflowY: 'auto',
-      }}>
-        {filtered.map(comp => (
-          <div
-            key={comp.id}
-            onPointerDown={(e) => handlePanelPointerDown(e, comp)}
-            style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.05)',
-              borderRadius: 8, padding: 6, cursor: 'grab',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              touchAction: 'none',
-            }}
-          >
-            <div
-              dangerouslySetInnerHTML={{ __html: getComponentSVG(comp, '#C9A84C', 1.5) }}
-              style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-            <span style={{ fontSize: 9, color: '#6A6A6A', textAlign: 'center', lineHeight: 1.2 }}>{comp.name}</span>
+      {/* 数学组件面板 */}
+      {panelTab === 'math' && (
+        <>
+          <div style={{ display: 'flex', gap: 6, padding: '6px 16px', overflowX: 'auto' }}>
+            {['all', 'center', 'border', 'corner'].map(t => (
+              <button
+                key={t}
+                onClick={() => setFilter(t)}
+                style={{
+                  padding: '4px 12px', borderRadius: 12, fontSize: 12,
+                  background: filter === t ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
+                  color: filter === t ? '#F2D58A' : '#6A6A6A',
+                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
+                }}
+              >
+                {{ all: '全部', center: '中心', border: '边饰', corner: '角花' }[t]}
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+            gap: 8, padding: '0 16px', maxHeight: '32vh', overflowY: 'auto',
+          }}>
+            {filtered.map(comp => (
+              <div
+                key={comp.id}
+                onPointerDown={(e) => handlePanelPointerDown(e, comp)}
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  borderRadius: 8, padding: 6, cursor: 'grab',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                  touchAction: 'none',
+                }}
+              >
+                <div
+                  dangerouslySetInnerHTML={{ __html: getComponentSVG(comp, '#C9A84C', 1.5) }}
+                  style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                />
+                <span style={{ fontSize: 9, color: '#6A6A6A', textAlign: 'center', lineHeight: 1.2 }}>{comp.name}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* 真实元素面板 */}
+      {panelTab === 'real' && (
+        <>
+          <div style={{ display: 'flex', gap: 6, padding: '6px 16px', overflowX: 'auto' }}>
+            <button
+              onClick={() => setSourceFilter('all')}
+              style={pillStyle(sourceFilter === 'all')}
+            >全部</button>
+            {ELEMENT_MANIFEST.sources.map(s => (
+              <button key={s} onClick={() => setSourceFilter(s)} style={pillStyle(sourceFilter === s)}>
+                {SOURCE_NAMES[s] || s}
+              </button>
+            ))}
+          </div>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+            gap: 8, padding: '0 16px', maxHeight: '32vh', overflowY: 'auto',
+          }}>
+            {realElements.map(el => (
+              <div
+                key={el.id}
+                onPointerDown={(e) => handleElementPointerDown(e, el)}
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  borderRadius: 8, padding: 6, cursor: 'grab',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                  touchAction: 'none',
+                }}
+              >
+                <div style={{
+                  width: 52, height: 52,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <img
+                    src={`/elements/${el.file}`}
+                    alt={el.id}
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    loading="lazy"
+                  />
+                </div>
+                <span style={{ fontSize: 9, color: '#6A6A6A', textAlign: 'center', lineHeight: 1.2 }}>
+                  {SOURCE_NAMES[el.source] || el.source}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
+}
+
+function pillStyle(active) {
+  return {
+    padding: '4px 12px', borderRadius: 12, fontSize: 12, whiteSpace: 'nowrap',
+    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
+    color: active ? '#F2D58A' : '#6A6A6A',
+    border: active ? '1px solid rgba(212,175,106,0.2)' : '1px solid transparent',
+    cursor: 'pointer', fontFamily: 'inherit',
+  }
 }
 
 const btnStyle = {

@@ -2,10 +2,10 @@ import { useLocation, useNavigate } from './Router'
 
 const TABS = [
   { path: '/home', label: '首页', icon: '🏠' },
-  { path: '/library', label: '纹样', icon: '📚' },
+  { path: '/library', label: '图鉴', icon: '📚' },
   { path: '/puzzle', label: '拼图', icon: '🧩', center: true },
   { path: '/gacha', label: '抽卡', icon: '🎴' },
-  { path: '/editor', label: '编辑', icon: '✏️' },
+  { path: '/composer', label: '创作', icon: '✨' },
 ]
 
 export default function BottomNav() {
