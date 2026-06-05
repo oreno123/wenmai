@@ -1,0 +1,264 @@
+/* ========== Utility Classes ========== */
+
+.glass-card {
+  background: rgba(18, 18, 22, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.text-gold {
+  color: var(--gold-main);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #D4AF6A, #BC6B2F);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.light-rays {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    conic-gradient(
+      from 0deg at 50% 30%,
+      transparent 0deg,
+      rgba(212, 175, 106, 0.03) 10deg,
+      transparent 20deg,
+      rgba(212, 175, 106, 0.02) 60deg,
+      transparent 70deg,
+      rgba(212, 175, 106, 0.03) 120deg,
+      transparent 130deg,
+      rgba(212, 175, 106, 0.02) 180deg,
+      transparent 190deg,
+      rgba(212, 175, 106, 0.03) 240deg,
+      transparent 250deg,
+      rgba(212, 175, 106, 0.02) 300deg,
+      transparent 310deg,
+      rgba(212, 175, 106, 0.03) 350deg,
+      transparent 360deg
+    );
+  animation: light-rays 20s linear infinite;
+}
+
+/* Rarity badges */
+.rarity-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.rarity-common {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rarity-rare {
+  background: rgba(201, 162, 60, 0.1);
+  color: var(--gold-main);
+  border: 1px solid rgba(201, 162, 60, 0.15);
+}
+
+.rarity-ssr {
+  background: linear-gradient(135deg, rgba(201, 162, 60, 0.2), rgba(242, 213, 138, 0.15));
+  color: var(--gold-bright);
+  border: 1px solid rgba(242, 213, 138, 0.25);
+  text-shadow: 0 0 8px rgba(201, 162, 60, 0.3);
+}
+
+/* CSS variables used across gacha */
+:root {
+  --bg-glass-strong: rgba(18, 18, 24, 0.85);
+  --gold-gradient: linear-gradient(135deg, #D4AF6A, #F2D58A, #BC6B2F);
+  --gold-light: #F5E6C8;
+  --gold: #D4AF6A;
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --red: #8B1A1A;
+  --text-primary: #F5F1E8;
+  --text-secondary: #8A8A8A;
+  --text-dim: #4A4A4A;
+  --bg-secondary: #1A1A1C;
+  --bg-tertiary: #222220;
+  --border-gold: rgba(212, 175, 106, 0.18);
+  --gold-main: #D4AF6A;
+  --gold-bright: #F2D58A;
+}
+
+/* ========== Keyframes ========== */
+
+/* Gacha card pull sequence: shake → glow → flip (1.5s total) */
+@keyframes gacha-pull-card {
+  /* Shake phase: 0% - 20% (0 - 0.3s) */
+  0%   { transform: rotateY(0deg) translateX(0); }
+  4%   { transform: rotateY(0deg) translateX(-12px); }
+  8%   { transform: rotateY(0deg) translateX(11px); }
+  12%  { transform: rotateY(0deg) translateX(-8px); }
+  16%  { transform: rotateY(0deg) translateX(6px); }
+  20%  { transform: rotateY(0deg) translateX(-3px); }
+  24%  { transform: rotateY(0deg) translateX(0); }
+  /* Flip phase: 24% - 93% (0.36s - 1.4s) with ease-out-in feel */
+  40%  { transform: rotateY(0deg) scale(1.03); }
+  50%  { transform: rotateY(40deg) scale(1.05); }
+  65%  { transform: rotateY(130deg) scale(1.02); }
+  80%  { transform: rotateY(178deg) scale(0.98); }
+  90%  { transform: rotateY(182deg) scale(1.01); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+
+/* Golden glow burst behind card (0.3s - 0.8s) */
+@keyframes gacha-glow-burst {
+  0%  { transform: scale(0.8); opacity: 0; }
+  20% { transform: scale(1.2); opacity: 1; }
+  40% { transform: scale(1.8); opacity: 0.7; }
+  60% { transform: scale(2.2); opacity: 0.4; }
+  80% { transform: scale(2.5); opacity: 0.1; }
+  100%{ transform: scale(3); opacity: 0; }
+}
+
+/* Particle flyout — 12 individual keyframes for each angle */
+@keyframes gacha-particle-0  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(70px,0px) scale(0); } }
+@keyframes gacha-particle-1  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(78px,45px) scale(0); } }
+@keyframes gacha-particle-2  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(60px,104px) scale(0); } }
+@keyframes gacha-particle-3  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(0px,95px) scale(0); } }
+@keyframes gacha-particle-4  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(-60px,104px) scale(0); } }
+@keyframes gacha-particle-5  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(-78px,45px) scale(0); } }
+@keyframes gacha-particle-6  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(-70px,0px) scale(0); } }
+@keyframes gacha-particle-7  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(-78px,-45px) scale(0); } }
+@keyframes gacha-particle-8  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(-60px,-104px) scale(0); } }
+@keyframes gacha-particle-9  { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(0px,-95px) scale(0); } }
+@keyframes gacha-particle-10 { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(60px,-104px) scale(0); } }
+@keyframes gacha-particle-11 { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:translate(78px,-45px) scale(0); } }
+
+/* Card entrance with spring bounce */
+@keyframes card-enter {
+  0% {
+    transform: scale(0.5) translateY(30px);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.12) translateY(-8px);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(0.94) translateY(3px);
+  }
+  70% {
+    transform: scale(1.04) translateY(-2px);
+  }
+  85% {
+    transform: scale(0.98) translateY(1px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Opacity breathing */
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Text shimmer sweep */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-gold[style*="shimmer"] {
+  background: linear-gradient(90deg, var(--gold-main), var(--gold-bright), var(--gold-main));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Button light sweep */
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* Float up and down */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Energy ring pulse */
+@keyframes energy-ring {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Glow pulse for SSR cards */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(201, 162, 60, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(201, 162, 60, 0.15), 0 0 80px rgba(201, 162, 60, 0.05);
+  }
+}
+
+/* SSR center burst */
+@keyframes ssr-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(8);
+    opacity: 0;
+  }
+}
+
+/* SSR expanding ring */
+@keyframes ssr-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(6);
+    opacity: 0;
+  }
+}
+
+/* Background flow */
+@keyframes flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Light rays rotation */
+@keyframes light-rays {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

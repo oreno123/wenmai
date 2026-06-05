@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap');
+
+:root {
+  --bg-base: #0F0F10;
+  --bg-card: #1A1A1C;
+  --bg-card-hover: #222220;
+  --gold-main: #D4AF6A;
+  --gold-bright: #F2D58A;
+  --gold-deep: #BC6B2F;
+  --gold-dim: #8A6A30;
+  --text-primary: #F5F1E8;
+  --text-secondary: #8A8A8A;
+  --text-dim: #4A4A4A;
+  --red-accent: #BC1F28;
+  --border-gold: rgba(212,175,106,0.18);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Noto Serif SC', 'STSong', Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }

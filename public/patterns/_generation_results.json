@@ -1,0 +1,20 @@
+{
+  "success": [
+    "basic-1",
+    "cloud-1",
+    "cloud-2",
+    "cloud-3",
+    "taotie-1",
+    "taotie-2",
+    "taotie-3",
+    "dragon-1",
+    "dragon-2",
+    "dragon-3",
+    "scroll-3",
+    "corner-1",
+    "corner-2",
+    "tile-1",
+    "tile-2"
+  ],
+  "failed": []
+}
