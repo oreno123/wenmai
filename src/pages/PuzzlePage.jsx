@@ -2,6 +2,8 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from '../components/common/Router'
 import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
 import APPROVED_IDS from '../../public/elements/approved.json'
+import { createOutlinedBlock } from '../utils/blockOutline'
+import PreviewScaleModal from '../components/PreviewScaleModal'
 
 const STORAGE_KEY = 'wenmai_approved_elements'
 
@@ -28,8 +30,11 @@ export default function PuzzlePage() {
   const [dragging, setDragging] = useState(null)
   const [dragFromTray, setDragFromTray] = useState(null)
   const [loadedImages, setLoadedImages] = useState({})
+  const [outlinedBlocks, setOutlinedBlocks] = useState({})
   const [sourceFilter, setSourceFilter] = useState('all')
   const [showTray, setShowTray] = useState(true)
+  const [showPreview, setShowPreview] = useState(false)
+  const [completedImage, setCompletedImage] = useState(null)
 
   const approvedSet = getApprovedSet()
   const allApproved = ELEMENT_MANIFEST.elements.filter(e => approvedSet.has(e.id))
@@ -37,13 +42,17 @@ export default function PuzzlePage() {
     ? allApproved
     : allApproved.filter(e => e.source === sourceFilter)
 
-  // Preload images
+  // Preload images + pre-render outlined blocks
   useEffect(() => {
     ELEMENT_MANIFEST.elements.forEach(el => {
       if (loadedImages[el.id]) return
       const img = new Image()
       img.src = `/elements/${el.file}`
-      img.onload = () => setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+      img.onload = () => {
+        setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+        const block = createOutlinedBlock(img)
+        setOutlinedBlocks(prev => ({ ...prev, [el.id]: block }))
+      }
     })
   }, [])
 
@@ -73,9 +82,10 @@ export default function PuzzlePage() {
 
     // Draw each placed element
     placements.forEach((p, idx) => {
-      const img = loadedImages[p.id]
-      if (!img) return
+      const block = outlinedBlocks[p.id] || loadedImages[p.id]
+      if (!block) return
 
+      const s = (p.scale || 1) * p.size
       ctx.save()
       ctx.translate(p.x, p.y)
       ctx.rotate((p.rotation || 0) * Math.PI / 180)
@@ -86,22 +96,23 @@ export default function PuzzlePage() {
       ctx.shadowOffsetX = 3
       ctx.shadowOffsetY = 3
 
-      ctx.drawImage(img, -p.size / 2, -p.size / 2, p.size, p.size)
+      ctx.drawImage(block, -s / 2, -s / 2, s, s)
+
+      ctx.shadowColor = 'transparent'
+      ctx.shadowBlur = 0
 
       // Selection highlight
       if (idx === selectedIdx) {
-        ctx.shadowColor = 'transparent'
-        ctx.shadowBlur = 0
         ctx.strokeStyle = 'rgba(201,168,76,0.8)'
         ctx.lineWidth = 2.5
         ctx.setLineDash([6, 4])
-        ctx.strokeRect(-p.size / 2 - 4, -p.size / 2 - 4, p.size + 8, p.size + 8)
+        ctx.strokeRect(-s / 2 - 4, -s / 2 - 4, s + 8, s + 8)
         ctx.setLineDash([])
       }
 
       ctx.restore()
     })
-  }, [placements, selectedIdx, loadedImages])
+  }, [placements, selectedIdx, loadedImages, outlinedBlocks])
 
   useEffect(() => { redraw() }, [redraw])
 
@@ -112,6 +123,30 @@ export default function PuzzlePage() {
     return { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
   }
 
+  // ── Pixel-accurate hit test ────────────────────────────
+
+  function hitTestPixel(pos, p) {
+    const img = loadedImages[p.id]
+    if (!img) return false
+    const canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0)
+
+    const s = (p.scale || 1) * p.size
+    const rad = (p.rotation || 0) * Math.PI / 180
+    // Transform click pos into image-local coords
+    const dx = pos.x - p.x
+    const dy = pos.y - p.y
+    const lx = (dx * Math.cos(-rad) - dy * Math.sin(-rad)) / s * img.width + img.width / 2
+    const ly = (dx * Math.sin(-rad) + dy * Math.cos(-rad)) / s * img.height + img.height / 2
+
+    if (lx < 0 || ly < 0 || lx >= img.width || ly >= img.height) return false
+    const pixel = ctx.getImageData(Math.floor(lx), Math.floor(ly), 1, 1).data
+    return pixel[3] > 30 // alpha threshold
+  }
+
   // ── Canvas pointer events ────────────────────────────
 
   const handleCanvasPointerDown = useCallback((e) => {
@@ -119,8 +154,12 @@ export default function PuzzlePage() {
     let hitIdx = -1
     for (let i = placements.length - 1; i >= 0; i--) {
       const p = placements[i]
+      // Quick bounding box check first
+      const s = (p.scale || 1) * p.size
       const dx = pos.x - p.x, dy = pos.y - p.y
-      if (Math.sqrt(dx * dx + dy * dy) < p.size * 0.45) {
+      if (Math.abs(dx) > s / 2 || Math.abs(dy) > s / 2) continue
+      // Pixel-accurate check
+      if (hitTestPixel(pos, p)) {
         hitIdx = i
         break
       }
@@ -143,12 +182,55 @@ export default function PuzzlePage() {
     const pos = canvasCoords(e)
     setPlacements(prev => {
       const next = [...prev]
-      next[dragging.idx] = { ...next[dragging.idx], x: pos.x - dragging.offsetX, y: pos.y - dragging.offsetY }
+      const moved = { ...next[dragging.idx], x: pos.x - dragging.offsetX, y: pos.y - dragging.offsetY }
+
+      // Reset other pieces to original positions
+      for (let i = 0; i < next.length; i++) {
+        if (i !== dragging.idx && next[i]._nudged) {
+          const { _nudged, _origX, _origY, ...clean } = next[i]
+          next[i] = { ...clean, x: _origX, y: _origY }
+        }
+      }
+
+      // Soft collision: gently push nearby pieces apart
+      for (let i = 0; i < next.length; i++) {
+        if (i === dragging.idx) continue
+        const other = next[i]
+        const dx = moved.x - other.x
+        const dy = moved.y - other.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const minDist = (moved.size + other.size) * 0.45
+
+        if (dist < minDist && dist > 1) {
+          const overlap = (minDist - dist) / minDist // 0~1
+          const pushStrength = overlap * 12
+          const nx = dx / dist, ny = dy / dist
+
+          // Push other piece gently away
+          const origX = other._origX ?? other.x
+          const origY = other._origY ?? other.y
+          next[i] = {
+            ...other,
+            _nudged: true,
+            _origX: origX,
+            _origY: origY,
+            x: origX - nx * pushStrength,
+            y: origY - ny * pushStrength,
+          }
+        }
+      }
+
+      next[dragging.idx] = moved
       return next
     })
   }, [dragging])
 
   const handleCanvasPointerUp = useCallback(() => {
+    // Keep nudged positions, clean up internal flags
+    setPlacements(prev => prev.map(p => {
+      const { _temp, _nudged, _origX, _origY, ...clean } = p
+      return clean
+    }))
     setDragging(null)
   }, [])
 
@@ -224,6 +306,14 @@ export default function PuzzlePage() {
     link.click()
   }, [])
 
+  const finishCreation = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    if (placements.length === 0) return
+    setCompletedImage(canvas.toDataURL('image/png'))
+    setShowPreview(true)
+  }, [placements.length])
+
   const clearCanvas = useCallback(() => {
     setPlacements([])
     setSelectedIdx(-1)
@@ -252,7 +342,23 @@ export default function PuzzlePage() {
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button onClick={clearCanvas} style={btnStyle}>清空</button>
-          <button onClick={exportPNG} style={{ ...btnStyle, background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8' }}>导出</button>
+          <button onClick={exportPNG} style={btnStyle}>导出</button>
+          <button
+            onClick={finishCreation}
+            disabled={placements.length === 0}
+            style={{
+              ...btnStyle,
+              background: placements.length === 0
+                ? 'rgba(255,255,255,0.04)'
+                : 'linear-gradient(145deg, #C9943A, #8B6914)',
+              color: placements.length === 0 ? '#5A5A5A' : '#F5F1E8',
+              border: placements.length === 0
+                ? '1px solid rgba(255,255,255,0.06)'
+                : '1px solid rgba(201,148,58,0.4)',
+              opacity: placements.length === 0 ? 0.5 : 1,
+              transition: 'all 0.2s',
+            }}
+          >完成创作</button>
         </div>
       </div>
 
@@ -352,6 +458,13 @@ export default function PuzzlePage() {
             </div>
           ))}
         </div>
+      )}
+
+      {showPreview && completedImage && (
+        <PreviewScaleModal
+          imageUrl={completedImage}
+          onClose={() => setShowPreview(false)}
+        />
       )}
     </div>
   )

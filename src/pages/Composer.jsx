@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../engine/componentLibrary'
 import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
+import { createOutlinedBlock } from '../utils/blockOutline'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -39,6 +40,7 @@ export default function Composer() {
   const [panelTab, setPanelTab] = useState('math')
   const [sourceFilter, setSourceFilter] = useState('all')
   const [loadedImages, setLoadedImages] = useState({})
+  const [outlinedBlocks, setOutlinedBlocks] = useState({})
 
   const filtered = (filter === 'all'
     ? COMPONENT_LIBRARY
@@ -51,27 +53,31 @@ export default function Composer() {
 
   const sliceAngle = (Math.PI * 2) / folds
 
-  // 预加载元素图片
+  // 预加载元素图片 + 预渲染轮廓块
   useEffect(() => {
     realElements.forEach(el => {
       if (loadedImages[el.id]) return
       const img = new Image()
       img.src = `/elements/${el.file}`
-      img.onload = () => setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+      img.onload = () => {
+        setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+        const block = createOutlinedBlock(img)
+        setOutlinedBlocks(prev => ({ ...prev, [el.id]: block }))
+      }
     })
   }, [realElements])
 
   // ── 绘制 ──────────────────────────────────────────
 
   const drawElementOnCanvas = useCallback((ctx, elementId, x, y, size, rotation = 0) => {
-    const img = loadedImages[elementId]
-    if (!img) return
+    const block = outlinedBlocks[elementId] || loadedImages[elementId]
+    if (!block) return
     ctx.save()
     ctx.translate(x, y)
     ctx.rotate(rotation * Math.PI / 180)
-    ctx.drawImage(img, -size / 2, -size / 2, size, size)
+    ctx.drawImage(block, -size / 2, -size / 2, size, size)
     ctx.restore()
-  }, [loadedImages])
+  }, [loadedImages, outlinedBlocks])
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current

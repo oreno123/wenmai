@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹脉 — 批量纹样生成器</title>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0F0F10; color: #F5F1E8;
+    font-family: 'Noto Serif SC', Georgia, serif;
+    padding: 24px; min-height: 100vh;
+  }
+  h1 { color: #F2D58A; font-size: 22px; margin-bottom: 8px; letter-spacing: 2; }
+  .sub { color: #8A8A8A; font-size: 13px; margin-bottom: 24px; }
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .controls label { font-size: 13px; color: #D4AF6A; }
+  .controls select, .controls button {
+    padding: 6px 14px; border-radius: 8px; font-size: 13px;
+    border: 1px solid rgba(212,175,106,0.2); cursor: pointer;
+    font-family: inherit;
+  }
+  .controls select {
+    background: rgba(255,255,255,0.04); color: #F5F1E8;
+  }
+  .btn-go {
+    background: linear-gradient(145deg, #C9943A, #8B6914);
+    color: #F5F1E8; border: 1px solid rgba(201,148,58,0.4);
+    padding: 8px 24px; font-weight: 600; letter-spacing: 1;
+  }
+  .btn-go:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-stop {
+    background: rgba(255,255,255,0.04); color: #E85D5D;
+    border-color: rgba(232,93,93,0.2);
+  }
+  .progress { margin-bottom: 20px; font-size: 13px; color: #8A8A8A; }
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2; margin-top: 6px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #C9943A, #F2D58A); border-radius: 2; transition: width 0.3s; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: #1A1A1C; border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: border-color 0.2s;
+  }
+  .card.done { border-color: rgba(201,148,58,0.3); }
+  .card.fail { border-color: rgba(232,93,93,0.3); }
+  .card-img {
+    width: 100%; aspect-ratio: 1; object-fit: contain;
+    background: #F5F0E6; display: flex; align-items: center; justify-content: center;
+  }
+  .card-img img { max-width: 100%; max-height: 100%; }
+  .card-img .placeholder { color: #6A6A6A; font-size: 12px; }
+  .card-info { padding: 10px 12px; }
+  .card-name { font-size: 14px; color: #F2D58A; font-weight: 600; margin-bottom: 2px; }
+  .card-status { font-size: 11px; }
+  .card-status.pending { color: #6A6A6A; }
+  .card-status.running { color: #D4AF6A; }
+  .card-status.done { color: #5DAE5D; }
+  .card-status.fail { color: #E85D5D; }
+  .card-actions { padding: 0 12px 10px; display: flex; gap: 6px; }
+  .card-actions button {
+    font-size: 11px; padding: 3px 10px; border-radius: 6px;
+    background: rgba(255,255,255,0.04); color: #D4AF6A;
+    border: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+    font-family: inherit;
+  }
+  .log {
+    margin-top: 20px; padding: 12px; border-radius: 8px;
+    background: rgba(0,0,0,0.3); max-height: 200px; overflow-y: auto;
+    font-size: 12px; color: #6A6A6A; font-family: monospace;
+  }
+</style>
+</head>
+<body>
+
+<h1>纹脉 · 批量纹样生成器</h1>
+<p class="sub">使用 Puter.js 免费出图，支持 Ideogram / Flux / Gemini / Seedream 等模型</p>
+
+<div class="controls">
+  <label>模型</label>
+  <select id="model">
+    <option value="ideogram/ideogram-3.0">Ideogram 3.0（推荐线条图案）</option>
+    <option value="black-forest-labs/flux-1.1-pro">Flux 1.1 Pro（最佳细节）</option>
+    <option value="ByteDance-Seed/Seedream-3.0">Seedream 3.0（字节）</option>
+    <option value="gemini-2.5-flash-image-preview">Gemini Flash（最快）</option>
+    <option value="gpt-image-2">GPT Image 2</option>
+  </select>
+  <button class="btn-go" id="startBtn" onclick="startBatch()">开始生成</button>
+  <button class="btn-stop" id="stopBtn" onclick="stopBatch()" style="display:none">停止</button>
+  <button onclick="downloadAll()" style="background:rgba(255,255,255,0.04);color:#D4AF6A;border:1px solid rgba(255,255,255,0.06);padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;">下载全部</button>
+</div>
+
+<div class="progress">
+  <span id="progressText">0 / 0 完成</span>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="log" id="log"></div>
+
+<script>
+const PROMPTS = [
+  { id: 'ruyi_cloud', name: '如意云纹', en: 'Traditional Chinese ruyi cloud pattern, stylized cloud scrolls with inward-curving terminals, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'flowing_cloud', name: '流云纹', en: 'Traditional Chinese flowing cloud pattern (liuyun), dynamic cloud wisps trailing horizontally, Han dynasty style, circular composition, golden line art on cream paper background, fine gongbi painting style, asymmetric flow, no shadow, 2048x2048' },
+  { id: 'auspicious_cloud', name: '祥云纹', en: 'Traditional Chinese auspicious cloud pattern (xiangyun), layered cloud scrolls with five-petal terminals, Tang dynasty style, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'floral_cloud', name: '朵云纹', en: 'Traditional Chinese floral cloud pattern (duoyun), cloud clusters like flower blossoms, Song dynasty style, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'taotie_shang', name: '饕餮纹·商', en: 'Traditional Chinese taotie beast mask pattern, Shang dynasty bronze style, frontal symmetric animal face with prominent eyes and horns, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'taotie_zhou', name: '饕餮纹·周', en: 'Traditional Chinese taotie beast mask pattern, Western Zhou dynasty style, more refined and elongated animal face with curled patterns, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'kuilong_taotie', name: '夔龙饕餮纹', en: 'Traditional Chinese kuilong-taotie composite pattern, Warring States style, beast face flanked by two kuilong dragons, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'panlong', name: '蟠龙纹', en: 'Traditional Chinese coiled dragon pattern (panlong), Han dynasty style, dragon body coiled in circular form, scales and claws visible, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'xinglong', name: '行龙纹', en: 'Traditional Chinese walking dragon pattern (xinglong), Tang dynasty style, dragon striding sideways with flowing mane, dynamic pose, circular composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'shenglong', name: '升龙纹', en: 'Traditional Chinese ascending dragon pattern (shenglong), Ming dynasty style, dragon rising upward with five claws, imperial style, circular composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'baoxiang_scroll', name: '宝相花卷草', en: 'Traditional Chinese baoxiang flower scroll pattern, Tang dynasty style, composite floral-scroll motif with lotus and peony elements, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'wanzi', name: '万字纹', en: 'Traditional Chinese wan (swastika) pattern, repeating geometric swastika fret, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'ruyi_corner', name: '如意角花', en: 'Traditional Chinese ruyi corner ornament, ruyi-scepter head motif for corner decoration, quarter-circle composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'phoenix_corner', name: '凤鸟角花', en: 'Traditional Chinese phoenix corner ornament, stylized feng bird motif for corner decoration, quarter-circle composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  // 山海经神兽
+  { id: 'jiuwei_hu', name: '九尾狐', en: 'Traditional Chinese nine-tailed fox (jiuwei hu) from Classic of Mountains and Seas, mythical fox with nine flowing tails, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'zhulong', name: '烛龙', en: 'Traditional Chinese Torch Dragon (zhulong) from Classic of Mountains and Seas, giant dragon with human face holding a torch, eyes glowing like sun and moon, circular composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'qiongqi', name: '穷奇', en: 'Traditional Chinese Qiongqi beast from Classic of Mountains and Seas, winged tiger-like creature with hedgehog quills, fierce mythical beast, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'taowu', name: '梼杌', en: 'Traditional Chinese Taowu beast from Classic of Mountains and Seas, tiger-like creature with human face, boar tusks, and long tail, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'hundun', name: '混沌', en: 'Traditional Chinese Hundun (Chaos) from Classic of Mountains and Seas, formless bag-like creature with no face but six legs and four wings, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'bifang', name: '毕方', en: 'Traditional Chinese Bifang bird from Classic of Mountains and Seas, one-legged crane-like bird with blue feathers and red beak, fire bird, circular composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'dijiang', name: '帝江', en: 'Traditional Chinese Dijiang from Classic of Mountains and Seas, round red creature with six legs and four wings, no face, dancing creature, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'luan_bird', name: '鸾鸟', en: 'Traditional Chinese Luan bird from Classic of Mountains and Seas, sacred five-colored phoenix-like bird, majestic tail feathers, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+  { id: 'jingwei', name: '精卫', en: 'Traditional Chinese Jingwei bird from Classic of Mountains and Seas, mythical bird with patterned head and white beak carrying stones to fill the sea, circular composition, golden line art on cream paper background, fine gongbi painting style, no shadow, 2048x2048' },
+  { id: 'baize', name: '白泽', en: 'Traditional Chinese Baize beast from Classic of Mountains and Seas, wise ox-like creature with nine eyes and six horns, divine beast of knowledge, circular composition, golden line art on cream paper background, fine gongbi painting style, symmetric, no shadow, 2048x2048' },
+];
+
+const state = { results: {}, running: false, stop: false };
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = PROMPTS.map(p => `
+    <div class="card ${state.results[p.id] ? 'done' : ''}" id="card-${p.id}">
+      <div class="card-img">
+        ${state.results[p.id]
+          ? `<img src="${state.results[p.id].blobURL}" alt="${p.name}" />`
+          : '<span class="placeholder">待生成</span>'}
+      </div>
+      <div class="card-info">
+        <div class="card-name">${p.name}</div>
+        <div class="card-status ${state.results[p.id] ? 'done' : 'pending'}" id="status-${p.id}">
+          ${state.results[p.id] ? '已完成' : '等待中'}
+        </div>
+      </div>
+      <div class="card-actions">
+        ${state.results[p.id] ? `
+          <button onclick="downloadOne('${p.id}', '${p.name}')">保存</button>
+          <button onclick="regenerate('${p.id}')">重新生成</button>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function log(msg) {
+  const el = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML += `[${time}] ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateProgress() {
+  const done = Object.keys(state.results).length;
+  const total = PROMPTS.length;
+  document.getElementById('progressText').textContent = `${done} / ${total} 完成`;
+  document.getElementById('progressFill').style.width = `${(done / total) * 100}%`;
+}
+
+function setStatus(id, status) {
+  const el = document.getElementById(`status-${id}`);
+  if (el) {
+    el.className = `card-status ${status}`;
+    el.textContent = status === 'running' ? '生成中...' :
+                     status === 'done' ? '已完成' :
+                     status === 'fail' ? '失败' : '等待中';
+  }
+  const card = document.getElementById(`card-${id}`);
+  if (card) card.className = `card ${status === 'done' ? 'done' : status === 'fail' ? 'fail' : ''}`;
+}
+
+async function generateOne(p) {
+  const model = document.getElementById('model').value;
+  setStatus(p.id, 'running');
+  log(`生成 "${p.name}" (模型: ${model})...`);
+
+  try {
+    const img = await puter.ai.txt2img(p.en, { model });
+    // Fetch the image as blob to bypass CORS canvas taint
+    const src = img.src;
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    const blobURL = URL.createObjectURL(blob);
+    state.results[p.id] = { blobURL, blob, width: img.naturalWidth || img.width, height: img.naturalHeight || img.height };
+    setStatus(p.id, 'done');
+    log(`"${p.name}" 生成完成 (${state.results[p.id].width}x${state.results[p.id].height})`);
+    renderGrid();
+    updateProgress();
+    return true;
+  } catch (err) {
+    setStatus(p.id, 'fail');
+    log(`"${p.name}" 失败: ${err.message}`);
+    renderGrid();
+    return false;
+  }
+}
+
+async function startBatch() {
+  if (state.running) return;
+  state.running = true;
+  state.stop = false;
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = '';
+
+  const pending = PROMPTS.filter(p => !state.results[p.id]);
+  log(`开始批量生成 ${pending.length} 个纹样...`);
+
+  for (const p of pending) {
+    if (state.stop) { log('已停止'); break; }
+    await generateOne(p);
+    // Rate limit: wait 2s between requests
+    if (!state.stop) await new Promise(r => setTimeout(r, 2000));
+  }
+
+  state.running = false;
+  document.getElementById('startBtn').style.display = '';
+  document.getElementById('stopBtn').style.display = 'none';
+  log('批量生成结束');
+}
+
+function stopBatch() {
+  state.stop = true;
+}
+
+function downloadOne(id, name) {
+  const result = state.results[id];
+  if (!result) return;
+  const link = document.createElement('a');
+  link.download = `wenmai-${id}.png`;
+  link.href = result.blobURL;
+  link.click();
+}
+
+async function regenerate(id) {
+  const p = PROMPTS.find(p => p.id === id);
+  if (p) await generateOne(p);
+}
+
+function downloadAll() {
+  const entries = Object.entries(state.results);
+  if (entries.length === 0) { alert('还没有生成任何图片'); return; }
+  for (const [id, result] of entries) {
+    const link = document.createElement('a');
+    link.download = `wenmai-${id}.png`;
+    link.href = result.blobURL;
+    link.click();
+  }
+  log(`已下载 ${entries.length} 张图片`);
+}
+
+renderGrid();
+updateProgress();
+</script>
+</body>
+</html>

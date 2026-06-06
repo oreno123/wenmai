@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>元素块效果预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0A0A0B; color: #ccc; font-family: system-ui, sans-serif; padding: 20px; }
+  h2 { color: #F2D58A; margin: 20px 0 10px; font-size: 16px; }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+  .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 12px; padding: 12px; text-align: center; }
+  .card span { display: block; font-size: 11px; color: #6A6A6A; margin-top: 6px; }
+  canvas { border-radius: 8px; display: block; }
+  .label { font-size: 12px; color: #9A9A9A; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<h1 style="font-size:18px;color:#F2D58A">元素块效果预览</h1>
+<p style="font-size:13px;color:#6A6A6A;margin:8px 0 20px">对比 4 种渲染方式，看哪个像"拼图块"</p>
+<div id="app"></div>
+
+<script>
+const ELEMENTS = [
+  { file: 'tuanlong_elem_01.png', name: '团龙-龙首' },
+  { file: 'tuanlong_elem_06.png', name: '团龙-鳞片' },
+  { file: 'yunlei_elem_05.png', name: '云雷-方块' },
+  { file: 'yunlei_elem_14.png', name: '云雷-角花' },
+  { file: 'yunlei_elem_00.png', name: '云雷-整体' },
+]
+
+const DISPLAY = 150
+const app = document.getElementById('app')
+
+async function traceContour(img, size) {
+  const c = document.createElement('canvas')
+  c.width = size; c.height = size
+  const ctx = c.getContext('2d')
+
+  const scale = size / Math.max(img.width, img.height)
+  const w = img.width * scale, h = img.height * scale
+  const ox = (size - w) / 2, oy = (size - h) / 2
+  ctx.drawImage(img, ox, oy, w, h)
+
+  const data = ctx.getImageData(0, 0, size, size).data
+  const raw = new Uint8Array(size * size)
+  for (let i = 0; i < raw.length; i++) raw[i] = data[i * 4 + 3]
+
+  // Clean alpha: box blur + threshold → closes anti-aliasing gaps
+  const alpha = new Uint8Array(size * size)
+  const r = 2
+  for (let y = r; y < size - r; y++) {
+    for (let x = r; x < size - r; x++) {
+      let sum = 0
+      for (let dy = -r; dy <= r; dy++)
+        for (let dx = -r; dx <= r; dx++)
+          sum += raw[(y+dy) * size + (x+dx)]
+      alpha[y * size + x] = (sum / ((2*r+1) ** 2)) > 35 ? 255 : 0
+    }
+  }
+
+  return { alpha, w, h, ox, oy }
+}
+
+function renderA(ctx, img, size) {
+  // A: 原图 + 金色 box 描边（当前方式）
+  ctx.clearRect(0, 0, size, size)
+  const scale = size / Math.max(img.width, img.height)
+  const w = img.width * scale, h = img.height * scale
+  const ox = (size - w) / 2, oy = (size - h) / 2
+
+  ctx.shadowColor = 'rgba(201,168,76,0.3)'
+  ctx.shadowBlur = 10
+  ctx.drawImage(img, ox, oy, w, h)
+  ctx.shadowColor = 'transparent'
+
+  ctx.strokeStyle = 'rgba(201,168,76,0.5)'
+  ctx.lineWidth = 2
+  ctx.strokeRect(ox + 2, oy + 2, w - 4, h - 4)
+}
+
+function renderB(ctx, img, size, contour) {
+  // B: 沿 alpha 轮廓描边（边缘检测）
+  ctx.clearRect(0, 0, size, size)
+  const { alpha } = contour
+
+  ctx.shadowColor = 'rgba(0,0,0,0.4)'
+  ctx.shadowBlur = 8
+  ctx.drawImage(img, contour.ox, contour.oy, contour.w, contour.h)
+  ctx.shadowColor = 'transparent'
+
+  // Edge detection: draw gold on pixels where alpha transitions
+  ctx.fillStyle = 'rgba(201,168,76,0.7)'
+  for (let y = 1; y < size - 1; y++) {
+    for (let x = 1; x < size - 1; x++) {
+      const i = y * size + x
+      const a = alpha[i]
+      if (a > 30) {
+        // Check if any neighbor is transparent
+        const neighbors = [alpha[i-1], alpha[i+1], alpha[i-size], alpha[i+size]]
+        if (neighbors.some(n => n < 30)) {
+          ctx.fillRect(x, y, 1, 1)
+        }
+      }
+    }
+  }
+}
+
+function renderC(ctx, img, size, contour) {
+  // C: 暗底填充 + 金色轮廓 + 内发光
+  ctx.clearRect(0, 0, size, size)
+  const { alpha } = contour
+
+  // Fill shape with dark background
+  const imgData = ctx.getImageData(0, 0, size, size)
+  const d = imgData.data
+  for (let i = 0; i < alpha.length; i++) {
+    if (alpha[i] > 30) {
+      d[i*4] = 22; d[i*4+1] = 20; d[i*4+2] = 18; d[i*4+3] = 255
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+
+  // Draw image on top with multiply-ish blend
+  ctx.globalCompositeOperation = 'source-atop'
+  ctx.drawImage(img, contour.ox, contour.oy, contour.w, contour.h)
+  ctx.globalCompositeOperation = 'source-over'
+
+  // Gold contour (thicker, 2px)
+  ctx.fillStyle = '#C9A84C'
+  for (let y = 2; y < size - 2; y++) {
+    for (let x = 2; x < size - 2; x++) {
+      const i = y * size + x
+      if (alpha[i] > 30) {
+        // Check 2px ring for transparency
+        const ring = [
+          alpha[i-2], alpha[i+2], alpha[i-size*2], alpha[i+size*2],
+          alpha[i-size-1], alpha[i-size+1], alpha[i+size-1], alpha[i+size+1]
+        ]
+        if (ring.some(n => n < 30)) {
+          ctx.fillRect(x-0.5, y-0.5, 2, 2)
+        }
+      }
+    }
+  }
+}
+
+function renderD(ctx, img, size, contour) {
+  // D: 扩张底板 + 连续外框（泛洪填充 → 只保留一个外部轮廓）
+  ctx.clearRect(0, 0, size, size)
+  const { alpha, w, h, ox, oy } = contour
+
+  // Flood-fill from canvas edges to find "outside" region
+  const mask = new Uint8Array(size * size)
+  for (let i = 0; i < alpha.length; i++) mask[i] = alpha[i] ? 1 : 0
+
+  const outside = new Uint8Array(size * size)
+  const queue = []
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++)
+      if ((y === 0 || y === size-1 || x === 0 || x === size-1) && !mask[y*size+x]) {
+        outside[y*size+x] = 1
+        queue.push(y * size + x)
+      }
+  let head = 0
+  while (head < queue.length) {
+    const i = queue[head++]
+    const x = i % size, y = (i - x) / size
+    const nb = [i-1, i+1, i-size, i+size]
+    for (const ni of nb) {
+      const nx = ni % size, ny = (ni - nx) / size
+      if (nx >= 0 && nx < size && ny >= 0 && ny < size && !outside[ni] && !mask[ni]) {
+        outside[ni] = 1
+        queue.push(ni)
+      }
+    }
+  }
+
+  // Solid = everything NOT outside (all internal holes filled)
+  const solid = new Uint8Array(size * size)
+  for (let i = 0; i < solid.length; i++) solid[i] = outside[i] ? 0 : 1
+
+  // Dilate solid for outline band
+  const pad = 4
+  const dilated = new Uint8Array(size * size)
+  for (let y = pad; y < size - pad; y++)
+    for (let x = pad; x < size - pad; x++)
+      if (solid[y * size + x])
+        for (let dy = -pad; dy <= pad; dy++)
+          for (let dx = -pad; dx <= pad; dx++)
+            if (dx*dx + dy*dy <= pad*pad + 2) dilated[(y+dy) * size + (x+dx)] = 1
+
+  // Outline (dilated − solid) + backing
+  const imgData = ctx.createImageData(size, size)
+  const d = imgData.data
+  for (let i = 0; i < dilated.length; i++) {
+    if (dilated[i] && !solid[i]) {
+      d[i*4] = 235; d[i*4+1] = 225; d[i*4+2] = 200; d[i*4+3] = 255
+    } else if (solid[i]) {
+      d[i*4] = 18; d[i*4+1] = 16; d[i*4+2] = 14; d[i*4+3] = 255
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+  ctx.drawImage(img, ox, oy, w, h)
+}
+
+const STYLES = [
+  { label: 'A: 方框描边（当前）', render: renderA, needContour: false },
+  { label: 'B: 边缘检测描边', render: renderB, needContour: true },
+  { label: 'C: 暗底填充+金色轮廓', render: renderC, needContour: true },
+  { label: 'D: 扩张底板+连续外框 ★', render: renderD, needContour: true },
+]
+
+async function init() {
+  for (const style of STYLES) {
+    const h2 = document.createElement('h2')
+    h2.textContent = style.label
+    app.appendChild(h2)
+
+    const row = document.createElement('div')
+    row.className = 'row'
+
+    for (const el of ELEMENTS) {
+      const img = new Image()
+      img.src = `/elements/${el.file}`
+      await new Promise(r => { img.onload = r; img.onerror = r })
+
+      const contour = style.needContour ? await traceContour(img, DISPLAY) : null
+
+      const card = document.createElement('div')
+      card.className = 'card'
+
+      const label = document.createElement('div')
+      label.className = 'label'
+      label.textContent = el.name
+      card.appendChild(label)
+
+      const canvas = document.createElement('canvas')
+      canvas.width = DISPLAY
+      canvas.height = DISPLAY
+      canvas.style.width = DISPLAY + 'px'
+      canvas.style.height = DISPLAY + 'px'
+      canvas.style.background = '#1a1a1a'
+
+      const ctx = canvas.getContext('2d')
+      style.render(ctx, img, DISPLAY, contour)
+
+      card.appendChild(canvas)
+      row.appendChild(card)
+    }
+
+    app.appendChild(row)
+  }
+}
+
+init()
+</script>
+</body>
+</html>
