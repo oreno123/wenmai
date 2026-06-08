@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
 import { useNavigate } from '../components/common/Router'
 import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/patternData'
+import PatternImage from '../components/common/PatternImage'
 
 const PATTERNS_WITH_IMAGES = PATTERN_LIBRARY.filter(p => p.image || p.procedural)
 
@@ -283,7 +284,7 @@ export default function Landing() {
                   aspectRatio: '1 / 1.15',
                   cursor: 'pointer',
                 }}>
-                  <img src={getPatternImage(p)} alt={p.name} loading="lazy"
+                  <PatternImage src={getPatternImage(p)} alt={p.name} loading="lazy"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
                   />
                   <div style={{

@@ -22,6 +22,7 @@ export default function useHandGesture() {
 
   useEffect(() => {
     let cancelled = false
+    let paused = false
     const video = document.createElement('video')
     video.playsInline = true
     video.muted = true
@@ -67,8 +68,15 @@ export default function useHandGesture() {
       }
     }
 
+    // Pause detection when tab is hidden
+    const onVisibilityChange = () => {
+      paused = document.hidden
+      if (!paused && !cancelled && handLandmarkerRef.current) detect()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
     function detect() {
-      if (cancelled) return
+      if (cancelled || paused) return
       const hl = handLandmarkerRef.current
       const vid = videoRef.current
       if (!hl || !vid || vid.readyState < 2) {
@@ -143,6 +151,7 @@ export default function useHandGesture() {
 
     return () => {
       cancelled = true
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       if (videoRef.current) {
         const s = videoRef.current.srcObject

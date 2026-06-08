@@ -41,39 +41,30 @@ export default function BottomNav() {
   const navigate = useNavigate()
 
   return (
-    <nav style={{
-      position: 'fixed', bottom: 0,
-      left: '50%', transform: 'translateX(-50%)',
-      width: '100%', maxWidth: '600px', height: 64,
-      background: 'rgba(10,10,10,0.95)',
-      borderTop: '1px solid rgba(212,175,106,0.12)',
-      backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-      display: 'flex', alignItems: 'flex-end',
-      justifyContent: 'space-around',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-      zIndex: 100,
-    }}>
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-16 flex items-end justify-around z-[100]"
+      style={{
+        background: 'rgba(10,10,10,0.95)',
+        borderTop: '1px solid rgba(212,175,106,0.12)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}>
       {TABS.map(tab => {
         const active = pathname === tab.path
         const color = active ? '#F2D58A' : '#4A4A4A'
 
         if (tab.center) {
           return (
-            <button key={tab.path} onClick={() => navigate(tab.path)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              position: 'relative', bottom: 8,
-              fontFamily: 'inherit',
-            }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: '50%',
-                background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 0 20px rgba(188,107,47,0.4)',
-              }}>
+            <button key={tab.path} onClick={() => navigate(tab.path)}
+              className="bg-transparent border-none cursor-pointer flex flex-col items-center relative bottom-2 font-serif">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)',
+                  boxShadow: '0 0 20px rgba(188,107,47,0.4)',
+                }}>
                 {ICONS[tab.icon]('#F5F1E8')}
               </div>
-              <span style={{ fontSize: 10, color: active ? '#F2D58A' : '#4A4A4A', marginTop: 2 }}>
+              <span className={`text-[10px] mt-0.5 ${active ? 'text-gold-bright' : 'text-text-dim'}`}>
                 {tab.label}
               </span>
             </button>
@@ -81,20 +72,14 @@ export default function BottomNav() {
         }
 
         return (
-          <button key={tab.path} onClick={() => navigate(tab.path)} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            gap: 2, padding: '6px 0', fontFamily: 'inherit',
-          }}>
+          <button key={tab.path} onClick={() => navigate(tab.path)}
+            className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5 py-1.5 font-serif relative">
             {ICONS[tab.icon](color)}
-            <span style={{ fontSize: 10, color }}>
+            <span className="text-[10px]" style={{ color }}>
               {tab.label}
             </span>
             {active && (
-              <div style={{
-                width: 16, height: 2, background: '#F2D58A', borderRadius: 1,
-                position: 'absolute', bottom: 8,
-              }} />
+              <div className="w-4 h-0.5 bg-gold-bright rounded-sm absolute bottom-2" />
             )}
           </button>
         )

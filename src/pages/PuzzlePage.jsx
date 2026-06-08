@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from '../components/common/Router'
+import { useApp } from '../store/AppState'
 import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
 import APPROVED_IDS from '../../public/elements/approved.json'
 import { createOutlinedBlock } from '../utils/blockOutline'
@@ -33,6 +34,7 @@ const SOURCE_NAMES = {
 export default function PuzzlePage() {
   const canvasRef = useRef(null)
   const navigate = useNavigate()
+  const { saveCreation } = useApp()
   const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation }
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [dragging, setDragging] = useState(null)
@@ -43,6 +45,7 @@ export default function PuzzlePage() {
   const [showTray, setShowTray] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
   const [completedImage, setCompletedImage] = useState(null)
+  const [saved, setSaved] = useState(false)
 
   const approvedSet = getApprovedSet()
   const allApproved = ELEMENT_MANIFEST.elements.filter(e => approvedSet.has(e.id))
@@ -322,6 +325,14 @@ export default function PuzzlePage() {
     setShowPreview(true)
   }, [placements.length])
 
+  const saveToLibrary = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas || placements.length === 0) return
+    saveCreation(canvas.toDataURL('image/jpeg', 0.7), 'puzzle')
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [placements.length, saveCreation])
+
   const clearCanvas = useCallback(() => {
     setPlacements([])
     setSelectedIdx(-1)
@@ -350,6 +361,12 @@ export default function PuzzlePage() {
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button onClick={clearCanvas} style={btnStyle}>清空</button>
+          <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
+            ...btnStyle,
+            background: saved ? 'rgba(100,180,100,0.15)' : placements.length === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(212,175,106,0.12)',
+            color: saved ? '#6B6' : placements.length === 0 ? '#5A5A5A' : '#D4AF6A',
+            opacity: placements.length === 0 ? 0.5 : 1,
+          }}>{saved ? '已保存' : '保存'}</button>
           <button onClick={exportPNG} style={btnStyle}>导出</button>
           <button
             onClick={finishCreation}

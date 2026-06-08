@@ -1,32 +1,55 @@
+import { lazy, Suspense } from 'react'
 import { RouterProvider, useLocation } from './components/common/Router'
 import { AppProvider } from './store/AppState'
 import BottomNav from './components/common/BottomNav'
 import GoldBackground from './components/common/GoldBackground'
-import SplashPage from './pages/SplashPage'
-import Landing from './pages/Landing'
-import Home from './pages/Home'
-import Library from './pages/Library'
-import GachaPage from './pages/GachaPage'
-import Editor from './pages/Editor'
-import Composer from './pages/Composer'
-import PuzzlePage from './pages/PuzzlePage'
-import JigsawPage from './pages/JigsawPage'
-import CuratePage from './pages/CuratePage'
-import Showcase from './pages/Showcase'
+import ErrorBoundary from './components/common/ErrorBoundary'
+
+const SplashPage = lazy(() => import('./pages/SplashPage'))
+const Landing = lazy(() => import('./pages/Landing'))
+const Home = lazy(() => import('./pages/Home'))
+const Library = lazy(() => import('./pages/Library'))
+const GachaPage = lazy(() => import('./pages/GachaPage'))
+const Editor = lazy(() => import('./pages/Editor'))
+const Composer = lazy(() => import('./pages/Composer'))
+const PuzzlePage = lazy(() => import('./pages/PuzzlePage'))
+const JigsawPage = lazy(() => import('./pages/JigsawPage'))
+const CuratePage = lazy(() => import('./pages/CuratePage'))
+const Showcase = lazy(() => import('./pages/Showcase'))
+
+function PageLoader() {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, display: 'flex',
+      alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg-primary, #0C0A0E)',
+      color: 'rgba(201,162,60,0.5)', fontSize: 24,
+    }}>
+      ☯
+    </div>
+  )
+}
 
 function Pages() {
   const { pathname } = useLocation()
-  if (pathname === '/showcase') return <Showcase />
-  if (pathname === '/home') return <Home />
-  if (pathname === '/library') return <Library />
-  if (pathname === '/gacha') return <GachaPage />
-  if (pathname === '/editor') return <Editor />
-  if (pathname === '/composer') return <Composer />
-  if (pathname === '/puzzle') return <PuzzlePage />
-  if (pathname === '/jigsaw') return <JigsawPage />
-  if (pathname === '/curate') return <CuratePage />
-  if (pathname === '/landing') return <Landing />
-  return <SplashPage />
+  let Page
+  if (pathname === '/showcase') Page = Showcase
+  else if (pathname === '/home') Page = Home
+  else if (pathname === '/library') Page = Library
+  else if (pathname === '/gacha') Page = GachaPage
+  else if (pathname === '/editor') Page = Editor
+  else if (pathname === '/composer') Page = Composer
+  else if (pathname === '/puzzle') Page = PuzzlePage
+  else if (pathname === '/jigsaw') Page = JigsawPage
+  else if (pathname === '/curate') Page = CuratePage
+  else if (pathname === '/landing') Page = Landing
+  else Page = SplashPage
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Page />
+    </Suspense>
+  )
 }
 
 function Layout() {
@@ -45,11 +68,13 @@ function Layout() {
 
 export default function App() {
   return (
-    <RouterProvider>
-      <AppProvider>
-        <GoldBackground />
-        <Layout />
-      </AppProvider>
-    </RouterProvider>
+    <ErrorBoundary>
+      <RouterProvider>
+        <AppProvider>
+          <GoldBackground />
+          <Layout />
+        </AppProvider>
+      </RouterProvider>
+    </ErrorBoundary>
   )
 }

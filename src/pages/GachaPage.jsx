@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react'
 import { useApp } from '../store/AppState'
 import { getRandomPattern, getRarityLabel, getPatternImage } from '../store/patternData'
+import { PULL_COST } from '../constants'
+import PatternImage from '../components/common/PatternImage'
 
 /* 太极 + 能量环 SVG */
 function YinYangSymbol({ size = 120, bloom = false }) {
@@ -39,30 +41,32 @@ function YinYangSymbol({ size = 120, bloom = false }) {
 }
 
 export default function GachaPage() {
-  const { data, doPull, addToLibrary, addPoints } = useApp()
+  const { data, doPull, addToLibrary, incrementPity, resetPity } = useApp()
   const [state, setState] = useState('idle')
   const [result, setResult] = useState(null)
   const [showBurst, setShowBurst] = useState(false)
 
-  const cost = data.freePulls > 0 ? 0 : 10
-  const canAfford = true
+  const cost = data.freePulls > 0 ? 0 : PULL_COST
+  const canAfford = data.freePulls > 0 || data.points >= cost
 
   const handlePull = useCallback(() => {
-    if (state !== 'idle') return
-    // 扣积分，不够就自动补
-    if (!doPull()) {
-      addPoints(30)
-      doPull()
-    }
+    if (state !== 'idle' || !canAfford) return
+    doPull()
     setState('pulling')
-    const p = getRandomPattern()
+    const p = getRandomPattern(data.pityCounter || 0)
     setResult(p)
     setTimeout(() => {
       addToLibrary(p.id)
+      if (p.rarity === 'ssr') {
+        resetPity()
+        setShowBurst(true)
+        setTimeout(() => setShowBurst(false), 2500)
+      } else {
+        incrementPity()
+      }
       setState('revealed')
-      if (p.rarity === 'ssr') { setShowBurst(true); setTimeout(() => setShowBurst(false), 2500) }
     }, 2200)
-  }, [doPull, addToLibrary, addPoints, state])
+  }, [doPull, addToLibrary, incrementPity, resetPity, canAfford, state, data.pityCounter])
 
   const handleReset = () => { setState('idle'); setResult(null); setShowBurst(false) }
 
@@ -202,11 +206,7 @@ export default function GachaPage() {
                 alignItems: 'center', justifyContent: 'center',
                 padding: '16px',
               }}>
-                {getPatternImage(result) ? (
-                  <img src={getPatternImage(result)} alt={result.name} style={{ maxWidth: '85%', maxHeight: '65%', objectFit: 'contain' }} />
-                ) : (
-                  <YinYangSymbol size={120} bloom />
-                )}
+                <PatternImage src={getPatternImage(result)} alt={result.name} fallbackSize={120} style={{ maxWidth: '85%', maxHeight: '65%', objectFit: 'contain' }} />
                 <span className={`rarity-badge rarity-${result.rarity}`} style={{ marginTop: '12px', fontSize: '12px', padding: '4px 12px' }}>
                   {getRarityLabel(result.rarity)}
                 </span>
@@ -273,26 +273,20 @@ export default function GachaPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: '12px',
               }}>
-                {getPatternImage(result) ? (
-                  <img
-                    src={getPatternImage(result)}
-                    alt={result.name}
-                    style={{
-                      maxWidth: '90%', maxHeight: '100%', objectFit: 'contain',
-                      filter: result.rarity === 'ssr'
-                        ? 'drop-shadow(0 0 16px rgba(201,162,60,0.35))'
-                        : result.rarity === 'rare'
-                        ? 'drop-shadow(0 0 8px rgba(201,162,60,0.15))'
-                        : 'none',
-                      animation: result.rarity === 'ssr' ? 'breathe 2.5s ease-in-out infinite' : 'none',
-                    }}
-                  />
-                ) : (
-                  <YinYangSymbol
-                    size={result.rarity === 'ssr' ? 160 : 130}
-                    bloom={result.rarity !== 'common'}
-                  />
-                )}
+                <PatternImage
+                  src={getPatternImage(result)}
+                  alt={result.name}
+                  fallbackSize={result.rarity === 'ssr' ? 160 : 130}
+                  style={{
+                    maxWidth: '90%', maxHeight: '100%', objectFit: 'contain',
+                    filter: result.rarity === 'ssr'
+                      ? 'drop-shadow(0 0 16px rgba(201,162,60,0.35))'
+                      : result.rarity === 'rare'
+                      ? 'drop-shadow(0 0 8px rgba(201,162,60,0.15))'
+                      : 'none',
+                    animation: result.rarity === 'ssr' ? 'breathe 2.5s ease-in-out infinite' : 'none',
+                  }}
+                />
               </div>
 
               {/* 分隔 */}

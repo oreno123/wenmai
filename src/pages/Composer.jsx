@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../engine/componentLibrary'
+import { useApp } from '../store/AppState'
 import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
 import { createOutlinedBlock } from '../utils/blockOutline'
 
@@ -29,6 +30,8 @@ const SOURCE_NAMES = {
 
 export default function Composer() {
   const canvasRef = useRef(null)
+  const { saveCreation } = useApp()
+  const [saved, setSaved] = useState(false)
   const [folds, setFolds] = useState(4)
   const [placements, setPlacements] = useState([])
   const [selectedIdx, setSelectedIdx] = useState(-1)
@@ -354,6 +357,14 @@ export default function Composer() {
     setSelectedIdx(-1)
   }, [])
 
+  const saveToLibrary = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    saveCreation(canvas.toDataURL('image/jpeg', 0.7), 'composer')
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [saveCreation])
+
   // ── 渲染 ──────────────────────────────────────────
 
   return (
@@ -362,6 +373,11 @@ export default function Composer() {
       <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>纹样工坊</span>
         <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={saveToLibrary} style={{
+            ...btnStyle,
+            background: saved ? 'rgba(100,180,100,0.15)' : 'rgba(212,175,106,0.12)',
+            color: saved ? '#6B6' : '#D4AF6A',
+          }}>{saved ? '已保存' : '保存'}</button>
           <button onClick={exportPNG} style={{ ...btnStyle, background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)' }}>导出</button>
         </div>
       </div>

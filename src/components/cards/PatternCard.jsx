@@ -1,4 +1,5 @@
 import { getRarityLabel, getPatternImage } from '../../store/patternData'
+import PatternImage from '../common/PatternImage'
 
 export default function PatternCard({ pattern, onClick, compact = false }) {
   const isSSR = pattern.rarity === 'ssr'
@@ -50,28 +51,17 @@ export default function PatternCard({ pattern, onClick, compact = false }) {
           })}
         </svg>
 
-        {imgSrc ? (
-          <img
-            src={imgSrc}
-            alt={pattern.name}
-            style={{
-              maxWidth: '80%', maxHeight: '80%', objectFit: 'contain',
-              position: 'relative',
-              filter: isSSR ? 'drop-shadow(0 0 12px rgba(201,162,60,0.35))' : isRare ? 'drop-shadow(0 0 6px rgba(201,162,60,0.15))' : 'none',
-              animation: isSSR ? 'breathe 2.5s ease-in-out infinite' : 'none',
-            }}
-          />
-        ) : (
-          <div style={{
-            fontSize: compact ? '24px' : '36px',
+        <PatternImage
+          src={imgSrc}
+          alt={pattern.name}
+          fallbackSize={compact ? 24 : 36}
+          style={{
+            maxWidth: '80%', maxHeight: '80%', objectFit: 'contain',
             position: 'relative',
-            color: isSSR ? 'var(--gold-bright)' : isRare ? 'var(--gold-main)' : 'rgba(201,162,60,0.3)',
             filter: isSSR ? 'drop-shadow(0 0 12px rgba(201,162,60,0.35))' : isRare ? 'drop-shadow(0 0 6px rgba(201,162,60,0.15))' : 'none',
             animation: isSSR ? 'breathe 2.5s ease-in-out infinite' : 'none',
-          }}>
-            ☯
-          </div>
-        )}
+          }}
+        />
       </div>
 
       {/* 分隔 */}

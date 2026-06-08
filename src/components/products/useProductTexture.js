@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -11,6 +11,10 @@ export default function useProductTexture(canvasEl, opts = {}) {
     if (opts.repeat) t.repeat.set(opts.repeat[0], opts.repeat[1])
     return t
   }, [canvasEl])
+
+  useEffect(() => {
+    return () => { if (tex) tex.dispose() }
+  }, [tex])
 
   useFrame(() => { if (tex) tex.needsUpdate = true })
 

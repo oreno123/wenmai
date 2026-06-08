@@ -4,6 +4,7 @@ import {
   generatePuzzle, drawPiece, findSnap, hitTestPiece, generateThumbnail,
 } from '../engine/jigsawEngine'
 import { PATTERN_LIBRARY, getPatternImage } from '../store/patternData'
+import PatternImage from '../components/common/PatternImage'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -351,9 +352,10 @@ export default function JigsawPage() {
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 }}
               >
-                <img
+                <PatternImage
                   src={getPatternImage(p)}
                   alt={p.name}
+                  fallbackSize={28}
                   style={{
                     width: 64, height: 64, objectFit: 'contain',
                     background: p.series === 'shanjing' ? '#A03030' : 'transparent',

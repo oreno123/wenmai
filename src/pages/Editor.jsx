@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage } from '../store/patternData'
+import PatternImage from '../components/common/PatternImage'
 import { SYMMETRY_MODES, drawSymmetric } from '../engine/symmetry'
 import ProductScene from '../components/products/ProductScene'
 import ProductSwitcher from '../components/products/ProductSwitcher'
@@ -56,41 +57,46 @@ export default function Editor() {
     ctx.restore()
   }, [])
 
-  // Auto-generate pattern when params change
+  // Auto-generate pattern when params change (debounced)
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    const pat = myPatterns.find(p => p.id === selectedPattern)
+    const timer = setTimeout(() => {
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    if (getPatternImage(pat)) {
-      const img = new Image()
-      img.onload = () => {
+      const pat = myPatterns.find(p => p.id === selectedPattern)
+
+      if (getPatternImage(pat)) {
+        const img = new Image()
+        img.onload = () => {
+          const drawFn = (ctx, cx, cy, size) => {
+            const s = size * 0.3
+            ctx.drawImage(img, cx - s / 2, cy - s / 2, s, s)
+          }
+          drawSymmetric(ctx, drawFn, symmetryMode, canvas.width)
+          syncOffscreen()
+        }
+        img.src = getPatternImage(pat)
+      } else {
         const drawFn = (ctx, cx, cy, size) => {
-          const s = size * 0.3
-          ctx.drawImage(img, cx - s / 2, cy - s / 2, s, s)
+          ctx.save()
+          ctx.fillStyle = '#D4AF6A'
+          ctx.beginPath()
+          const r = size * 0.12
+          ctx.arc(cx - r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
+          ctx.arc(cx + r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
+          ctx.arc(cx, cy + r * 0.2, r * 0.8, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.restore()
         }
         drawSymmetric(ctx, drawFn, symmetryMode, canvas.width)
         syncOffscreen()
       }
-      img.src = getPatternImage(pat)
-    } else {
-      const drawFn = (ctx, cx, cy, size) => {
-        ctx.save()
-        ctx.fillStyle = '#D4AF6A'
-        ctx.beginPath()
-        const r = size * 0.12
-        ctx.arc(cx - r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
-        ctx.arc(cx + r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
-        ctx.arc(cx, cy + r * 0.2, r * 0.8, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.restore()
-      }
-      drawSymmetric(ctx, drawFn, symmetryMode, canvas.width)
-      syncOffscreen()
-    }
+    }, 50)
+
+    return () => clearTimeout(timer)
   }, [symmetryMode, selectedPattern, myPatterns, syncOffscreen])
 
   return (
@@ -183,11 +189,7 @@ export default function Editor() {
                   cursor: 'pointer', overflow: 'hidden',
                 }}
               >
-                {getPatternImage(p) ? (
-                  <img src={getPatternImage(p)} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span style={{ fontSize: '20px' }}>☯</span>
-                )}
+                <PatternImage src={getPatternImage(p)} alt={p.name} fallbackSize={20} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>

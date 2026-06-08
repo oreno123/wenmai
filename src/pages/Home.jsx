@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
+import PatternImage from '../components/common/PatternImage'
 
 const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
 const fadeUp = {
@@ -159,11 +160,7 @@ export default function Home() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       overflow: 'hidden',
                     }}>
-                      {imgSrc ? (
-                        <img src={imgSrc} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                      ) : (
-                        <CloudPattern size={38} opacity={0.85} />
-                      )}
+                      <PatternImage src={imgSrc} alt={p.name} fallbackSize={38} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                       <span style={{
                         position: 'absolute', top: 4, right: 4,
                         background: rarityBg, color: rarityColor, fontSize: 9,
@@ -180,6 +177,28 @@ export default function Home() {
               })}
             </motion.div>
           </motion.div>
+
+          {/* ── 我的创作 ── */}
+          {data.creations && data.creations.length > 0 && (
+            <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
+              <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span style={{ fontFamily: 'serif', fontSize: 16, color: '#F5F1E8' }}>我的创作</span>
+                <span style={{ fontSize: 12, color: '#8A6A30' }}>{data.creations.length} 件</span>
+              </motion.div>
+
+              <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10 }}>
+                {[...data.creations].reverse().map(c => (
+                  <div key={c.id} style={{
+                    aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
+                    border: '1px solid rgba(212,175,106,0.15)',
+                    background: 'linear-gradient(145deg, #1E1C16, #14120E)',
+                  }}>
+                    <img src={c.image} alt="创作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
 
           {/* ── 系列收集进度 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
