@@ -2,6 +2,7 @@ import { RouterProvider, useLocation } from './components/common/Router'
 import { AppProvider } from './store/AppState'
 import BottomNav from './components/common/BottomNav'
 import GoldBackground from './components/common/GoldBackground'
+import SplashPage from './pages/SplashPage'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
 import Library from './pages/Library'
@@ -24,18 +25,20 @@ function Pages() {
   if (pathname === '/puzzle') return <PuzzlePage />
   if (pathname === '/jigsaw') return <JigsawPage />
   if (pathname === '/curate') return <CuratePage />
-  return <Landing />
+  if (pathname === '/landing') return <Landing />
+  return <SplashPage />
 }
 
 function Layout() {
   const { pathname } = useLocation()
-  const isLanding = pathname === '/' || pathname === ''
+  const isSplash = pathname === '/' || pathname === ''
+  const isLanding = pathname === '/landing'
   const isShowcase = pathname === '/showcase'
 
   return (
     <>
       <Pages />
-      {!isLanding && !isShowcase && <BottomNav />}
+      {!isSplash && !isLanding && !isShowcase && <BottomNav />}
     </>
   )
 }

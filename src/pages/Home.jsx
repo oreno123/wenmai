@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import { getPatternById, getAllSeries } from '../store/patternData'
+import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
 
 const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
 const fadeUp = {
@@ -39,7 +39,8 @@ export default function Home() {
           height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 16px', background: 'transparent',
         }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+            onClick={() => navigate('/landing')} title="回到首页">
             <span style={{ fontFamily: 'serif', fontSize: 22, color: '#F2D58A', letterSpacing: '0.25em' }}>纹脉</span>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#BC1F28', marginLeft: 2 }} />
           </div>
@@ -113,12 +114,12 @@ export default function Home() {
             style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}
           >
             {[
-              { icon: '📷', label: '拍照识别' },
-              { icon: '✏️', label: '创 作' },
-              { icon: '⊞', label: '系 列' },
-              { icon: '▣', label: '3D预览' },
+              { icon: '📷', label: '拍照识别', path: null },
+              { icon: '✏️', label: '创 作', path: '/puzzle' },
+              { icon: '⊞', label: '经典拼图', path: '/jigsaw' },
+              { icon: '▣', label: '3D预览', path: '/showcase' },
             ].map((item, i) => (
-              <motion.div key={i} variants={fadeUp} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default', opacity: item.path ? 1 : 0.5 }}>
                 <div style={{
                   width: 48, height: 48,
                   background: 'linear-gradient(145deg, #222220, #1A1A18)',
@@ -148,15 +149,21 @@ export default function Home() {
                   : p.rarity === 'rare' ? '#D4AF6A' : '#6A6A6A'
                 const rarityText = p.rarity === 'ssr' ? 'SSR'
                   : p.rarity === 'rare' ? 'SR' : 'N'
+                const imgSrc = getPatternImage(p)
                 return (
-                  <div key={p.id}>
+                  <div key={p.id} onClick={() => navigate('/curate')} style={{ cursor: 'pointer' }}>
                     <div style={{
                       aspectRatio: '1', position: 'relative',
                       background: 'linear-gradient(145deg, #1E1C16, #14120E)',
                       border: '1px solid rgba(212,175,106,0.2)', borderRadius: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      overflow: 'hidden',
                     }}>
-                      <CloudPattern size={38} opacity={0.85} />
+                      {imgSrc ? (
+                        <img src={imgSrc} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ) : (
+                        <CloudPattern size={38} opacity={0.85} />
+                      )}
                       <span style={{
                         position: 'absolute', top: 4, right: 4,
                         background: rarityBg, color: rarityColor, fontSize: 9,

@@ -2,19 +2,29 @@ import { useState, useCallback } from 'react'
 
 const STORAGE_KEY = 'wenmai_data'
 
+const DAILY_FREE_PULLS = 10
+
 const DEFAULT_DATA = {
   points: 1000,
-  freePulls: 10,
+  freePulls: DAILY_FREE_PULLS,
   library: ['basic-1', 'basic-2', 'basic-3'],
   series: {},
   dailyPull: { date: null, used: false },
   creations: [],
 }
 
+function checkDailyReset(data) {
+  const today = new Date().toDateString()
+  if (data.dailyPull.date !== today) {
+    return { ...data, freePulls: DAILY_FREE_PULLS, dailyPull: { date: today, used: false } }
+  }
+  return data
+}
+
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { ...DEFAULT_DATA, ...JSON.parse(raw) }
+    if (raw) return checkDailyReset({ ...DEFAULT_DATA, ...JSON.parse(raw) })
   } catch {}
   return { ...DEFAULT_DATA }
 }

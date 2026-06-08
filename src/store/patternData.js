@@ -4,39 +4,39 @@ import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/procedu
 // procedural: 使用程序化 SVG 生成的纹样类型（无需 AI 图片）
 const PATTERN_LIBRARY = [
   // 基础纹样（所有人免费）
-  { id: 'basic-1', name: '如意云纹', type: '云纹', series: 'cloud', rarity: 'common', tags: ['基础', '云纹'], image: '/patterns/ruyi_cloud.png' },
-  { id: 'basic-2', name: '回纹', type: '几何纹', series: 'geometric', rarity: 'common', tags: ['基础', '几何'], image: '/patterns/huiwen.png' },
-  { id: 'basic-3', name: '莲瓣纹', type: '花卉纹', series: 'floral', rarity: 'common', tags: ['基础', '花卉'], image: '/patterns/lianhua.png' },
+  { id: 'basic-1', name: '如意云纹', type: '云纹', series: 'cloud', rarity: 'common', tags: ['基础', '云纹'], image: '/patterns/ruyi_cloud.webp' },
+  { id: 'basic-2', name: '回纹', type: '几何纹', series: 'geometric', rarity: 'common', tags: ['基础', '几何'], image: '/patterns/huiwen.webp' },
+  { id: 'basic-3', name: '莲瓣纹', type: '花卉纹', series: 'floral', rarity: 'common', tags: ['基础', '花卉'], image: '/patterns/lianhua.webp' },
 
   // 云纹系列
-  { id: 'cloud-1', name: '流云纹', type: '云纹', series: 'cloud', rarity: 'common', tags: ['云纹', '汉代'], image: '/patterns/liuyun.png' },
-  { id: 'cloud-2', name: '祥云纹', type: '云纹', series: 'cloud', rarity: 'rare', tags: ['云纹', '唐代'], image: '/patterns/xiangyun.png' },
-  { id: 'cloud-3', name: '朵云纹', type: '云纹', series: 'cloud', rarity: 'rare', tags: ['云纹', '宋代'], image: '/patterns/duoyun.png' },
-  { id: 'cloud-4', name: '团云纹', type: '云纹', series: 'cloud', rarity: 'ssr', tags: ['云纹', '明代'], image: '/patterns/yunlei.png' },
+  { id: 'cloud-1', name: '流云纹', type: '云纹', series: 'cloud', rarity: 'common', tags: ['云纹', '汉代'], image: '/patterns/liuyun.webp' },
+  { id: 'cloud-2', name: '祥云纹', type: '云纹', series: 'cloud', rarity: 'rare', tags: ['云纹', '唐代'], image: '/patterns/xiangyun.webp' },
+  { id: 'cloud-3', name: '朵云纹', type: '云纹', series: 'cloud', rarity: 'rare', tags: ['云纹', '宋代'], image: '/patterns/duoyun.webp' },
+  { id: 'cloud-4', name: '团云纹', type: '云纹', series: 'cloud', rarity: 'ssr', tags: ['云纹', '明代'], image: '/patterns/yunlei.webp' },
 
   // 饕餮系列
-  { id: 'taotie-1', name: '饕餮纹·商', type: '兽面纹', series: 'taotie', rarity: 'rare', tags: ['兽面纹', '商代'], image: '/patterns/taotie_shang.png' },
-  { id: 'taotie-2', name: '饕餮纹·周', type: '兽面纹', series: 'taotie', rarity: 'rare', tags: ['兽面纹', '周代'], image: '/patterns/taotie_zhou.png' },
-  { id: 'taotie-3', name: '夔龙饕餮纹', type: '兽面纹', series: 'taotie', rarity: 'ssr', tags: ['兽面纹', '战国'], image: '/patterns/kuilong_taotie.png' },
+  { id: 'taotie-1', name: '饕餮纹·商', type: '兽面纹', series: 'taotie', rarity: 'rare', tags: ['兽面纹', '商代'], image: '/patterns/taotie_shang.webp' },
+  { id: 'taotie-2', name: '饕餮纹·周', type: '兽面纹', series: 'taotie', rarity: 'rare', tags: ['兽面纹', '周代'], image: '/patterns/taotie_zhou.webp' },
+  { id: 'taotie-3', name: '夔龙饕餮纹', type: '兽面纹', series: 'taotie', rarity: 'ssr', tags: ['兽面纹', '战国'], image: '/patterns/kuilong_taotie.webp' },
 
   // 龙纹系列
-  { id: 'dragon-1', name: '蟠龙纹', type: '龙纹', series: 'dragon', rarity: 'rare', tags: ['龙纹', '汉代'], image: '/patterns/panlong.png' },
-  { id: 'dragon-2', name: '行龙纹', type: '龙纹', series: 'dragon', rarity: 'rare', tags: ['龙纹', '唐代'], image: '/patterns/xinglong.png' },
-  { id: 'dragon-3', name: '升龙纹', type: '龙纹', series: 'dragon', rarity: 'ssr', tags: ['龙纹', '明代'], image: '/patterns/shenglong.png' },
-  { id: 'dragon-4', name: '团龙纹', type: '龙纹', series: 'dragon', rarity: 'ssr', tags: ['龙纹', '清代'], image: '/patterns/tuanlong.png' },
+  { id: 'dragon-1', name: '蟠龙纹', type: '龙纹', series: 'dragon', rarity: 'rare', tags: ['龙纹', '汉代'], image: '/patterns/panlong.webp' },
+  { id: 'dragon-2', name: '行龙纹', type: '龙纹', series: 'dragon', rarity: 'rare', tags: ['龙纹', '唐代'], image: '/patterns/xinglong.webp' },
+  { id: 'dragon-3', name: '升龙纹', type: '龙纹', series: 'dragon', rarity: 'ssr', tags: ['龙纹', '明代'], image: '/patterns/shenglong.webp' },
+  { id: 'dragon-4', name: '团龙纹', type: '龙纹', series: 'dragon', rarity: 'ssr', tags: ['龙纹', '清代'], image: '/patterns/tuanlong.webp' },
 
   // 卷草纹
-  { id: 'scroll-1', name: '唐草纹', type: '卷草纹', series: 'scroll', rarity: 'common', tags: ['卷草纹', '唐代'], image: '/patterns/juancao.png' },
-  { id: 'scroll-2', name: '缠枝纹', type: '卷草纹', series: 'scroll', rarity: 'rare', tags: ['卷草纹', '明代'], image: '/patterns/juancao-fixed.png' },
-  { id: 'scroll-3', name: '宝相花卷草', type: '卷草纹', series: 'scroll', rarity: 'ssr', tags: ['卷草纹', '唐代'], image: '/patterns/baoxiang.png' },
+  { id: 'scroll-1', name: '唐草纹', type: '卷草纹', series: 'scroll', rarity: 'common', tags: ['卷草纹', '唐代'], image: '/patterns/juancao.webp' },
+  { id: 'scroll-2', name: '缠枝纹', type: '卷草纹', series: 'scroll', rarity: 'rare', tags: ['卷草纹', '明代'], image: '/patterns/juancao-fixed.webp' },
+  { id: 'scroll-3', name: '宝相花卷草', type: '卷草纹', series: 'scroll', rarity: 'ssr', tags: ['卷草纹', '唐代'], image: '/patterns/baoxiang.webp' },
 
   // 角花
-  { id: 'corner-1', name: '如意角花', type: '角花', series: 'corner', rarity: 'common', tags: ['角花'], image: '/patterns/ruyi_corner.png' },
-  { id: 'corner-2', name: '凤鸟角花', type: '角花', series: 'corner', rarity: 'rare', tags: ['角花', '凤鸟'], image: '/patterns/fengniao_corner.png' },
+  { id: 'corner-1', name: '如意角花', type: '角花', series: 'corner', rarity: 'common', tags: ['角花'], image: '/patterns/ruyi_corner.webp' },
+  { id: 'corner-2', name: '凤鸟角花', type: '角花', series: 'corner', rarity: 'rare', tags: ['角花', '凤鸟'], image: '/patterns/fengniao_corner.webp' },
 
   // 四方连续
-  { id: 'tile-1', name: '万字不到头', type: '四方连续', series: 'tile', rarity: 'common', tags: ['四方连续', '万字'], image: '/patterns/wanzi_endless.png' },
-  { id: 'tile-2', name: '冰裂纹', type: '四方连续', series: 'tile', rarity: 'rare', tags: ['四方连续', '冰裂'], image: '/patterns/binglie.png' },
+  { id: 'tile-1', name: '万字不到头', type: '四方连续', series: 'tile', rarity: 'common', tags: ['四方连续', '万字'], image: '/patterns/wanzi_endless.webp' },
+  { id: 'tile-2', name: '冰裂纹', type: '四方连续', series: 'tile', rarity: 'rare', tags: ['四方连续', '冰裂'], image: '/patterns/binglie.webp' },
 
   // 山海经系列（全部传说）
   { id: 'sj-1', name: '马身人面神·人马踏珪纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/马身人面神·人马踏珪纹.png' },
