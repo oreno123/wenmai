@@ -1,10 +1,11 @@
 {
-  "total": 35,
+  "total": 60,
   "sources": [
     "huiwen",
     "juanco2",
     "tuanlong",
-    "yunlei"
+    "yunlei",
+    "shanjing"
   ],
   "bySource": {
     "huiwen": [
@@ -189,6 +190,158 @@
         "file": "yunlei_elem_26.png",
         "source": "yunlei"
       }
+    ],
+    "shanjing": [
+      {
+        "id": "shanjing_elem_00",
+        "file": "shanjing_elem_00.png",
+        "source": "shanjing",
+        "name": "人身龙首神"
+      },
+      {
+        "id": "shanjing_elem_01",
+        "file": "shanjing_elem_01.png",
+        "source": "shanjing",
+        "name": "凤皇"
+      },
+      {
+        "id": "shanjing_elem_02",
+        "file": "shanjing_elem_02.png",
+        "source": "shanjing",
+        "name": "夫诸"
+      },
+      {
+        "id": "shanjing_elem_03",
+        "file": "shanjing_elem_03.png",
+        "source": "shanjing",
+        "name": "应龙"
+      },
+      {
+        "id": "shanjing_elem_04",
+        "file": "shanjing_elem_04.png",
+        "source": "shanjing",
+        "name": "文鳐鱼"
+      },
+      {
+        "id": "shanjing_elem_05",
+        "file": "shanjing_elem_05.png",
+        "source": "shanjing",
+        "name": "旋龟"
+      },
+      {
+        "id": "shanjing_elem_06",
+        "file": "shanjing_elem_06.png",
+        "source": "shanjing",
+        "name": "武罗"
+      },
+      {
+        "id": "shanjing_elem_07",
+        "file": "shanjing_elem_07.png",
+        "source": "shanjing",
+        "name": "狍鸮"
+      },
+      {
+        "id": "shanjing_elem_08",
+        "file": "shanjing_elem_08.png",
+        "source": "shanjing",
+        "name": "獬讹"
+      },
+      {
+        "id": "shanjing_elem_09",
+        "file": "shanjing_elem_09.png",
+        "source": "shanjing",
+        "name": "相繇"
+      },
+      {
+        "id": "shanjing_elem_10",
+        "file": "shanjing_elem_10.png",
+        "source": "shanjing",
+        "name": "瞿如"
+      },
+      {
+        "id": "shanjing_elem_11",
+        "file": "shanjing_elem_11.png",
+        "source": "shanjing",
+        "name": "穷奇"
+      },
+      {
+        "id": "shanjing_elem_12",
+        "file": "shanjing_elem_12.png",
+        "source": "shanjing",
+        "name": "窫窳"
+      },
+      {
+        "id": "shanjing_elem_13",
+        "file": "shanjing_elem_13.png",
+        "source": "shanjing",
+        "name": "肥遗"
+      },
+      {
+        "id": "shanjing_elem_14",
+        "file": "shanjing_elem_14.png",
+        "source": "shanjing",
+        "name": "臘疏"
+      },
+      {
+        "id": "shanjing_elem_15",
+        "file": "shanjing_elem_15.png",
+        "source": "shanjing",
+        "name": "英招"
+      },
+      {
+        "id": "shanjing_elem_16",
+        "file": "shanjing_elem_16.png",
+        "source": "shanjing",
+        "name": "葱聋"
+      },
+      {
+        "id": "shanjing_elem_17",
+        "file": "shanjing_elem_17.png",
+        "source": "shanjing",
+        "name": "虎蛟"
+      },
+      {
+        "id": "shanjing_elem_18",
+        "file": "shanjing_elem_18.png",
+        "source": "shanjing",
+        "name": "蛇身人面神"
+      },
+      {
+        "id": "shanjing_elem_19",
+        "file": "shanjing_elem_19.png",
+        "source": "shanjing",
+        "name": "计蒙"
+      },
+      {
+        "id": "shanjing_elem_20",
+        "file": "shanjing_elem_20.png",
+        "source": "shanjing",
+        "name": "诸犍"
+      },
+      {
+        "id": "shanjing_elem_21",
+        "file": "shanjing_elem_21.png",
+        "source": "shanjing",
+        "name": "顒"
+      },
+      {
+        "id": "shanjing_elem_22",
+        "file": "shanjing_elem_22.png",
+        "source": "shanjing",
+        "name": "马身人面神"
+      },
+      {
+        "id": "shanjing_elem_23",
+        "file": "shanjing_elem_23.png",
+        "source": "shanjing",
+        "name": "鷧"
+      },
+      {
+        "id": "shanjing_elem_24",
+        "file": "shanjing_elem_24.png",
+        "source": "shanjing",
+        "name": "鼓"
+      }
     ]
   },
   "elements": [
@@ -366,6 +519,156 @@
       "id": "yunlei_elem_26",
       "file": "yunlei_elem_26.png",
       "source": "yunlei"
+    },
+    {
+      "id": "shanjing_elem_00",
+      "file": "shanjing_elem_00.png",
+      "source": "shanjing",
+      "name": "人身龙首神"
+    },
+    {
+      "id": "shanjing_elem_01",
+      "file": "shanjing_elem_01.png",
+      "source": "shanjing",
+      "name": "凤皇"
+    },
+    {
+      "id": "shanjing_elem_02",
+      "file": "shanjing_elem_02.png",
+      "source": "shanjing",
+      "name": "夫诸"
+    },
+    {
+      "id": "shanjing_elem_03",
+      "file": "shanjing_elem_03.png",
+      "source": "shanjing",
+      "name": "应龙"
+    },
+    {
+      "id": "shanjing_elem_04",
+      "file": "shanjing_elem_04.png",
+      "source": "shanjing",
+      "name": "文鳐鱼"
+    },
+    {
+      "id": "shanjing_elem_05",
+      "file": "shanjing_elem_05.png",
+      "source": "shanjing",
+      "name": "旋龟"
+    },
+    {
+      "id": "shanjing_elem_06",
+      "file": "shanjing_elem_06.png",
+      "source": "shanjing",
+      "name": "武罗"
+    },
+    {
+      "id": "shanjing_elem_07",
+      "file": "shanjing_elem_07.png",
+      "source": "shanjing",
+      "name": "狍鸮"
+    },
+    {
+      "id": "shanjing_elem_08",
+      "file": "shanjing_elem_08.png",
+      "source": "shanjing",
+      "name": "獬讹"
+    },
+    {
+      "id": "shanjing_elem_09",
+      "file": "shanjing_elem_09.png",
+      "source": "shanjing",
+      "name": "相繇"
+    },
+    {
+      "id": "shanjing_elem_10",
+      "file": "shanjing_elem_10.png",
+      "source": "shanjing",
+      "name": "瞿如"
+    },
+    {
+      "id": "shanjing_elem_11",
+      "file": "shanjing_elem_11.png",
+      "source": "shanjing",
+      "name": "穷奇"
+    },
+    {
+      "id": "shanjing_elem_12",
+      "file": "shanjing_elem_12.png",
+      "source": "shanjing",
+      "name": "窫窳"
+    },
+    {
+      "id": "shanjing_elem_13",
+      "file": "shanjing_elem_13.png",
+      "source": "shanjing",
+      "name": "肥遗"
+    },
+    {
+      "id": "shanjing_elem_14",
+      "file": "shanjing_elem_14.png",
+      "source": "shanjing",
+      "name": "臘疏"
+    },
+    {
+      "id": "shanjing_elem_15",
+      "file": "shanjing_elem_15.png",
+      "source": "shanjing",
+      "name": "英招"
+    },
+    {
+      "id": "shanjing_elem_16",
+      "file": "shanjing_elem_16.png",
+      "source": "shanjing",
+      "name": "葱聋"
+    },
+    {
+      "id": "shanjing_elem_17",
+      "file": "shanjing_elem_17.png",
+      "source": "shanjing",
+      "name": "虎蛟"
+    },
+    {
+      "id": "shanjing_elem_18",
+      "file": "shanjing_elem_18.png",
+      "source": "shanjing",
+      "name": "蛇身人面神"
+    },
+    {
+      "id": "shanjing_elem_19",
+      "file": "shanjing_elem_19.png",
+      "source": "shanjing",
+      "name": "计蒙"
+    },
+    {
+      "id": "shanjing_elem_20",
+      "file": "shanjing_elem_20.png",
+      "source": "shanjing",
+      "name": "诸犍"
+    },
+    {
+      "id": "shanjing_elem_21",
+      "file": "shanjing_elem_21.png",
+      "source": "shanjing",
+      "name": "顒"
+    },
+    {
+      "id": "shanjing_elem_22",
+      "file": "shanjing_elem_22.png",
+      "source": "shanjing",
+      "name": "马身人面神"
+    },
+    {
+      "id": "shanjing_elem_23",
+      "file": "shanjing_elem_23.png",
+      "source": "shanjing",
+      "name": "鷧"
+    },
+    {
+      "id": "shanjing_elem_24",
+      "file": "shanjing_elem_24.png",
+      "source": "shanjing",
+      "name": "鼓"
     }
   ]
 }

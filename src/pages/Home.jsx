@@ -140,7 +140,7 @@ export default function Home() {
               <span style={{ fontSize: 12, color: '#8A6A30' }}>更多 ›</span>
             </motion.div>
 
-            <motion.div variants={fadeUp} style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+            <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: 12 }}>
               {myPatterns.map(p => {
                 const rarityBg = p.rarity === 'ssr' ? '#BC6B2F'
                   : p.rarity === 'rare' ? '#2A2A2A' : '#1A1A1A'
@@ -149,9 +149,9 @@ export default function Home() {
                 const rarityText = p.rarity === 'ssr' ? 'SSR'
                   : p.rarity === 'rare' ? 'SR' : 'N'
                 return (
-                  <div key={p.id} style={{ width: 88, flexShrink: 0 }}>
+                  <div key={p.id}>
                     <div style={{
-                      width: 88, height: 88, position: 'relative',
+                      aspectRatio: '1', position: 'relative',
                       background: 'linear-gradient(145deg, #1E1C16, #14120E)',
                       border: '1px solid rgba(212,175,106,0.2)', borderRadius: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -180,8 +180,8 @@ export default function Home() {
               <span style={{ fontFamily: 'serif', fontSize: 16, color: '#F5F1E8' }}>系列收集进度</span>
             </motion.div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-              {series.slice(0, 3).map((s, i) => {
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginTop: 12 }}>
+              {series.map((s, i) => {
                 const collected = s.patterns.filter(p => data.library.includes(p.id)).length
                 const total = s.patterns.length
                 const progress = total > 0 ? (collected / total) * 100 : 0

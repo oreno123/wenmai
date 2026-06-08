@@ -1,4 +1,7 @@
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import * as THREE from 'three'
+import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
 import { useNavigate } from '../components/common/Router'
 import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/patternData'
 
@@ -85,37 +88,104 @@ function GoldDivider() {
   )
 }
 
+function useCloudTrainShader(containerRef) {
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    let disposed = false
+
+    const W = Math.min(window.innerWidth, 960)
+    const H = Math.min(window.innerHeight, 540)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false })
+    renderer.setPixelRatio(1)
+    renderer.setSize(W, H)
+    renderer.outputColorSpace = THREE.SRGBColorSpace
+
+    const scene = new THREE.Scene()
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+    const uniforms = {
+      u_resolution: { value: new THREE.Vector3(W, H, 1.0) },
+      u_time: { value: 0.0 },
+      u_noiseTexture: { value: new THREE.Texture() },
+      u_noiseSize: { value: new THREE.Vector2(1.0, 1.0) },
+      u_noiseStrength: { value: 1.9 },
+    }
+    const geometry = new THREE.PlaneGeometry(2, 2)
+    const material = new THREE.RawShaderMaterial({
+      glslVersion: THREE.GLSL3, uniforms, vertexShader, fragmentShader,
+    })
+    scene.add(new THREE.Mesh(geometry, material))
+
+    const cleanup = () => {
+      geometry.dispose(); material.dispose()
+      if (uniforms.u_noiseTexture.value) uniforms.u_noiseTexture.value.dispose()
+      renderer.dispose()
+    }
+
+    fetch('/shaders/noise_base64.txt').then(r => r.text()).then(b64 => {
+      if (disposed) return
+      const img = new Image()
+      img.onload = () => {
+        if (disposed) return
+        const tex = new THREE.Texture(img)
+        tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping
+        tex.minFilter = THREE.NearestFilter; tex.magFilter = THREE.NearestFilter
+        tex.needsUpdate = true
+        uniforms.u_noiseTexture.value = tex
+        uniforms.u_noiseSize.value.set(img.width, img.height)
+
+        // Render 60 frames (about 1 second of animation), then snapshot to static image
+        let frame = 0
+        const TOTAL_FRAMES = 60
+        const renderLoop = () => {
+          if (disposed) return
+          uniforms.u_time.value += 0.03
+          renderer.render(scene, camera)
+          frame++
+          if (frame < TOTAL_FRAMES) {
+            requestAnimationFrame(renderLoop)
+          } else {
+            // Snapshot last frame as static background image
+            const dataURL = renderer.domElement.toDataURL('image/jpeg', 0.85)
+            container.style.backgroundImage = `url(${dataURL})`
+            container.style.backgroundSize = 'cover'
+            container.style.backgroundPosition = 'center'
+            cleanup()
+          }
+        }
+        requestAnimationFrame(renderLoop)
+      }
+      img.src = b64.startsWith('data:image') ? b64 : `data:image/png;base64,${b64}`
+    })
+
+    return () => { disposed = true; cleanup() }
+  }, [containerRef])
+}
+
 export default function Landing() {
   const navigate = useNavigate()
   const series = getAllSeries()
+  const shaderRef = useRef(null)
+  useCloudTrainShader(shaderRef)
 
   return (
     <main style={{ background: 'transparent', overflowX: 'hidden' }}>
-      {/* ═══ Hero ═══ */}
+      {/* ═══ Hero with shader background ═══ */}
       <header style={{
         height: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         position: 'relative', padding: '0 24px', textAlign: 'center',
       }}>
-        <div style={{
-          position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
-          width: 280, height: 280,
-          background: 'radial-gradient(circle, rgba(212,175,106,0.07) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
+        {/* Shader snapshot background */}
+        <div ref={shaderRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, background: '#1a0a05' }} />
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: 'easeOut' }}
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 120, repeat: Infinity, ease: 'linear' }}
-          >
-            <HuiWenDecor size={96} opacity={0.1} />
-          </motion.div>
-        </motion.div>
+        {/* Dark overlay */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.5) 100%)',
+          zIndex: 1,
+        }} />
 
         <motion.h1
           initial={{ opacity: 0, y: 20, letterSpacing: '0.6em' }}
@@ -124,7 +194,8 @@ export default function Landing() {
           style={{
             fontFamily: 'Noto Serif SC, STSong, Georgia, serif',
             fontSize: 48, color: '#F2D58A', fontWeight: 700,
-            margin: '20px 0 0', lineHeight: 1,
+            margin: '20px 0 0', lineHeight: 1, position: 'relative', zIndex: 2,
+            textShadow: '0 2px 16px rgba(0,0,0,0.5)',
           }}
         >
           纹脉
@@ -136,7 +207,7 @@ export default function Landing() {
           transition={{ duration: 0.5, delay: 0.7 }}
           style={{
             fontSize: 11, color: '#D4AF6A', letterSpacing: '0.15em',
-            marginTop: 8, opacity: 0.6,
+            marginTop: 8, opacity: 0.6, position: 'relative', zIndex: 2,
           }}
         >
           PATTERN VEINS
@@ -148,7 +219,7 @@ export default function Landing() {
           transition={{ duration: 0.6, delay: 1 }}
           style={{
             fontSize: 14, color: '#A0A0A0', lineHeight: 1.8,
-            marginTop: 28, letterSpacing: '0.05em',
+            marginTop: 28, letterSpacing: '0.05em', position: 'relative', zIndex: 2,
           }}
         >
           你看见的每一道纹样<br />都是某个人的呼吸
@@ -158,7 +229,7 @@ export default function Landing() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8 }}
-          style={{ position: 'absolute', bottom: 36 }}
+          style={{ position: 'absolute', bottom: 36, zIndex: 2 }}
         >
           <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -193,7 +264,7 @@ export default function Landing() {
           initial="initial"
           whileInView="whileInView"
           viewport={{ once: true, amount: 0.05 }}
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}
         >
           {PATTERNS_WITH_IMAGES.map(p => {
             const rs = RARITY_STYLE[p.rarity]
@@ -304,7 +375,7 @@ export default function Landing() {
         >
           <GoldDivider />
           <h2 style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 20, color: '#F5F1E8', letterSpacing: '0.1em' }}>
-            八大专集
+            九大专集
           </h2>
           <p style={{ fontSize: 12, color: '#A0A0A0', marginTop: 6 }}>每一个系列，都是一段纹样史诗</p>
         </motion.div>
@@ -314,9 +385,9 @@ export default function Landing() {
           initial="initial"
           whileInView="whileInView"
           viewport={{ once: true, amount: 0.05 }}
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}
         >
-          {series.slice(0, 6).map(s => (
+          {series.map(s => (
             <motion.div key={s.id} variants={fadeUp}
                 whileHover={{ scale: 1.02, borderColor: 'rgba(212,175,106,0.25)' }}
                 transition={{ duration: 0.2 }}

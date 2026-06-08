@@ -48,6 +48,12 @@ export default function JigsawPage() {
       c.height = CANVAS_SIZE
       const ctx = c.getContext('2d')
 
+      // Fill background for transparent images (shanjing)
+      if (selectedPattern.series === 'shanjing') {
+        ctx.fillStyle = '#A03030'
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+      }
+
       // Center-crop fill
       const scale = Math.max(CANVAS_SIZE / img.width, CANVAS_SIZE / img.height)
       const sw = CANVAS_SIZE / scale
@@ -331,7 +337,7 @@ export default function JigsawPage() {
         <div style={{ padding: '8px 16px' }}>
           <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>选择纹样</div>
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10,
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10,
             maxHeight: '50vh', overflowY: 'auto',
           }}>
             {patterns.map(p => (
@@ -348,7 +354,11 @@ export default function JigsawPage() {
                 <img
                   src={getPatternImage(p)}
                   alt={p.name}
-                  style={{ width: 64, height: 64, objectFit: 'contain' }}
+                  style={{
+                    width: 64, height: 64, objectFit: 'contain',
+                    background: p.series === 'shanjing' ? '#A03030' : 'transparent',
+                    borderRadius: p.series === 'shanjing' ? 4 : 0,
+                  }}
                 />
                 <span style={{ fontSize: 10, color: '#9A9A9A', textAlign: 'center' }}>{p.name}</span>
               </div>
@@ -431,7 +441,7 @@ export default function JigsawPage() {
       {/* Canvas */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
         <div style={{
-          width: DISPLAY_SIZE, height: DISPLAY_SIZE,
+          width: '100%', maxWidth: DISPLAY_SIZE, aspectRatio: '1',
           borderRadius: 12, overflow: 'hidden',
           border: '1px solid rgba(255,255,255,0.06)',
           boxShadow: '0 0 30px rgba(0,0,0,0.5)',

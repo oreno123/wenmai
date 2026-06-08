@@ -8,6 +8,8 @@ export default function useHandGesture() {
     isFist: false,
     isReady: false,
     error: null,
+    allLandmarks: [],
+    videoEl: null,
   })
 
   const handLandmarkerRef = useRef(null)
@@ -41,7 +43,7 @@ export default function useHandGesture() {
             delegate: 'GPU',
           },
           runningMode: 'VIDEO',
-          numHands: 1,
+          numHands: 2,
           minHandDetectionConfidence: 0.5,
           minHandPresenceConfidence: 0.5,
           minTrackingConfidence: 0.5,
@@ -58,7 +60,7 @@ export default function useHandGesture() {
         video.srcObject = stream
         await new Promise((resolve) => { video.onloadedmetadata = () => video.play().then(resolve) })
 
-        setState((s) => ({ ...s, isReady: true }))
+        setState((s) => ({ ...s, isReady: true, videoEl: video }))
         detect()
       } catch (err) {
         setState((s) => ({ ...s, error: err.message }))
@@ -84,6 +86,10 @@ export default function useHandGesture() {
       try {
         const result = hl.detectForVideo(vid, timestamp)
         if (result.landmarks && result.landmarks.length > 0) {
+          // Store all hands' landmarks
+          setState(s => ({ ...s, allLandmarks: result.landmarks }))
+
+          // Use first hand for gesture detection
           const landmarks = result.landmarks[0]
           const wrist = landmarks[0]
           const middleMCP = landmarks[9]
@@ -120,6 +126,7 @@ export default function useHandGesture() {
             }
           }
         } else {
+          setState(s => ({ ...s, allLandmarks: [] }))
           openFramesRef.current = 0
           closeFramesRef.current = 0
           if (gestureRef.current.isOpen || gestureRef.current.isFist) {

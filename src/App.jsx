@@ -45,9 +45,7 @@ export default function App() {
     <RouterProvider>
       <AppProvider>
         <GoldBackground />
-        <div style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', background: 'transparent', position: 'relative', zIndex: 1 }}>
-          <Layout />
-        </div>
+        <Layout />
       </AppProvider>
     </RouterProvider>
   )

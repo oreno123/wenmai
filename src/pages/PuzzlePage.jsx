@@ -9,8 +9,16 @@ const STORAGE_KEY = 'wenmai_approved_elements'
 
 function getApprovedSet() {
   const saved = localStorage.getItem(STORAGE_KEY)
-  if (saved) try { return new Set(JSON.parse(saved)) } catch {}
-  return new Set(APPROVED_IDS.length > 0 ? APPROVED_IDS : ELEMENT_MANIFEST.elements.map(e => e.id))
+  const builtIn = APPROVED_IDS.length > 0 ? APPROVED_IDS : ELEMENT_MANIFEST.elements.map(e => e.id)
+  if (saved) {
+    try {
+      const savedSet = new Set(JSON.parse(saved))
+      // Merge: auto-approve any new elements added to built-in list
+      builtIn.forEach(id => savedSet.add(id))
+      return savedSet
+    } catch {}
+  }
+  return new Set(builtIn)
 }
 
 const CANVAS_SIZE = 1024
@@ -19,7 +27,7 @@ const SCALE = DISPLAY_SIZE / CANVAS_SIZE
 
 const SOURCE_NAMES = {
   tuanlong: '团龙', yunlei: '云雷', huiwen: '回纹',
-  lianhua: '莲花', juanco2: '卷草',
+  lianhua: '莲花', juanco2: '卷草', shanjing: '山海经',
 }
 
 export default function PuzzlePage() {
@@ -365,7 +373,7 @@ export default function PuzzlePage() {
       {/* Canvas */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
         <div style={{
-          width: DISPLAY_SIZE, height: DISPLAY_SIZE,
+          width: '100%', maxWidth: DISPLAY_SIZE, aspectRatio: '1',
           borderRadius: 12, overflow: 'hidden',
           border: '1px solid rgba(160,140,100,0.2)',
           boxShadow: '0 0 30px rgba(0,0,0,0.3)',
@@ -374,7 +382,7 @@ export default function PuzzlePage() {
             ref={canvasRef}
             width={CANVAS_SIZE}
             height={CANVAS_SIZE}
-            style={{ width: DISPLAY_SIZE, height: DISPLAY_SIZE, display: 'block', touchAction: 'none' }}
+            style={{ width: '100%', height: '100%', display: 'block', touchAction: 'none' }}
             onPointerDown={handleCanvasPointerDown}
             onPointerMove={handleCanvasPointerMove}
             onPointerUp={handleCanvasPointerUp}
@@ -424,7 +432,7 @@ export default function PuzzlePage() {
       {/* Element tray */}
       {showTray && (
         <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))',
           gap: 6, padding: '0 16px 8px', maxHeight: '35vh', overflowY: 'auto',
         }}>
           {filteredElements.map(el => (
@@ -453,7 +461,7 @@ export default function PuzzlePage() {
                 )}
               </div>
               <span style={{ fontSize: 8, color: '#6A6A6A', textAlign: 'center' }}>
-                {SOURCE_NAMES[el.source] || el.source}
+                {el.name || SOURCE_NAMES[el.source] || el.source}
               </span>
             </div>
           ))}

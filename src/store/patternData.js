@@ -37,6 +37,33 @@ const PATTERN_LIBRARY = [
   // 四方连续
   { id: 'tile-1', name: '万字不到头', type: '四方连续', series: 'tile', rarity: 'common', tags: ['四方连续', '万字'], image: '/patterns/wanzi_endless.png' },
   { id: 'tile-2', name: '冰裂纹', type: '四方连续', series: 'tile', rarity: 'rare', tags: ['四方连续', '冰裂'], image: '/patterns/binglie.png' },
+
+  // 山海经系列（全部传说）
+  { id: 'sj-1', name: '马身人面神·人马踏珪纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/马身人面神·人马踏珪纹.png' },
+  { id: 'sj-2', name: '狍鸮·羊身人爪纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/狍鸮·羊身人爪纹.png' },
+  { id: 'sj-3', name: '臘疏·马身独角纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/臘疏·马身独角纹.png' },
+  { id: 'sj-4', name: '蛇身人面神·盘坐莲心纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/蛇身人面神·盘坐莲心纹.png' },
+  { id: 'sj-5', name: '英招·四海巡游纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/英招·四海巡游纹.png' },
+  { id: 'sj-6', name: '武罗·山神腾云纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/武罗·山神腾云纹.png' },
+  { id: 'sj-7', name: '夫诸·白鹿行水纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/夫诸·白鹿行水纹.png' },
+  { id: 'sj-8', name: '文鳐鱼·鸟翼锦鲤纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/文鳐鱼·鸟翼锦鲤纹.png' },
+  { id: 'sj-9', name: '旋龟·鸟首蛇身纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/旋龟·鸟首蛇身纹.png' },
+  { id: 'sj-10', name: '计蒙·游渊司雨纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/计蒙·游渊司雨纹.png' },
+  { id: 'sj-11', name: '人身龙首神·龙吟守山纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神'], image: '/patterns/shanjing/人身龙首神·龙吟守山纹.png' },
+  { id: 'sj-12', name: '应龙·飞龙布雨纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/应龙·飞龙布雨纹.png' },
+  { id: 'sj-13', name: '葱聋·山羊垂鬃纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/葱聋·山羊垂鬃纹.png' },
+  { id: 'sj-14', name: '鼓·人面龙身纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/鼓·人面龙身纹.png' },
+  { id: 'sj-15', name: '瞿如·三足人面纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/瞿如·三足人面纹.png' },
+  { id: 'sj-16', name: '獬讹·一目九尾纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/獬讹·一目九尾纹.png' },
+  { id: 'sj-17', name: '虎蛟·鱼身蛇尾纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/虎蛟·鱼身蛇尾纹.png' },
+  { id: 'sj-18', name: '穷奇·如虎飞翼纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/穷奇·如虎飞翼纹.png' },
+  { id: 'sj-19', name: '肥遗·一蛇双身纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/肥遗·一蛇双身纹.png' },
+  { id: 'sj-20', name: '窫窳·赤牛食人纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/窫窳·赤牛食人纹.png' },
+  { id: 'sj-21', name: '凤皇·自在歌舞纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '神鸟'], image: '/patterns/shanjing/凤皇·自在歌舞纹.png' },
+  { id: 'sj-22', name: '顒·人面四目纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/顒·人面四目纹.png' },
+  { id: 'sj-23', name: '鷧·双首四足纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/鷧·双首四足纹.png' },
+  { id: 'sj-24', name: '诸犍·一目豹行纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/诸犍·一目豹行纹.png' },
+  { id: 'sj-25', name: '相繇·九首蛇身纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/相繇·九首蛇身纹.png' },
 ]
 
 // 稀有度权重（抽卡概率）
@@ -56,6 +83,7 @@ const SERIES_INFO = {
   floral: { name: '花卉清韵', description: '以花为信，以瓣为言', color: '#FFB6C1' },
   corner: { name: '角花集', description: '转角处的惊喜', color: '#F0E68C' },
   tile: { name: '四方连续', description: '无限延展的纹样世界', color: '#B0C4DE' },
+  shanjing: { name: '山海经', description: '上古神兽，千年纹影', color: '#C41E3A' },
 }
 
 // 程序化纹样 SVG 缓存

@@ -17,18 +17,28 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
 
   const clampScale = useCallback((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s)), [])
   const clampOffset = useCallback((ox, oy, s) => {
-    const limit = (FRAME_SIZE * (s - 1)) / 2 + 20
+    const frame = frameRef.current
+    const size = frame ? frame.offsetWidth : FRAME_SIZE
+    const limit = size * s * 0.5
     return {
       x: Math.max(-limit, Math.min(limit, ox)),
       y: Math.max(-limit, Math.min(limit, oy)),
     }
   }, [])
 
-  const handleWheel = useCallback((e) => {
-    e.preventDefault()
-    const delta = e.deltaY > 0 ? -0.08 : 0.08
-    setScale(prev => clampScale(prev + delta * prev))
-  }, [clampScale])
+  // Attach non-passive wheel listener for zoom/pan
+  useEffect(() => {
+    const frame = frameRef.current
+    if (!frame) return
+    const onWheel = (e) => {
+      e.preventDefault()
+      // Wheel = zoom
+      const delta = e.deltaY > 0 ? -0.08 : 0.08
+      setScale(prev => clampScale(prev + delta * prev))
+    }
+    frame.addEventListener('wheel', onWheel, { passive: false })
+    return () => frame.removeEventListener('wheel', onWheel)
+  }, [clampScale, clampOffset, scale])
 
   const handlePointerDown = useCallback((e) => {
     if (e.target.closest('.controls-area')) return
@@ -58,28 +68,33 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
   }, [dragging, handlePointerMove, handlePointerUp])
 
   const goToShowcase = useCallback(() => {
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const size = 1024
-      canvas.width = size
-      canvas.height = size
-      const ctx = canvas.getContext('2d')
-
-      ctx.fillStyle = '#F5F0E6'
-      ctx.fillRect(0, 0, size, size)
-
-      ctx.save()
-      ctx.translate(size / 2, size / 2)
-      ctx.rotate(rotation * Math.PI / 180)
-      ctx.scale(scale, scale)
-      ctx.drawImage(img, -img.width / 2, -img.height / 2)
-      ctx.restore()
-
-      sessionStorage.setItem('showcase_image', canvas.toDataURL('image/png'))
+    try {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas')
+          const size = 1024
+          canvas.width = size
+          canvas.height = size
+          const ctx = canvas.getContext('2d')
+          ctx.fillStyle = '#F5F0E6'
+          ctx.fillRect(0, 0, size, size)
+          ctx.save()
+          ctx.translate(size / 2, size / 2)
+          ctx.rotate(rotation * Math.PI / 180)
+          ctx.scale(scale, scale)
+          ctx.drawImage(img, -img.width / 2, -img.height / 2)
+          ctx.restore()
+          sessionStorage.setItem('showcase_image', canvas.toDataURL('image/png'))
+        } catch {}
+        navigate('/showcase')
+      }
+      img.onerror = () => navigate('/showcase')
+      img.src = imageUrl
+    } catch {
       navigate('/showcase')
     }
-    img.src = imageUrl
   }, [imageUrl, scale, rotation, navigate])
 
   return (
@@ -90,11 +105,12 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         style={{
-          position: 'fixed', inset: 0, zIndex: 100,
+          position: 'fixed', inset: 0, zIndex: 200,
           display: 'flex', flexDirection: 'column',
           background: 'rgba(8,6,4,0.92)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
+          overflowY: 'auto',
         }}
       >
         {/* Header */}
@@ -136,10 +152,10 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
           >
             <div
               ref={frameRef}
-              onWheel={handleWheel}
               onPointerDown={handlePointerDown}
               style={{
-                width: FRAME_SIZE, height: FRAME_SIZE,
+                width: 'min(320px, 80vmin)', height: 'min(320px, 80vmin)',
+                maxWidth: '100%', maxHeight: '60vh',
                 background: '#F5F0E6',
                 borderRadius: 16,
                 border: '2px solid rgba(180,155,100,0.35)',
@@ -200,7 +216,7 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
 
         {/* Controls */}
         <div className="controls-area" style={{
-          padding: '0 24px 16px',
+          padding: '0 24px 80px',
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
         }}>
           {/* Scale slider */}
@@ -287,7 +303,7 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
             fontSize: 11, color: '#6A6A5A', margin: 0,
             textAlign: 'center',
           }}>
-            滚轮或滑条缩放 · 拖拽移动 · 调整后点击下方按钮
+            滚轮缩放 · 拖拽移动 · 调整后点击下方按钮
           </p>
 
           {/* CTA */}

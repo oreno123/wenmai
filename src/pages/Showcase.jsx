@@ -1,8 +1,89 @@
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import ShatterScene from '../showcase/ShatterScene'
 import useHandGesture from '../showcase/useHandGesture'
 import { BG_COLOR } from '../showcase/constants'
+
+const HAND_CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],
+  [0,5],[5,6],[6,7],[7,8],
+  [0,9],[9,10],[10,11],[11,12],
+  [0,13],[13,14],[14,15],[15,16],
+  [0,17],[17,18],[18,19],[19,20],
+  [5,9],[9,13],[13,17],
+]
+
+function HandOverlay({ videoEl, allLandmarks }) {
+  const canvasRef = useRef(null)
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current
+    const video = videoEl
+    if (!canvas || !video) return
+
+    const ctx = canvas.getContext('2d')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+
+    // Draw camera feed (mirrored)
+    ctx.save()
+    ctx.translate(canvas.width, 0)
+    ctx.scale(-1, 1)
+    ctx.drawImage(video, 0, 0)
+    ctx.restore()
+
+    // Draw hand skeleton for ALL detected hands
+    if (allLandmarks && allLandmarks.length > 0) {
+      const w = canvas.width
+      const h = canvas.height
+
+      for (const landmarks of allLandmarks) {
+        // Draw connections
+        ctx.strokeStyle = 'rgba(0, 255, 200, 0.7)'
+        ctx.lineWidth = 2
+        for (const [a, b] of HAND_CONNECTIONS) {
+          const la = landmarks[a], lb = landmarks[b]
+          ctx.beginPath()
+          ctx.moveTo((1 - la.x) * w, la.y * h)
+          ctx.lineTo((1 - lb.x) * w, lb.y * h)
+          ctx.stroke()
+        }
+
+        // Draw landmarks
+        for (const pt of landmarks) {
+          ctx.beginPath()
+          ctx.arc((1 - pt.x) * w, pt.y * h, 3, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255, 200, 50, 0.9)'
+          ctx.fill()
+        }
+      }
+    }
+  }, [videoEl, allLandmarks])
+
+  useEffect(() => {
+    let raf
+    const loop = () => { draw(); raf = requestAnimationFrame(loop) }
+    loop()
+    return () => cancelAnimationFrame(raf)
+  }, [draw])
+
+  if (!videoEl) return null
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute', bottom: 16, right: 16,
+        width: 240, height: 180,
+        borderRadius: 12,
+        border: '2px solid rgba(0,255,200,0.3)',
+        boxShadow: '0 0 20px rgba(0,255,200,0.15)',
+        zIndex: 20,
+        objectFit: 'cover',
+      }}
+    />
+  )
+}
 
 function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
   return (
@@ -27,7 +108,7 @@ function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
 }
 
 export default function Showcase() {
-  const { isOpen, isFist, isReady, error } = useHandGesture()
+  const { isOpen, isFist, isReady, error, allLandmarks, videoEl } = useHandGesture()
   const [userImage, setUserImage] = useState(null)
 
   useEffect(() => {
@@ -53,6 +134,9 @@ export default function Showcase() {
           />
         </Suspense>
       </Canvas>
+
+      {/* Camera feed with hand skeleton overlay */}
+      <HandOverlay videoEl={videoEl} allLandmarks={allLandmarks} />
 
       <a
         href="#/home"
