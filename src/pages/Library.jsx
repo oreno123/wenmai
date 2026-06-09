@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import PatternCard from '../components/cards/PatternCard'
 import { getPatternById, PATTERN_LIBRARY, getAllSeries, getRarityLabel } from '../store/patternData'
@@ -12,6 +13,7 @@ const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
 
 export default function Library() {
   const { data } = useApp()
+  const navigate = useNavigate()
   const [tab, setTab] = useState('mine')
   const [seriesFilter, setSeriesFilter] = useState('all')
 
@@ -88,7 +90,7 @@ export default function Library() {
             const owned = data.library.includes(p.id)
             return (
               <div key={p.id} style={{ position: 'relative' }}>
-                <PatternCard pattern={p} />
+                <PatternCard pattern={p} onClick={() => navigate('/pattern/' + p.id)} />
                 {!owned && (
                   <div style={{
                     position: 'absolute', inset: 0,

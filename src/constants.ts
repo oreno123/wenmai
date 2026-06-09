@@ -6,6 +6,7 @@
 // ── 游戏经济 ─────────────────────────────────────────────
 export const DAILY_FREE_PULLS = 10
 export const PULL_COST = 10            // 非免费单次抽卡积分消耗
+export const TEN_PULL_COST = 90        // 十连抽积分（九折）
 export const INITIAL_POINTS = 1000
 export const MAX_CREATIONS = 20
 

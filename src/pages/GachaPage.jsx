@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react'
 import { useApp } from '../store/AppState'
-import { getRandomPattern, getRarityLabel, getPatternImage } from '../store/patternData'
-import { PULL_COST } from '../constants'
+import { getRandomPattern, getRarityLabel, getPatternImage, getTenPullPatterns, getSeriesInfo } from '../store/patternData'
+import { PULL_COST, TEN_PULL_COST } from '../constants'
+import { generateShareCard } from '../utils/shareCard'
+import { shareImage } from '../utils/shareOrDownload'
 import PatternImage from '../components/common/PatternImage'
 
 /* 太极 + 能量环 SVG */
@@ -41,13 +43,29 @@ function YinYangSymbol({ size = 120, bloom = false }) {
 }
 
 export default function GachaPage() {
-  const { data, doPull, addToLibrary, incrementPity, resetPity } = useApp()
+  const { data, doPull, doTenPull, addToLibrary, incrementPity, resetPity } = useApp()
   const [state, setState] = useState('idle')
   const [result, setResult] = useState(null)
+  const [tenResults, setTenResults] = useState(null)
   const [showBurst, setShowBurst] = useState(false)
+  const [sharing, setSharing] = useState(false)
+
+  const handleShare = useCallback(async (pattern) => {
+    if (sharing) return
+    setSharing(true)
+    try {
+      const series = getSeriesInfo(pattern.series)
+      const blob = await generateShareCard(pattern, series)
+      await shareImage(blob, `wenmai-${pattern.id}.png`)
+    } catch (e) {
+      console.error('Share failed:', e)
+    }
+    setSharing(false)
+  }, [sharing])
 
   const cost = data.freePulls > 0 ? 0 : PULL_COST
   const canAfford = data.freePulls > 0 || data.points >= cost
+  const canAffordTen = data.freePulls >= 10 || data.points >= TEN_PULL_COST
 
   const handlePull = useCallback(() => {
     if (state !== 'idle' || !canAfford) return
@@ -68,7 +86,27 @@ export default function GachaPage() {
     }, 2200)
   }, [doPull, addToLibrary, incrementPity, resetPity, canAfford, state, data.pityCounter])
 
-  const handleReset = () => { setState('idle'); setResult(null); setShowBurst(false) }
+  const handleTenPull = useCallback(() => {
+    if (state !== 'idle' || !canAffordTen) return
+    doTenPull()
+    const { patterns, finalPity, ssrHit } = getTenPullPatterns(data.pityCounter || 0)
+    setState('pulling')
+    setTenResults(patterns)
+    setTimeout(() => {
+      patterns.forEach(p => addToLibrary(p.id))
+      if (ssrHit) {
+        resetPity()
+        setShowBurst(true)
+        setTimeout(() => setShowBurst(false), 2500)
+      } else {
+        // set pity to the computed final value
+        for (let i = 0; i < finalPity - (data.pityCounter || 0); i++) incrementPity()
+      }
+      setState('revealed')
+    }, 2200)
+  }, [doTenPull, addToLibrary, incrementPity, resetPity, canAffordTen, state, data.pityCounter])
+
+  const handleReset = () => { setState('idle'); setResult(null); setTenResults(null); setShowBurst(false) }
 
   return (
     <div style={{
@@ -132,24 +170,60 @@ export default function GachaPage() {
           </div>
 
           {/* 按钮 */}
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <button onClick={handlePull} disabled={!canAfford} style={{
-              position: 'relative', borderRadius: '16px', padding: '18px 64px',
-              fontSize: '16px', fontWeight: 700, letterSpacing: '4px',
-              fontFamily: 'inherit', cursor: canAfford ? 'pointer' : 'not-allowed',
-              background: canAfford ? 'var(--red)' : 'rgba(14,16,40,0.6)',
-              color: canAfford ? 'var(--gold-light)' : 'var(--text-dim)',
-              border: canAfford ? '1px solid rgba(201,162,60,0.2)' : '1px solid var(--border-glass)',
-              boxShadow: canAfford ? '0 4px 30px rgba(176,32,48,0.25), 0 0 50px rgba(201,162,60,0.06)' : 'none',
-              overflow: 'hidden',
-            }}>
-              {canAfford && <div style={{
-                position: 'absolute', top: 0, left: 0, width: '40%', height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)',
-                animation: 'sweep 2.5s ease-in-out infinite',
-              }} />}
-              <span style={{ position: 'relative' }}>{data.freePulls > 0 ? '免费抽卡' : `${cost} 积分抽卡`}</span>
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            {/* 单抽 */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <button onClick={handlePull} disabled={!canAfford} style={{
+                position: 'relative', borderRadius: '16px', padding: '18px 64px',
+                fontSize: '16px', fontWeight: 700, letterSpacing: '4px',
+                fontFamily: 'inherit', cursor: canAfford ? 'pointer' : 'not-allowed',
+                background: canAfford ? 'var(--red)' : 'rgba(14,16,40,0.6)',
+                color: canAfford ? 'var(--gold-light)' : 'var(--text-dim)',
+                border: canAfford ? '1px solid rgba(201,162,60,0.2)' : '1px solid var(--border-glass)',
+                boxShadow: canAfford ? '0 4px 30px rgba(176,32,48,0.25), 0 0 50px rgba(201,162,60,0.06)' : 'none',
+                overflow: 'hidden',
+              }}>
+                {canAfford && <div style={{
+                  position: 'absolute', top: 0, left: 0, width: '40%', height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)',
+                  animation: 'sweep 2.5s ease-in-out infinite',
+                }} />}
+                <span style={{ position: 'relative' }}>{data.freePulls > 0 ? '免费抽卡' : `${cost} 积分抽卡`}</span>
+              </button>
+            </div>
+
+            {/* 十连抽 */}
+            <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <button onClick={handleTenPull} disabled={!canAffordTen} style={{
+                position: 'relative', borderRadius: '12px', padding: '12px 40px',
+                fontSize: '14px', fontWeight: 700, letterSpacing: '3px',
+                fontFamily: 'inherit', cursor: canAffordTen ? 'pointer' : 'not-allowed',
+                background: canAffordTen
+                  ? 'linear-gradient(135deg, rgba(201,162,60,0.15) 0%, rgba(176,32,48,0.2) 100%)'
+                  : 'rgba(14,16,40,0.6)',
+                color: canAffordTen ? 'var(--gold-light)' : 'var(--text-dim)',
+                border: canAffordTen ? '1px solid rgba(201,162,60,0.25)' : '1px solid var(--border-glass)',
+                boxShadow: canAffordTen ? '0 4px 24px rgba(201,162,60,0.1), 0 0 40px rgba(201,162,60,0.04)' : 'none',
+                overflow: 'hidden',
+              }}>
+                {canAffordTen && <div style={{
+                  position: 'absolute', top: 0, left: 0, width: '40%', height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+                  animation: 'sweep 3s ease-in-out infinite',
+                }} />}
+                <span style={{ position: 'relative' }}>
+                  {data.freePulls >= 10 ? '免费十连抽' : `${TEN_PULL_COST} 积分十连抽`}
+                </span>
+              </button>
+              <span style={{
+                fontSize: '11px', fontWeight: 700, color: 'var(--gold-bright)',
+                background: 'rgba(201,162,60,0.08)', borderRadius: '6px',
+                padding: '4px 8px', border: '1px solid rgba(201,162,60,0.15)',
+                letterSpacing: '1px',
+              }}>
+                ×10
+              </span>
+            </div>
           </div>
 
           <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-dim)', letterSpacing: '1px' }}>
@@ -159,7 +233,8 @@ export default function GachaPage() {
       )}
 
       {/* ===== 翻牌 ===== */}
-      {state === 'pulling' && result && (
+      {/* 单抽翻牌动画 */}
+      {state === 'pulling' && result && !tenResults && (
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
           <div style={{ width: '220px', height: '300px', position: 'relative', perspective: '1200px' }}>
             {/* 金色光晕扩散 */}
@@ -241,8 +316,41 @@ export default function GachaPage() {
         </div>
       )}
 
-      {/* ===== 揭示 ===== */}
-      {state === 'revealed' && result && (
+      {/* 十连抽降临动画 */}
+      {state === 'pulling' && tenResults && (
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
+          <div style={{
+            animation: 'float-y 4s ease-in-out infinite',
+          }}>
+            <YinYangSymbol size={160} bloom />
+          </div>
+          <div style={{ marginTop: '32px', fontSize: '16px', letterSpacing: '4px', animation: 'shimmer 1.5s ease-in-out infinite' }} className="text-gold">
+            十连降临中...
+          </div>
+          {/* 环绕粒子 */}
+          {Array.from({ length: 20 }).map((_, i) => {
+            const angle = (i * 18) * Math.PI / 180
+            const dist = 90 + (i % 3) * 20
+            return (
+              <div key={i} style={{
+                position: 'absolute',
+                top: '40%', left: '50%',
+                width: 3 + (i % 2) * 2, height: 3 + (i % 2) * 2,
+                marginTop: -(1.5 + (i % 2)), marginLeft: -(1.5 + (i % 2)),
+                borderRadius: '50%',
+                background: i % 3 === 0 ? '#F2D58A' : '#D4AF6A',
+                boxShadow: '0 0 6px rgba(212,175,106,0.6)',
+                opacity: 0,
+                animation: `gacha-particle-${i % 12} 0.7s ease-out ${0.2 + i * 0.06}s forwards`,
+                pointerEvents: 'none',
+              }} />
+            )
+          })}
+        </div>
+      )}
+
+      {/* ===== 揭示 — 单抽 ===== */}
+      {state === 'revealed' && result && !tenResults && (
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
           <div style={{
             width: '240px', height: '330px', margin: '0 auto 28px',
@@ -311,6 +419,105 @@ export default function GachaPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div style={{ position: 'relative', display: 'inline-flex', gap: 12 }}>
+            <button onClick={() => handleShare(result)} disabled={sharing} style={{
+              padding: '16px 36px', fontSize: '15px', letterSpacing: '2px',
+              background: sharing ? 'rgba(255,255,255,0.04)' : 'rgba(201,162,60,0.12)',
+              color: sharing ? '#5A5A5A' : '#D4AF6A',
+              border: '1px solid rgba(201,162,60,0.2)', borderRadius: 12,
+              cursor: sharing ? 'not-allowed' : 'pointer', fontFamily: 'inherit',
+            }}>
+              {sharing ? '生成中...' : '分享'}
+            </button>
+            <button onClick={handleReset} className="btn-gold" style={{ padding: '16px 52px', fontSize: '15px', letterSpacing: '3px' }}>
+              再来一次
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== 揭示 — 十连抽 ===== */}
+      {state === 'revealed' && tenResults && (
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 10, padding: '20px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: '10px',
+            maxWidth: '600px',
+            margin: '0 auto 24px',
+            animation: 'card-enter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+          }}>
+            {/* Sort: SSR first, then rare, then common */}
+            {[...tenResults].sort((a, b) => {
+              const order = { ssr: 0, rare: 1, common: 2 }
+              return order[a.rarity] - order[b.rarity]
+            }).map((p, i) => (
+              <div key={p.id + i} style={{
+                position: 'relative',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                background: '#0F0F10',
+                border: `1px solid ${
+                  p.rarity === 'ssr' ? 'rgba(201,162,60,0.35)'
+                  : p.rarity === 'rare' ? 'rgba(201,162,60,0.15)'
+                  : 'rgba(201,162,60,0.06)'
+                }`,
+                boxShadow: p.rarity === 'ssr'
+                  ? '0 0 20px rgba(201,162,60,0.2), 0 0 40px rgba(201,162,60,0.06)'
+                  : 'none',
+                animation: p.rarity === 'ssr' ? 'pulse-glow 2s ease-in-out infinite' : 'none',
+              }}>
+                {p.rarity === 'ssr' && (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'radial-gradient(ellipse at 50% 30%, rgba(201,162,60,0.08) 0%, transparent 60%)',
+                    pointerEvents: 'none',
+                  }} />
+                )}
+                <div style={{
+                  aspectRatio: '3/4',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '6px',
+                  position: 'relative',
+                }}>
+                  <PatternImage
+                    src={getPatternImage(p)}
+                    alt={p.name}
+                    fallbackSize={60}
+                    style={{
+                      maxWidth: '100%', maxHeight: '100%', objectFit: 'contain',
+                      filter: p.rarity === 'ssr'
+                        ? 'drop-shadow(0 0 10px rgba(201,162,60,0.35))'
+                        : p.rarity === 'rare'
+                        ? 'drop-shadow(0 0 4px rgba(201,162,60,0.12))'
+                        : 'none',
+                    }}
+                  />
+                </div>
+                <div style={{
+                  padding: '4px 6px 6px',
+                  textAlign: 'center',
+                  borderTop: '1px solid rgba(201,162,60,0.06)',
+                }}>
+                  <div style={{
+                    fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    color: p.rarity === 'ssr' ? 'var(--gold-light)' : 'var(--text-primary)',
+                    textShadow: p.rarity === 'ssr' ? '0 0 8px rgba(201,162,60,0.3)' : 'none',
+                  }}>
+                    {p.name}
+                  </div>
+                  <span className={`rarity-badge rarity-${p.rarity}`} style={{
+                    fontSize: '9px', padding: '2px 6px', marginTop: '3px',
+                    display: 'inline-block',
+                  }}>
+                    {getRarityLabel(p.rarity)}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div style={{ position: 'relative', display: 'inline-block' }}>

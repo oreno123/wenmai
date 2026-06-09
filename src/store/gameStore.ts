@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { DAILY_FREE_PULLS, INITIAL_POINTS, STORAGE_KEY, MAX_STORAGE_BYTES, PULL_COST, MAX_CREATIONS } from '../constants'
+import { DAILY_FREE_PULLS, INITIAL_POINTS, STORAGE_KEY, MAX_STORAGE_BYTES, PULL_COST, MAX_CREATIONS, TEN_PULL_COST } from '../constants'
 
 // ── Types ──────────────────────────────────────────────
 
@@ -33,6 +33,7 @@ export interface GameStore {
   canPullToday: () => boolean
   recordPull: () => void
   doPull: () => true | null
+  doTenPull: () => true | null
   incrementPity: () => void
   resetPity: () => void
   saveCreation: (imageDataUrl: string, source?: string) => string
@@ -154,6 +155,25 @@ export function useGameStore(): GameStore {
     return success ? true : null
   }, [setData])
 
+  const doTenPull = useCallback((): true | null => {
+    let success = false
+    setData(d => {
+      const useFree = d.freePulls >= 10
+      const cost = useFree ? 0 : TEN_PULL_COST
+      if (!useFree && d.points < cost) return d
+
+      success = true
+      const today = new Date().toDateString()
+      return {
+        ...d,
+        points: useFree ? d.points : d.points - cost,
+        freePulls: useFree ? d.freePulls - 10 : d.freePulls,
+        dailyPull: { date: today, used: true },
+      }
+    })
+    return success ? true : null
+  }, [setData])
+
   const incrementPity = useCallback(() => {
     setData(d => ({ ...d, pityCounter: (d.pityCounter || 0) + 1 }))
   }, [setData])
@@ -195,6 +215,7 @@ export function useGameStore(): GameStore {
     canPullToday,
     recordPull,
     doPull,
+    doTenPull,
     incrementPity,
     resetPity,
     saveCreation,

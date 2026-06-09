@@ -115,12 +115,12 @@ export default function Home() {
             style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}
           >
             {[
-              { icon: '📷', label: '拍照识别', path: null },
+              { icon: '📷', label: '拍照识别', path: '/photo-match' },
               { icon: '✏️', label: '创 作', path: '/puzzle' },
               { icon: '⊞', label: '经典拼图', path: '/jigsaw' },
               { icon: '▣', label: '3D预览', path: '/showcase' },
             ].map((item, i) => (
-              <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default', opacity: item.path ? 1 : 0.5 }}>
+              <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
                 <div style={{
                   width: 48, height: 48,
                   background: 'linear-gradient(145deg, #222220, #1A1A18)',

@@ -16,6 +16,8 @@ const PuzzlePage = lazy(() => import('./pages/PuzzlePage'))
 const JigsawPage = lazy(() => import('./pages/JigsawPage'))
 const CuratePage = lazy(() => import('./pages/CuratePage'))
 const Showcase = lazy(() => import('./pages/Showcase'))
+const PatternDetailPage = lazy(() => import('./pages/PatternDetailPage'))
+const PhotoMatchPage = lazy(() => import('./pages/PhotoMatchPage'))
 
 function PageLoader() {
   return (
@@ -42,6 +44,8 @@ function Pages() {
   else if (pathname === '/puzzle') Page = PuzzlePage
   else if (pathname === '/jigsaw') Page = JigsawPage
   else if (pathname === '/curate') Page = CuratePage
+  else if (pathname.startsWith('/pattern/')) Page = PatternDetailPage
+  else if (pathname === '/photo-match') Page = PhotoMatchPage
   else if (pathname === '/landing') Page = Landing
   else Page = SplashPage
 

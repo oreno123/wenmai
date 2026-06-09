@@ -193,6 +193,39 @@ function getRandomOfRarity(rarity: Rarity): Pattern {
   return pool[Math.floor(Math.random() * pool.length)]
 }
 
+/**
+ * 十连抽：批量生成10个纹样，推进保底计数器，保证至少1个稀有+
+ */
+export function getTenPullPatterns(pityCounter: number): {
+  patterns: Pattern[]
+  finalPity: number
+  ssrHit: boolean
+} {
+  const patterns: Pattern[] = []
+  let pity = pityCounter
+  let ssrHit = false
+
+  for (let i = 0; i < 10; i++) {
+    const p = getRandomPattern(pity)
+    patterns.push(p)
+    if (p.rarity === 'ssr') {
+      pity = 0
+      ssrHit = true
+    } else {
+      pity++
+    }
+  }
+
+  // 保底至少1个稀有+
+  if (!patterns.some(p => p.rarity === 'rare' || p.rarity === 'ssr')) {
+    const rarePool = PATTERN_LIBRARY.filter(p => p.rarity === 'rare')
+    const replacement = rarePool[Math.floor(Math.random() * rarePool.length)]
+    patterns[0] = replacement
+  }
+
+  return { patterns, finalPity: pity, ssrHit }
+}
+
 export function getRarityLabel(rarity: Rarity): string {
   return ({ common: '普通', rare: '稀有', ssr: '传说' } as Record<Rarity, string>)[rarity] || '普通'
 }
