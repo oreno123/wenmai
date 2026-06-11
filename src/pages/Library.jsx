@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import PatternCard from '../components/cards/PatternCard'
 import { getPatternById, PATTERN_LIBRARY, getAllSeries, getRarityLabel } from '../store/patternData'
+
+const GestureCardView = lazy(() => import('../gesture-cards/GestureCardView'))
 
 const TABS = [
   { id: 'mine', label: '我的' },
@@ -16,6 +18,7 @@ export default function Library() {
   const navigate = useNavigate()
   const [tab, setTab] = useState('mine')
   const [seriesFilter, setSeriesFilter] = useState('all')
+  const [showGestureView, setShowGestureView] = useState(false)
 
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const base = tab === 'mine' ? myPatterns : PATTERN_LIBRARY
@@ -31,9 +34,25 @@ export default function Library() {
   return (
     <div style={{ padding: '16px', paddingBottom: '80px' }}>
       {/* 标题 + 进度 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>图鉴</h1>
-        <span style={{ fontSize: 12, color: '#6A6A6A' }}>{collected}/{total}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 12, color: '#6A6A6A' }}>{collected}/{total}</span>
+          <button
+            onClick={() => setShowGestureView(true)}
+            disabled={myPatterns.length === 0}
+            style={{
+              fontSize: 11, padding: '4px 10px', borderRadius: 12,
+              background: myPatterns.length === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(212,175,106,0.15)',
+              color: myPatterns.length === 0 ? '#4A4A4A' : '#F2D58A',
+              border: myPatterns.length === 0 ? '1px solid transparent' : '1px solid rgba(212,175,106,0.2)',
+              cursor: myPatterns.length === 0 ? 'default' : 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            手势浏览
+          </button>
+        </div>
       </div>
 
       {/* 收集进度条 */}
@@ -112,6 +131,15 @@ export default function Library() {
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#4A4A4A', fontSize: 14 }}>
           {tab === 'mine' ? '还没有收集到纹样，去抽卡吧' : '没有匹配的纹样'}
         </div>
+      )}
+
+      {showGestureView && (
+        <Suspense fallback={null}>
+          <GestureCardView
+            patterns={myPatterns}
+            onClose={() => setShowGestureView(false)}
+          />
+        </Suspense>
       )}
     </div>
   )
