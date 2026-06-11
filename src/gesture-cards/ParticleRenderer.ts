@@ -11,7 +11,6 @@ export class ParticleRenderer {
   private particles: Particle[] = []
   private hands: HandData[] = []
   private colorIndex = 0
-  private animFrameId: number | null = null
 
   constructor(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d')
@@ -143,10 +142,6 @@ export class ParticleRenderer {
   }
 
   dispose(): void {
-    if (this.animFrameId !== null) {
-      cancelAnimationFrame(this.animFrameId)
-      this.animFrameId = null
-    }
     this.particles = []
     this.hands = []
   }

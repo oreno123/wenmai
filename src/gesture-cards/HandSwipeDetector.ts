@@ -1,4 +1,4 @@
-import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision'
+import { FilesetResolver, HandLandmarker, type HandLandmarkerResult } from '@mediapipe/tasks-vision'
 import type {
   GestureState,
   HandData,
@@ -166,10 +166,7 @@ export class HandSwipeDetector {
     this.rafId = requestAnimationFrame(this.detect)
   }
 
-  private processResult(result: {
-    landmarks: Array<Array<{ x: number; y: number; z: number }>>
-    handedness: Array<Array<{ categoryName: string }>>
-  }): void {
+  private processResult(result: HandLandmarkerResult): void {
     const numHands = result.landmarks?.length ?? 0
     const now = performance.now()
 
@@ -227,10 +224,8 @@ export class HandSwipeDetector {
       if (this.prevTwoHandDistance !== null) {
         const changeRatio = Math.abs(dist - this.prevTwoHandDistance) / this.prevTwoHandDistance
         if (changeRatio >= SCALE_CHANGE_THRESHOLD) {
-          // Map the distance ratio to 0.5–2.0 scale range
-          const normalizedScale = dist / this.prevTwoHandDistance
-          const scale = Math.max(0.5, Math.min(2.0, normalizedScale))
-          const event: ScaleEvent = { scale }
+          const ratio = dist / this.prevTwoHandDistance
+          const event: ScaleEvent = { scale: ratio }
           this.callbacks.onScale(event)
           this.prevTwoHandDistance = dist
         }

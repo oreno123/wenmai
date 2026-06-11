@@ -125,7 +125,7 @@ export default function GestureCardView({ patterns, onClose }: Props) {
         renderer.triggerSwipeArc(event)
       },
       onScale: (event: ScaleEvent) => {
-        setCardScale(event.scale)
+        setCardScale(prev => Math.max(0.5, Math.min(2.0, prev * event.scale)))
       },
       onStateChange: (state: GestureState) => {
         setGestureState(state)
@@ -139,7 +139,15 @@ export default function GestureCardView({ patterns, onClose }: Props) {
 
     // 3. Initialize detector
     detector.init()
-      .then(() => setIsReady(true))
+      .then(() => {
+        setIsReady(true)
+        // Attach video source to visible element
+        const src = detector.getVideoElement()
+        if (src && videoRef.current) {
+          videoRef.current.srcObject = src.srcObject
+          videoRef.current.play().catch(() => {})
+        }
+      })
       .catch((err) => setError(err instanceof Error ? err.message : '摄像头不可用'))
 
     // 4. Start particle render loop
@@ -186,16 +194,6 @@ export default function GestureCardView({ patterns, onClose }: Props) {
       rendererRef.current = null
     }
   }, [patterns.length, goNext, goPrev])
-
-  // Video attachment: copy srcObject from detector to visible video
-  useEffect(() => {
-    if (!isReady || !detectorRef.current) return
-    const src = detectorRef.current.getVideoElement()
-    if (src && videoRef.current) {
-      videoRef.current.srcObject = src.srcObject
-      videoRef.current.play().catch(() => {})
-    }
-  }, [isReady])
 
   // Card carousel helpers
   const len = patterns.length
