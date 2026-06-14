@@ -14,12 +14,65 @@
 - **3D 产品预览** — 马克杯、手机壳、盘子、丝巾贴纹样实时预览
 - **手势交互展示** — MediaPipe 手势控制纹样碎裂 / 拼合，弹簧物理动画
 - **分享卡片** — Canvas 生成 750×1334 品牌分享图，一键保存
+- **账号系统** — Supabase 邮箱注册，登录后积分/收藏/创作自动同步到云端，支持跨设备；未登录走 localStorage
+
+## 账号与数据同步
+
+### 注册流程（用户视角）
+
+1. Home 顶栏右上角点 **登录** → 进入 `/auth`
+2. 切换到 **注册**：填用户名 + 邮箱 + 密码（≥ 8 位） → **注册**
+3. **去邮箱收确认邮件** → 点确认链接（Supabase 默认开启 Email Verification，必须验证才能登录）
+4. 回到 `/auth` 用邮箱 + 密码登录
+5. 登录后 Home 顶栏账号按钮变成头像 + 用户名，数据开始自动云端同步
+
+### 同步机制
+
+- 登录瞬间：从 Supabase `profiles` 表拉数据覆盖本地（云端优先）
+- 每次 `setData`（抽卡、收藏、保存作品等）→ 1s debounce 推到云端
+- 登出：停止推送，本地数据保留
+- 未登录：纯 localStorage，体验零侵入
+
+### 配置
+
+需要 `.env.local`：
+
+```
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_...
+```
+
+数据库表结构（在 Supabase SQL Editor 跑一次）：
+
+```sql
+CREATE TABLE profiles (
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  username TEXT,
+  points INTEGER DEFAULT 1000,
+  free_pulls INTEGER DEFAULT 10,
+  pity_counter INTEGER DEFAULT 0,
+  daily_pull_date TEXT,
+  library JSONB DEFAULT '["basic-1","basic-2","basic-3"]'::jsonb,
+  creations JSONB DEFAULT '[]'::jsonb,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users access own profile" ON profiles
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+```
+
+### 防刷建议
+
+- 保持 **Authentication → Providers → Email → Confirm email** 开启（默认）
+- 加 **Cloudflare Turnstile** CAPTCHA（Supabase Auth 设置里填 site key）
+- 或改成 Invite-only（关闭 Allow new users to sign up，手动 Add user）
 
 ## 技术栈
 
-Vite 8 · React 19 · Three.js (R3F) · Framer Motion · Tailwind CSS 4 · MediaPipe
+Vite 8 · React 19 · Three.js (R3F) · Framer Motion · Tailwind CSS 4 · MediaPipe · Supabase
 
-纯前端 SPA，无后端依赖，数据存 localStorage。
+前端 SPA + Supabase 后端（Auth + Postgres），未登录数据降级到 localStorage。
 
 ## 开发
 
