@@ -272,7 +272,7 @@ export default function Home() {
             style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 28 }}
           >
             {[
-              { icon: 'camera', label: '拍照识别', path: '/photo-match' },
+              { icon: 'camera', label: '找相似', path: '/photo-match' },
               { icon: 'compose', label: '创 作', path: '/puzzle' },
               { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
               { icon: 'cube', label: '纹样浮雕', path: '/editor' },
