@@ -1,5 +1,34 @@
 import { useState, useCallback } from 'react'
 import { DAILY_FREE_PULLS, INITIAL_POINTS, STORAGE_KEY, MAX_STORAGE_BYTES, PULL_COST, MAX_CREATIONS, TEN_PULL_COST } from '../constants'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
+
+// Module-level: when set, every setData triggers a debounced push to the
+// user's profile row in Supabase. App.tsx sets this via setSyncUser.
+let syncUserId: string | null = null
+let pushTimer: ReturnType<typeof setTimeout> | null = null
+
+export function setSyncUser(userId: string | null) {
+  syncUserId = userId
+  if (!userId && pushTimer) {
+    clearTimeout(pushTimer)
+    pushTimer = null
+  }
+}
+
+async function pushToCloud(userId: string, data: GameData) {
+  if (!isSupabaseConfigured) return
+  const { error } = await supabase.from('profiles').upsert({
+    user_id: userId,
+    points: data.points,
+    free_pulls: data.freePulls,
+    pity_counter: data.pityCounter,
+    daily_pull_date: data.dailyPull.date,
+    library: data.library,
+    creations: data.creations,
+    updated_at: new Date().toISOString(),
+  })
+  if (error) console.warn('[sync] push failed:', error.message)
+}
 
 // ── Types ──────────────────────────────────────────────
 
@@ -48,6 +77,7 @@ export interface GameStore {
   resetPity: () => void
   saveCreation: (imageDataUrl: string, source?: string, placements?: Placement[]) => string
   deleteCreation: (creationId: string) => void
+  syncFromCloud: (userId: string) => Promise<void>
 }
 
 // ── Constants ──────────────────────────────────────────
@@ -110,6 +140,13 @@ export function useGameStore(): GameStore {
     setDataState(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater
       saveData(next)
+      // When logged in, push to cloud (debounced 1s)
+      if (syncUserId) {
+        if (pushTimer) clearTimeout(pushTimer)
+        pushTimer = setTimeout(() => {
+          pushToCloud(syncUserId, next)
+        }, 1000)
+      }
       return next
     })
   }, [])
@@ -218,6 +255,42 @@ export function useGameStore(): GameStore {
     }))
   }, [setData])
 
+  const syncFromCloud = useCallback(async (userId: string) => {
+    if (!isSupabaseConfigured) return
+    setSyncUser(userId)
+    const { data: row, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (error) {
+      console.warn('[sync] pull failed:', error.message)
+      return
+    }
+
+    if (!row) {
+      // Cloud has no row yet — push current local state up.
+      const current = loadData()
+      // Reapply daily reset to whatever we push so cloud and local agree.
+      const fresh = checkDailyReset(current)
+      saveData(fresh)
+      await pushToCloud(userId, fresh)
+      return
+    }
+
+    // Merge cloud fields over local — cloud is source of truth for cross-device.
+    setDataState(prev => ({
+      ...prev,
+      points: row.points ?? prev.points,
+      freePulls: row.free_pulls ?? prev.freePulls,
+      pityCounter: row.pity_counter ?? prev.pityCounter,
+      dailyPull: { date: row.daily_pull_date ?? prev.dailyPull.date, used: false },
+      library: Array.isArray(row.library) ? row.library : prev.library,
+      creations: Array.isArray(row.creations) ? row.creations : prev.creations,
+    }))
+  }, [])
+
   return {
     data,
     addPoints,
@@ -231,5 +304,6 @@ export function useGameStore(): GameStore {
     resetPity,
     saveCreation,
     deleteCreation,
+    syncFromCloud,
   }
 }

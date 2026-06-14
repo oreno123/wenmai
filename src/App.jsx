@@ -1,9 +1,11 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { RouterProvider, useLocation } from './components/common/Router'
-import { AppProvider } from './store/AppState'
+import { AppProvider, useApp } from './store/AppState'
 import BottomNav from './components/common/BottomNav'
 import GoldBackground from './components/common/GoldBackground'
 import ErrorBoundary from './components/common/ErrorBoundary'
+import { useAuth } from './lib/auth'
+import { setSyncUser } from './store/gameStore'
 
 const SplashPage = lazy(() => import('./pages/SplashPage'))
 const Landing = lazy(() => import('./pages/Landing'))
@@ -19,6 +21,7 @@ const Showcase = lazy(() => import('./pages/Showcase'))
 const PatternDetailPage = lazy(() => import('./pages/PatternDetailPage'))
 const PhotoMatchPage = lazy(() => import('./pages/PhotoMatchPage'))
 const QinghuaBrowser = lazy(() => import('./pages/QinghuaBrowser'))
+const AuthPage = lazy(() => import('./pages/AuthPage'))
 
 function PageLoader() {
   return (
@@ -48,6 +51,7 @@ function Pages() {
   else if (pathname.startsWith('/pattern/')) Page = PatternDetailPage
   else if (pathname === '/photo-match') Page = PhotoMatchPage
   else if (pathname === '/qinghua') Page = QinghuaBrowser
+  else if (pathname === '/auth') Page = AuthPage
   else if (pathname === '/landing') Page = Landing
   else Page = SplashPage
 
@@ -78,9 +82,28 @@ export default function App() {
       <RouterProvider>
         <AppProvider>
           <GoldBackground />
+          <CloudSync />
           <Layout />
         </AppProvider>
       </RouterProvider>
     </ErrorBoundary>
   )
+}
+
+// Bridge Supabase auth to the game store: pull cloud data when a session
+// appears, stop pushing when it disappears. Must live inside AppProvider
+// so it can call useApp().
+function CloudSync() {
+  const { user } = useAuth()
+  const { syncFromCloud } = useApp()
+
+  useEffect(() => {
+    if (user) {
+      syncFromCloud(user.id)
+    } else {
+      setSyncUser(null)
+    }
+  }, [user, syncFromCloud])
+
+  return null
 }

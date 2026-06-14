@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
+import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
 
 const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
@@ -72,9 +73,11 @@ function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
 export default function Home() {
   const navigate = useNavigate()
   const { data } = useApp()
+  const { user } = useAuth()
   const series = getAllSeries()
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const creationsRef = useRef(null)
+  const displayName = user?.user_metadata?.username || user?.email?.split('@')[0]
 
   const scrollToCreations = () => {
     creationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -159,6 +162,52 @@ export default function Home() {
                 {data.points}
               </span>
             </div>
+            {/* Account button — shows avatar chip when logged in, "登录" otherwise */}
+            <button
+              onClick={() => navigate('/auth')}
+              title={user ? displayName : '登录账号'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: user ? '4px 6px 4px 4px' : '6px 14px',
+                borderRadius: 18,
+                background: user
+                  ? 'linear-gradient(145deg, rgba(201,148,58,0.18), rgba(201,148,58,0.06))'
+                  : 'rgba(212,175,106,0.08)',
+                border: user
+                  ? '1px solid rgba(201,148,58,0.4)'
+                  : '1px solid rgba(212,175,106,0.22)',
+                color: '#F2D58A', fontSize: 12, cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 500,
+                letterSpacing: '0.08em',
+                transition: 'all 0.2s',
+                boxShadow: user ? '0 0 12px rgba(201,148,58,0.15)' : 'none',
+              }}
+            >
+              {user ? (
+                <>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: '50%',
+                    background: 'linear-gradient(145deg, #C9943A, #8B6914)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Noto Serif SC, serif', fontSize: 12,
+                    color: '#F5F1E8', fontWeight: 700,
+                  }}>
+                    {(displayName || '?').slice(0, 1).toUpperCase()}
+                  </div>
+                  <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {displayName}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>登录</span>
+                </>
+              )}
+            </button>
           </div>
         </motion.div>
 
