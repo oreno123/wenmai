@@ -45,12 +45,16 @@ export async function signUpWithEmail(email, password, username) {
 
   // Create a profile row for the new user. RLS only allows the user to write
   // their own row, but the user is now authenticated so this works.
-  // Welcome bundle: 3 commons + 团龙 SSR, same as local DEFAULT_DATA.
+  // Welcome bundle matches DEFAULT_DATA: 3 commons + 6 SSRs.
   if (data.user) {
     await supabase.from('profiles').upsert({
       user_id: data.user.id,
       username,
-      library: ['basic-1', 'basic-2', 'basic-3', 'dragon-4'],
+      library: [
+        'basic-1', 'basic-2', 'basic-3',
+        'dragon-4', 'cloud-4', 'taotie-3', 'scroll-3',
+        'sj-7', 'sj-12',
+      ],
       updated_at: new Date().toISOString(),
     })
   }

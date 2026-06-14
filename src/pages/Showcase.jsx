@@ -140,6 +140,7 @@ export default function Showcase() {
             isFist={isFist}
             imageUrl={userImage}
             placements={placements}
+            allLandmarks={allLandmarks}
           />
         </Suspense>
       </Canvas>

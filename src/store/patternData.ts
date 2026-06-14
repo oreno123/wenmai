@@ -165,6 +165,20 @@ export function getAllSeries(): SeriesWithPatterns[] {
   }))
 }
 
+// Per-series weight modifier. Series with a huge number of patterns
+// (qinghua has 335) would otherwise dominate the draw just by counting
+// tickets, not because they're more likely. Apply a discount so each
+// series reads at roughly equal frequency in practice.
+const SERIES_WEIGHT_MOD: Record<string, number> = {
+  qinghua: 0.04,  // 335 patterns — heavy discount
+  shanjing: 1.0,  // 25 all-SSR shanhai patterns — full weight, they're the headline draws
+}
+
+function patternWeight(p: Pattern, rarityWeights: Record<Rarity, number>): number {
+  const mod = SERIES_WEIGHT_MOD[p.series] ?? 1
+  return rarityWeights[p.rarity] * mod
+}
+
 export function getRandomPattern(pityCounter: number = 0): Pattern {
   // 硬保底：90抽必出 SSR
   if (pityCounter >= PITY_THRESHOLD - 1) {
@@ -183,10 +197,10 @@ export function getRandomPattern(pityCounter: number = 0): Pattern {
     ssr: RARITY_WEIGHTS.ssr + ssrBoost,
   }
 
-  const total = PATTERN_LIBRARY.reduce((sum, p) => sum + boostedWeights[p.rarity], 0)
+  const total = PATTERN_LIBRARY.reduce((sum, p) => sum + patternWeight(p, boostedWeights), 0)
   let rand = Math.random() * total
   for (const pattern of PATTERN_LIBRARY) {
-    rand -= boostedWeights[pattern.rarity]
+    rand -= patternWeight(pattern, boostedWeights)
     if (rand <= 0) return pattern
   }
   return PATTERN_LIBRARY[0]
@@ -194,7 +208,20 @@ export function getRandomPattern(pityCounter: number = 0): Pattern {
 
 function getRandomOfRarity(rarity: Rarity): Pattern {
   const pool = PATTERN_LIBRARY.filter(p => p.rarity === rarity)
-  return pool[Math.floor(Math.random() * pool.length)]
+  // Use the same series-discounted weighting so SSR pity also doesn't
+  // collapse into "yet another qinghua".
+  const baseWeights: Record<Rarity, number> = {
+    common: RARITY_WEIGHTS.common,
+    rare: RARITY_WEIGHTS.rare,
+    ssr: RARITY_WEIGHTS.ssr,
+  }
+  const total = pool.reduce((sum, p) => sum + patternWeight(p, baseWeights), 0)
+  let rand = Math.random() * total
+  for (const p of pool) {
+    rand -= patternWeight(p, baseWeights)
+    if (rand <= 0) return p
+  }
+  return pool[0]
 }
 
 /**

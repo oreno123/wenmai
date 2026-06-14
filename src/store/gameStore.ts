@@ -78,6 +78,7 @@ export interface GameStore {
   saveCreation: (imageDataUrl: string, source?: string, placements?: Placement[]) => string
   deleteCreation: (creationId: string) => void
   syncFromCloud: (userId: string) => Promise<void>
+  resetLocalData: () => void
 }
 
 // ── Constants ──────────────────────────────────────────
@@ -85,9 +86,17 @@ export interface GameStore {
 const DEFAULT_DATA: GameData = {
   points: INITIAL_POINTS,
   freePulls: DAILY_FREE_PULLS,
-  // New-user welcome bundle: 3 commons + 1 SSR (团龙纹) so first-time
-  // visitors have something to play with in the editor/showcase immediately.
-  library: ['basic-1', 'basic-2', 'basic-3', 'dragon-4'],
+  // New-user welcome bundle: 3 commons + 6 SSRs spanning 4 series so the
+  // editor/showcase has decent material right out of the gate.
+  library: [
+    'basic-1', 'basic-2', 'basic-3',           // 3 基础 common
+    'dragon-4',                                  // 团龙纹
+    'cloud-4',                                   // 团云纹
+    'taotie-3',                                  // 夔龙饕餮纹
+    'scroll-3',                                  // 宝相花卷草
+    'sj-7',                                      // 夫诸·白鹿行水（山海经）
+    'sj-12',                                     // 应龙·飞龙布雨（山海经）
+  ],
   series: {},
   dailyPull: { date: null, used: false },
   creations: [],
@@ -272,11 +281,12 @@ export function useGameStore(): GameStore {
     }
 
     if (!row) {
-      // Cloud has no row yet — push current local state up.
-      const current = loadData()
-      // Reapply daily reset to whatever we push so cloud and local agree.
-      const fresh = checkDailyReset(current)
+      // New user — push the DEFAULT_DATA welcome bundle (新人福利: dragon-4 SSR
+      // + 3 basics) up to cloud. Don't push whatever is currently in local
+      // state because that may be the previous user's data leaking through.
+      const fresh = checkDailyReset({ ...DEFAULT_DATA })
       saveData(fresh)
+      setDataState(fresh)
       await pushToCloud(userId, fresh)
       return
     }
@@ -293,6 +303,14 @@ export function useGameStore(): GameStore {
     }))
   }, [])
 
+  // Wipe local state back to DEFAULT_DATA. Called when switching accounts
+  // so user A's library/creations don't leak into user B's view.
+  const resetLocalData = useCallback(() => {
+    const fresh = { ...DEFAULT_DATA }
+    saveData(fresh)
+    setDataState(fresh)
+  }, [])
+
   return {
     data,
     addPoints,
@@ -307,5 +325,6 @@ export function useGameStore(): GameStore {
     saveCreation,
     deleteCreation,
     syncFromCloud,
+    resetLocalData,
   }
 }

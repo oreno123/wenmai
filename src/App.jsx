@@ -96,15 +96,18 @@ export default function App() {
 // so it can call useApp().
 function CloudSync() {
   const { user } = useAuth()
-  const { syncFromCloud } = useApp()
+  const { syncFromCloud, resetLocalData } = useApp()
 
   useEffect(() => {
     if (user) {
+      // Always reset local before syncing so a previous user's data
+      // (library, creations, points) can't leak into the new session.
+      resetLocalData()
       syncFromCloud(user.id)
     } else {
       setSyncUser(null)
     }
-  }, [user, syncFromCloud])
+  }, [user, syncFromCloud, resetLocalData])
 
   return null
 }

@@ -72,11 +72,12 @@ function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
 
 export default function Home() {
   const navigate = useNavigate()
-  const { data } = useApp()
+  const { data, deleteCreation } = useApp()
   const { user } = useAuth()
   const series = getAllSeries()
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const creationsRef = useRef(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0]
 
   const scrollToCreations = () => {
@@ -368,6 +369,7 @@ export default function Home() {
                       navigate('/showcase')
                     } catch {}
                   }} style={{
+                    position: 'relative',
                     aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
                     border: '1px solid rgba(212,175,106,0.18)',
                     background: 'linear-gradient(145deg, #1E1C16, #14120E)',
@@ -384,8 +386,116 @@ export default function Home() {
                     }}
                   >
                     <img src={c.image} alt="创作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {/* Delete button — top-right × ; stops propagation so the
+                        card's "open in Showcase" click doesn't fire */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDeleteTarget(c)
+                      }}
+                      title="删除作品"
+                      style={{
+                        position: 'absolute', top: 5, right: 5,
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: 'rgba(8,6,4,0.72)',
+                        backdropFilter: 'blur(6px)',
+                        WebkitBackdropFilter: 'blur(6px)',
+                        border: '1px solid rgba(232,128,128,0.25)',
+                        color: '#E88080',
+                        fontSize: 14, lineHeight: '20px',
+                        cursor: 'pointer', padding: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'inherit',
+                        opacity: 0.7,
+                        transition: 'opacity 0.2s',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
+                    >×</button>
                   </div>
                 ))}
+              </motion.div>
+            )}
+
+            {/* Delete-confirmation modal */}
+            {deleteTarget && (
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setDeleteTarget(null)}
+                style={{
+                  position: 'fixed', inset: 0, zIndex: 200,
+                  background: 'rgba(8,6,4,0.78)',
+                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 24,
+                }}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 12 }} animate={{ scale: 1, y: 0 }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    width: '100%', maxWidth: 280,
+                    padding: '22px 22px 18px',
+                    borderRadius: 14,
+                    background: 'linear-gradient(145deg, #1F1D17, #14120D)',
+                    border: '1px solid rgba(212,175,106,0.22)',
+                    boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%',
+                    background: 'rgba(232,128,128,0.1)',
+                    border: '1px solid rgba(232,128,128,0.25)',
+                    margin: '0 auto 12px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E88080" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" />
+                    </svg>
+                  </div>
+                  <div style={{
+                    fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600,
+                    color: '#F2D58A', letterSpacing: '0.1em', marginBottom: 6,
+                  }}>
+                    删除这幅作品？
+                  </div>
+                  <div style={{
+                    fontSize: 12, color: '#7A7060', lineHeight: 1.6, marginBottom: 18,
+                  }}>
+                    删除后无法恢复<br />云端账号会同步删除
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => setDeleteTarget(null)}
+                      style={{
+                        flex: 1, padding: '10px',
+                        borderRadius: 10, fontSize: 12,
+                        fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em',
+                        background: 'rgba(255,255,255,0.04)',
+                        color: '#A09682',
+                        border: '1px solid rgba(255,255,255,0.06)',
+                        cursor: 'pointer',
+                      }}
+                    >取消</button>
+                    <button
+                      onClick={() => {
+                        if (deleteTarget) deleteCreation(deleteTarget.id)
+                        setDeleteTarget(null)
+                      }}
+                      style={{
+                        flex: 1, padding: '10px',
+                        borderRadius: 10, fontSize: 12, fontWeight: 600,
+                        fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em',
+                        background: 'linear-gradient(145deg, #C0392B, #8B2A1F)',
+                        color: '#F5F1E8',
+                        border: '1px solid rgba(192,57,43,0.4)',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 10px rgba(192,57,43,0.25)',
+                      }}
+                    >删除</button>
+                  </div>
+                </motion.div>
               </motion.div>
             )}
           </motion.div>

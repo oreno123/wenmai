@@ -10,7 +10,7 @@ import { createOutlinedBlock } from '../utils/blockOutline'
 // Module-level cache: same element file is processed once across all Showcase sessions.
 const _outlinedTextureCache = new Map()
 
-function loadOutlinedTexture(path) {
+function loadOutlinedTexture(path, clearCorners = true) {
   if (_outlinedTextureCache.has(path)) {
     const cached = _outlinedTextureCache.get(path)
     return cached instanceof Promise ? cached : Promise.resolve(cached)
@@ -19,7 +19,7 @@ function loadOutlinedTexture(path) {
     const img = new Image()
     img.onload = () => {
       try {
-        const canvas = createOutlinedBlock(img)
+        const canvas = createOutlinedBlock(img, { clearCorners })
         const tex = new THREE.CanvasTexture(canvas)
         tex.colorSpace = THREE.SRGBColorSpace
         tex.minFilter = THREE.LinearFilter
@@ -518,9 +518,9 @@ const VoronoiMesh = React.forwardRef(function VoronoiMesh({ fragment, texture, a
 
 // ── Main export: dispatches to classic or user creation ──
 
-export default function ShatterScene({ isOpen, isFist, imageUrl, placements }) {
+export default function ShatterScene({ isOpen, isFist, imageUrl, placements, allLandmarks }) {
   if (placements && placements.length > 0) {
-    return <UserPlacementScene placements={placements} isOpen={isOpen} isFist={isFist} />
+    return <UserPlacementScene placements={placements} isOpen={isOpen} isFist={isFist} allLandmarks={allLandmarks} />
   }
   if (imageUrl) {
     return <UserCreationScene imageUrl={imageUrl} isOpen={isOpen} isFist={isFist} />
@@ -532,7 +532,7 @@ export default function ShatterScene({ isOpen, isFist, imageUrl, placements }) {
 
 const PLACEMENT_TOTAL_SIZE = 2.8
 
-function UserPlacementScene({ placements, isOpen, isFist }) {
+function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
   // Resolve each placement's pattern image URL via the pattern store.
   // Placements now reference pattern IDs (cloud-4, qh-50, etc.) rather than
   // element IDs, so we can pull from the full PATTERN_LIBRARY.
@@ -563,7 +563,11 @@ function UserPlacementScene({ placements, isOpen, isFist }) {
   useEffect(() => {
     if (elementFiles.length === 0) return
     let cancelled = false
-    Promise.all(elementFiles.map(path => loadOutlinedTexture(path).then(tex => [path, tex])))
+    Promise.all(elementFiles.map(path => {
+      // qinghua porcelain photos have no AI watermark — don't clear corners
+      const isQinghua = path.includes('/patterns/qinghua/')
+      return loadOutlinedTexture(path, !isQinghua).then(tex => [path, tex])
+    }))
       .then(entries => {
         if (cancelled) return
         setTextureByPath(new Map(entries))
@@ -598,8 +602,11 @@ function UserPlacementScene({ placements, isOpen, isFist }) {
 
   if (!stateRef.current) {
     stateRef.current = items.map((item) => {
-      const angle = Math.atan2(item.home.y, item.home.x) + (Math.random() - 0.5) * 0.8
-      const dist = 2.2 + Math.random() * 1.5
+      // Keep shatter radius tight — camera is at z=4 with fov=45, so the
+      // visible horizontal half-width is ~1.65. Flying to dist 2-3 puts
+      // fragments outside the frame. Pull it back to ~1.0-1.8.
+      const angle = Math.atan2(item.home.y, item.home.x) + (Math.random() - 0.5) * 0.6
+      const dist = 1.0 + Math.random() * 0.8
       return {
         home: { ...item.home },
         homeRotationZ: item.rotation,
@@ -610,14 +617,14 @@ function UserPlacementScene({ placements, isOpen, isFist }) {
         targetRotation: { x: 0, y: 0, z: item.rotation },
         rotVelocity: { x: 0, y: 0, z: 0 },
         shatterPos: {
-          x: Math.cos(angle) * dist + (Math.random() - 0.5) * 0.6,
-          y: Math.sin(angle) * dist + (Math.random() - 0.5) * 0.6,
-          z: (Math.random() - 0.5) * 1.0,
+          x: Math.cos(angle) * dist + (Math.random() - 0.5) * 0.4,
+          y: Math.sin(angle) * dist + (Math.random() - 0.5) * 0.4,
+          z: (Math.random() - 0.5) * 0.6,
         },
         shatterRot: {
-          x: (Math.random() - 0.5) * 0.6,
-          y: (Math.random() - 0.5) * 0.5,
-          z: item.rotation + (Math.random() - 0.5) * 0.4,
+          x: (Math.random() - 0.5) * 0.4,
+          y: (Math.random() - 0.5) * 0.35,
+          z: item.rotation + (Math.random() - 0.5) * 0.3,
         },
         isAssembling: true,
       }
@@ -669,9 +676,47 @@ function UserPlacementScene({ placements, isOpen, isFist }) {
 
     if (isOpen && !prevOpen.current && !isShattered.current) {
       isShattered.current = true
+
+      // Derive shatter direction from where the hand actually is —
+      // fragments flee the palm rather than flying along a canned angle.
+      let palmX = 0, palmY = 0
+      let havePalm = false
+      if (allLandmarks && allLandmarks.length > 0) {
+        const lm = allLandmarks[0]
+        if (lm && lm[0] && lm[9]) {
+          // Mirror x (selfie cam), remap 0..1 → -1.85..1.85 world units
+          const px = (lm[0].x + lm[9].x) / 2
+          const py = (lm[0].y + lm[9].y) / 2
+          palmX = (1 - px - 0.5) * 3.7
+          palmY = (0.5 - py) * 3.7
+          havePalm = true
+        }
+      }
+
       for (const st of pieces) {
-        st.target = { ...st.shatterPos }
-        st.targetRotation = { ...st.shatterRot }
+        let nx, ny
+        if (havePalm) {
+          const dx = st.home.x - palmX
+          const dy = st.home.y - palmY
+          const len = Math.sqrt(dx*dx + dy*dy) || 1
+          nx = dx / len
+          ny = dy / len
+        } else {
+          const ang = Math.atan2(st.home.y, st.home.x)
+          nx = Math.cos(ang)
+          ny = Math.sin(ang)
+        }
+        const dist = 1.0 + Math.random() * 0.8
+        st.target = {
+          x: st.home.x + nx * dist + (Math.random() - 0.5) * 0.3,
+          y: st.home.y + ny * dist + (Math.random() - 0.5) * 0.3,
+          z: (Math.random() - 0.5) * 0.6,
+        }
+        st.targetRotation = {
+          x: (Math.random() - 0.5) * 0.4,
+          y: (Math.random() - 0.5) * 0.35,
+          z: st.homeRotationZ + (Math.random() - 0.5) * 0.3,
+        }
         st.isAssembling = false
       }
     }

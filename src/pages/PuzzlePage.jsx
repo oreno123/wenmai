@@ -46,7 +46,7 @@ export default function PuzzlePage() {
       img.src = getPatternImage(p)
       img.onload = () => {
         setLoadedImages(prev => ({ ...prev, [p.id]: img }))
-        const block = createOutlinedBlock(img)
+        const block = createOutlinedBlock(img, { clearCorners: p.series !== 'qinghua' })
         setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
         // Also expose a dataURL so the tray thumbnail (an <img>) can show
         // the shape-stamped version, not the original square image.

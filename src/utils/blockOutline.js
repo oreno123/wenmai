@@ -9,8 +9,14 @@ const OUTLINE_SIZE = 256
  * Inside the silhouette: dark backing fills any internal holes (so the
  * piece reads as a solid chip), warm cream outline traces the edge, then
  * the original image is composited on top.
+ *
+ * Options:
+ *   clearCorners (default true) — fill the four corners with the sampled
+ *   background color to erase AI-generator watermarks. Pass false for
+ *   series that are photographic (qinghua — porcelain photos have no
+ *   watermark and overpainting corners shows up as visible squares).
  */
-export function createOutlinedBlock(img) {
+export function createOutlinedBlock(img, { clearCorners = true } = {}) {
   const size = OUTLINE_SIZE
   const canvas = document.createElement('canvas')
   canvas.width = size
@@ -42,14 +48,16 @@ export function createOutlinedBlock(img) {
 
   // Overpaint AI-watermark corners with the sampled background color so
   // the white watermark text doesn't get picked up as "pattern" later.
-  // Keep this small (13%) — too aggressive and we eat into patterns like
-  // 角花 that legitimately extend toward corners.
-  const watermarkSize = size * 0.13
-  ctx.fillStyle = `rgb(${Math.round(bgR)}, ${Math.round(bgG)}, ${Math.round(bgB)})`
-  ctx.fillRect(0, 0, watermarkSize, watermarkSize)
-  ctx.fillRect(size - watermarkSize, 0, watermarkSize, watermarkSize)
-  ctx.fillRect(0, size - watermarkSize, watermarkSize, watermarkSize)
-  ctx.fillRect(size - watermarkSize, size - watermarkSize, watermarkSize, watermarkSize)
+  // Skip for photographic series (qinghua) where there's no watermark
+  // and corner-filling shows up as visible squares.
+  if (clearCorners) {
+    const watermarkSize = size * 0.13
+    ctx.fillStyle = `rgb(${Math.round(bgR)}, ${Math.round(bgG)}, ${Math.round(bgB)})`
+    ctx.fillRect(0, 0, watermarkSize, watermarkSize)
+    ctx.fillRect(size - watermarkSize, 0, watermarkSize, watermarkSize)
+    ctx.fillRect(0, size - watermarkSize, watermarkSize, watermarkSize)
+    ctx.fillRect(size - watermarkSize, size - watermarkSize, watermarkSize, watermarkSize)
+  }
 
   const data = ctx.getImageData(0, 0, size, size).data
 
