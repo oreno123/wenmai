@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
@@ -26,32 +27,138 @@ function CloudPattern({ size = 44, opacity = 0.85 }) {
   )
 }
 
+/* 五入口图标 — 线条 SVG，统一风格 */
+function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
+  const icons = {
+    camera: (
+      <>
+        <path d="M3 7h3l2-3h8l2 3h3v12H3V7z" />
+        <circle cx="12" cy="13" r="3.5" />
+      </>
+    ),
+    compose: (
+      <>
+        <path d="M14 4l6 6L8 22H2v-6L14 4z" />
+        <path d="M12 6l6 6" />
+      </>
+    ),
+    puzzle: (
+      <>
+        <path d="M5 5h6v2c0 1 1 2 2 2s2-1 2-2V5h4v6h-2c-1 0-2 1-2 2s1 2 2 2h2v6h-6v-2c0-1-1-2-2-2s-2 1-2 2v2H5v-6h2c1 0 2-1 2-2s-1-2-2-2H5V5z" />
+      </>
+    ),
+    cube: (
+      <>
+        <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z" />
+        <path d="M12 22V12M3 7l9 5 9-5" />
+      </>
+    ),
+    hand: (
+      <>
+        <path d="M9 11V5a1.8 1.8 0 1 1 3.6 0v5" />
+        <path d="M12.6 9V4a1.8 1.8 0 1 1 3.6 0v6" />
+        <path d="M16.2 11V6a1.8 1.8 0 1 1 3.6 0v8a8 8 0 0 1-8 8h-1c-3 0-4.5-1-6.5-3l-3-3c-1-1 0-2.5 1.5-2l3 2V9a1.8 1.8 0 1 1 3.6 0v3" />
+      </>
+    ),
+  }
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      {icons[name]}
+    </svg>
+  )
+}
+
 export default function Home() {
   const navigate = useNavigate()
   const { data } = useApp()
   const series = getAllSeries()
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
+  const creationsRef = useRef(null)
+
+  const scrollToCreations = () => {
+    creationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div style={{ background: 'transparent', minHeight: '100vh', paddingBottom: '80px', position: 'relative' }}>
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* ── 顶栏 ── */}
         <motion.div style={{
-          height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 16px', background: 'transparent',
+          height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 20px', background: 'transparent',
         }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, cursor: 'pointer' }}
             onClick={() => navigate('/landing')} title="回到首页">
-            <span style={{ fontFamily: 'serif', fontSize: 22, color: '#F2D58A', letterSpacing: '0.25em' }}>纹脉</span>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#BC1F28', marginLeft: 2 }} />
+            <span style={{
+              fontFamily: 'Noto Serif SC, serif', fontSize: 24, fontWeight: 600,
+              color: '#F2D58A', letterSpacing: '0.2em',
+            }}>
+              纹脉
+            </span>
+            <span style={{
+              fontSize: 9, color: '#8A6A30', letterSpacing: '0.35em',
+              textTransform: 'uppercase', fontWeight: 500,
+            }}>
+              Pattern Veins
+            </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="#D4AF6A" strokeWidth="1" />
-              <path d="M10 5 L10 15 M5 10 L15 10" stroke="#D4AF6A" strokeWidth="0.6" />
-            </svg>
-            <span style={{ color: '#F2D58A', fontSize: 15 }}>{data.points}</span>
-            <span style={{ color: '#8A8A8A', fontSize: 18, cursor: 'pointer' }}>+</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={scrollToCreations}
+              title="作品集"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 18,
+                background: 'rgba(212,175,106,0.08)',
+                border: '1px solid rgba(212,175,106,0.22)',
+                color: '#F2D58A', fontSize: 12, cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 500,
+                letterSpacing: '0.08em',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(212,175,106,0.15)'
+                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(212,175,106,0.08)'
+                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 3v18" opacity="0.5" />
+              </svg>
+              <span>作品</span>
+              {data.creations && data.creations.length > 0 && (
+                <span style={{
+                  background: '#BC1F28', color: '#F5F1E8',
+                  fontSize: 10, fontWeight: 700,
+                  padding: '1px 7px', borderRadius: 9,
+                  minWidth: 18, textAlign: 'center', lineHeight: '14px',
+                }}>
+                  {data.creations.length}
+                </span>
+              )}
+            </button>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', borderRadius: 18,
+              background: 'rgba(212,175,106,0.04)',
+              border: '1px solid rgba(212,175,106,0.12)',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="#D4AF6A" strokeWidth="1" />
+                <path d="M10 5 L10 15 M5 10 L15 10" stroke="#D4AF6A" strokeWidth="0.6" />
+              </svg>
+              <span style={{
+                color: '#F2D58A', fontSize: 13, fontWeight: 600,
+                fontFamily: 'Noto Serif SC, serif',
+              }}>
+                {data.points}
+              </span>
+            </div>
           </div>
         </motion.div>
 
@@ -110,95 +217,129 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* ── 四个功能入口 ── */}
+          {/* ── 五个功能入口 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate"
-            style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 28 }}
           >
             {[
-              { icon: '📷', label: '拍照识别', path: '/photo-match' },
-              { icon: '✏️', label: '创 作', path: '/puzzle' },
-              { icon: '⊞', label: '经典拼图', path: '/jigsaw' },
-              { icon: '▣', label: '3D预览', path: '/showcase' },
+              { icon: 'camera', label: '拍照识别', path: '/photo-match' },
+              { icon: 'compose', label: '创 作', path: '/puzzle' },
+              { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
+              { icon: 'cube', label: '纹样浮雕', path: '/editor' },
+              { icon: 'hand', label: '手势展示', path: '/showcase' },
             ].map((item, i) => (
-              <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
+              <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
                 <div style={{
-                  width: 48, height: 48,
-                  background: 'linear-gradient(145deg, #222220, #1A1A18)',
-                  border: '1px solid rgba(212,175,106,0.15)', borderRadius: 12,
+                  width: 54, height: 54,
+                  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
+                  border: '1px solid rgba(212,175,106,0.2)',
+                  borderRadius: 14,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 22, color: '#D4AF6A',
-                }}>
-                  {item.icon}
+                  position: 'relative',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,106,0.05)',
+                  transition: 'all 0.25s ease',
+                }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.45)'
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4), 0 0 16px rgba(212,175,106,0.12), inset 0 1px 0 rgba(212,175,106,0.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.2)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,106,0.05)'
+                  }}
+                >
+                  <FeatureIcon name={item.icon} size={22} color="#F2D58A" />
+                  <div style={{
+                    position: 'absolute', top: 6, right: 6,
+                    width: 3, height: 3, borderRadius: '50%',
+                    background: '#BC1F28', opacity: 0.55,
+                  }} />
                 </div>
-                <span style={{ fontSize: 11, color: '#8A8A8A', marginTop: 6 }}>{item.label}</span>
+                <span style={{
+                  fontSize: 11, color: '#A09682', marginTop: 8,
+                  fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
+                }}>
+                  {item.label}
+                </span>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* ── 推荐纹样 ── */}
-          <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
-            <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <span style={{ fontFamily: 'serif', fontSize: 16, color: '#F5F1E8' }}>推荐纹样</span>
-              <span style={{ fontSize: 12, color: '#8A6A30' }}>更多 ›</span>
+          {/* ── 按系列轮播 ── */}
+          {series.map(s => (
+            <SeriesCarousel key={s.id} series={s} navigate={navigate} />
+          ))}
+
+          {/* ── 我的作品集 ── */}
+          <motion.div ref={creationsRef} variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28, scrollMarginTop: 70 }}>
+            <motion.div variants={fadeUp} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+              marginBottom: 4,
+              paddingBottom: 6,
+              borderBottom: '1px solid rgba(212,175,106,0.15)',
+            }}>
+              <span style={{
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 19, fontWeight: 600,
+                color: '#F2D58A', letterSpacing: '0.1em',
+              }}>
+                我的作品集
+              </span>
+              {data.creations && data.creations.length > 0 && (
+                <span style={{
+                  fontSize: 11, color: '#8A6A30',
+                  padding: '2px 10px', borderRadius: 10,
+                  background: 'rgba(212,175,106,0.06)',
+                }}>
+                  共 {data.creations.length} 件
+                </span>
+              )}
+            </motion.div>
+            <motion.div variants={fadeUp} style={{ fontSize: 11, color: '#6A6A6A', marginBottom: 12 }}>
+              {data.creations && data.creations.length > 0
+                ? '点击作品进入手势展示'
+                : '完成创作后保存，作品会出现在这里'}
             </motion.div>
 
-            <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: 12 }}>
-              {myPatterns.map(p => {
-                const rarityBg = p.rarity === 'ssr' ? '#BC6B2F'
-                  : p.rarity === 'rare' ? '#2A2A2A' : '#1A1A1A'
-                const rarityColor = p.rarity === 'ssr' ? '#F2D58A'
-                  : p.rarity === 'rare' ? '#D4AF6A' : '#6A6A6A'
-                const rarityText = p.rarity === 'ssr' ? 'SSR'
-                  : p.rarity === 'rare' ? 'SR' : 'N'
-                const imgSrc = getPatternImage(p)
-                return (
-                  <div key={p.id} onClick={() => navigate('/curate')} style={{ cursor: 'pointer' }}>
-                    <div style={{
-                      aspectRatio: '1', position: 'relative',
-                      background: 'linear-gradient(145deg, #1E1C16, #14120E)',
-                      border: '1px solid rgba(212,175,106,0.2)', borderRadius: 10,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      overflow: 'hidden',
-                    }}>
-                      <PatternImage src={imgSrc} alt={p.name} fallbackSize={38} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                      <span style={{
-                        position: 'absolute', top: 4, right: 4,
-                        background: rarityBg, color: rarityColor, fontSize: 9,
-                        padding: '1px 5px', borderRadius: 3,
-                      }}>
-                        {rarityText}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11, color: '#C8C0A8', marginTop: 5, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {p.name}
-                    </div>
-                  </div>
-                )
-              })}
-            </motion.div>
-          </motion.div>
-
-          {/* ── 我的创作 ── */}
-          {data.creations && data.creations.length > 0 && (
-            <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
-              <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span style={{ fontFamily: 'serif', fontSize: 16, color: '#F5F1E8' }}>我的创作</span>
-                <span style={{ fontSize: 12, color: '#8A6A30' }}>{data.creations.length} 件</span>
-              </motion.div>
-
+            {data.creations && data.creations.length > 0 && (
               <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10 }}>
                 {[...data.creations].reverse().map(c => (
-                  <div key={c.id} style={{
+                  <div key={c.id} onClick={() => {
+                    try {
+                      if (c.placements && c.placements.length > 0) {
+                        sessionStorage.setItem('showcase_placements', JSON.stringify(c.placements))
+                        sessionStorage.removeItem('showcase_image')
+                      } else {
+                        sessionStorage.setItem('showcase_image', c.image)
+                        sessionStorage.removeItem('showcase_placements')
+                      }
+                      navigate('/showcase')
+                    } catch {}
+                  }} style={{
                     aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
-                    border: '1px solid rgba(212,175,106,0.15)',
+                    border: '1px solid rgba(212,175,106,0.18)',
                     background: 'linear-gradient(145deg, #1E1C16, #14120E)',
-                  }}>
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s, border-color 0.2s',
+                  }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.03)'
+                      e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)'
+                      e.currentTarget.style.borderColor = 'rgba(212,175,106,0.18)'
+                    }}
+                  >
                     <img src={c.image} alt="创作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ))}
               </motion.div>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
 
           {/* ── 系列收集进度 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
@@ -234,6 +375,53 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function SeriesCarousel({ series, navigate }) {
+  if (!series.patterns.length) return null
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <span style={{ fontFamily: 'serif', fontSize: 15, color: series.color || '#F2D58A' }}>
+          {series.name}
+        </span>
+        <span style={{ fontSize: 11, color: '#666' }}>{series.patterns.length} 款</span>
+      </div>
+      <div style={{
+        display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8,
+        scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+      }}>
+        {series.patterns.map(p => {
+          const imgSrc = getPatternImage(p)
+          return (
+            <div key={p.id} onClick={() => navigate('/pattern/' + p.id)}
+              style={{
+                flex: '0 0 auto', width: 100, cursor: 'pointer',
+                scrollSnapAlign: 'start',
+              }}>
+              <div style={{
+                aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
+                background: '#111',
+                border: `1px solid ${series.color}22`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <PatternImage src={imgSrc} alt={p.name} fallbackSize={28}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+              <div style={{
+                fontSize: 10, color: '#999', marginTop: 5,
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {p.name}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

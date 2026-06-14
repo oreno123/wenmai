@@ -8,11 +8,21 @@ interface DailyPull {
   used: boolean
 }
 
+interface Placement {
+  id: string
+  x: number
+  y: number
+  size: number
+  rotation?: number
+  scale?: number
+}
+
 interface Creation {
   id: string
   image: string
   source: string
   createdAt: string
+  placements?: Placement[]
 }
 
 export interface GameData {
@@ -36,7 +46,7 @@ export interface GameStore {
   doTenPull: () => true | null
   incrementPity: () => void
   resetPity: () => void
-  saveCreation: (imageDataUrl: string, source?: string) => string
+  saveCreation: (imageDataUrl: string, source?: string, placements?: Placement[]) => string
   deleteCreation: (creationId: string) => void
 }
 
@@ -182,12 +192,13 @@ export function useGameStore(): GameStore {
     setData(d => ({ ...d, pityCounter: 0 }))
   }, [setData])
 
-  const saveCreation = useCallback((imageDataUrl: string, source: string = 'puzzle'): string => {
+  const saveCreation = useCallback((imageDataUrl: string, source: string = 'puzzle', placements?: Placement[]): string => {
     const creation: Creation = {
       id: `creation-${Date.now()}`,
       image: imageDataUrl,
       source,
       createdAt: new Date().toISOString(),
+      placements,
     }
     setData(d => {
       const next = { ...d, creations: [...d.creations, creation] }

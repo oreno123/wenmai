@@ -5,7 +5,7 @@ const TABS = [
   { path: '/library', label: '图鉴', icon: 'book' },
   { path: '/puzzle', label: '创作', icon: 'compose', center: true },
   { path: '/gacha', label: '抽卡', icon: 'card' },
-  { path: '/jigsaw', label: '拼图', icon: 'puzzle' },
+  { path: '/qinghua', label: '总览', icon: 'vase' },
 ]
 
 const ICONS = {
@@ -19,11 +19,6 @@ const ICONS = {
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
     </svg>
   ),
-  puzzle: (color) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568a1.5 1.5 0 010 2.122l-1.568 1.568c-.23.23-.338.556-.289.878l.39 2.334a1.5 1.5 0 01-1.212 1.726l-2.334.39a1.2 1.2 0 00-.878.289l-1.568 1.568a1.5 1.5 0 01-2.122 0l-1.568-1.568a1.2 1.2 0 00-.878-.289l-2.334-.39a1.5 1.5 0 01-1.212-1.726l.39-2.334c.049-.322-.059-.648-.289-.878L3.72 12.418a1.5 1.5 0 010-2.122l1.568-1.568c.23-.23.338-.556.289-.878l-.39-2.334A1.5 1.5 0 016.4 4.358l2.334-.39c.322-.049.648-.338.878-.568L11.18 1.832a1.5 1.5 0 012.122 0l1.568 1.568c.23.23.556.519.878.568l2.334.39a1.5 1.5 0 011.212 1.726z" />
-    </svg>
-  ),
   card: (color) => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="18" height="18" rx="3" /><path d="M12 8v8M8 12h8" />
@@ -32,6 +27,11 @@ const ICONS = {
   compose: (color) => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </svg>
+  ),
+  vase: (color) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 3h6" /><path d="M10 3c0 2-1 3-2 4-1.5 1.5-2 3.5-2 6 0 3 1.5 5 3 6.5.5.5 1 1 1 1.5h-4" /><path d="M14 3c0 2 1 3 2 4 1.5 1.5 2 3.5 2 6 0 3-1.5 5-3 6.5-.5.5-1 1-1 1.5" />
     </svg>
   ),
 }

@@ -1,9 +1,42 @@
-import React, { useRef, useEffect, useMemo } from 'react'
+import React, { useRef, useEffect, useMemo, useState } from 'react'
 import { useFrame, useLoader } from '@react-three/fiber'
 import * as THREE from 'three'
 import { updateSpring } from './springPhysics'
 import { voronoiShatter } from './voronoiShatter'
 import { SHATTER_SPRING, ASSEMBLE_SPRING, ROTATION_SPRING, GOLD_COLOR, BREAK_DISTANCE, FRAGMENT_COUNT } from './constants'
+import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
+import { createOutlinedBlock } from '../utils/blockOutline'
+
+// Module-level cache: same element file is processed once across all Showcase sessions.
+const _outlinedTextureCache = new Map()
+
+function loadOutlinedTexture(path) {
+  if (_outlinedTextureCache.has(path)) {
+    const cached = _outlinedTextureCache.get(path)
+    return cached instanceof Promise ? cached : Promise.resolve(cached)
+  }
+  const promise = new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      try {
+        const canvas = createOutlinedBlock(img)
+        const tex = new THREE.CanvasTexture(canvas)
+        tex.colorSpace = THREE.SRGBColorSpace
+        tex.minFilter = THREE.LinearFilter
+        tex.magFilter = THREE.LinearFilter
+        tex.generateMipmaps = false
+        _outlinedTextureCache.set(path, tex)
+        resolve(tex)
+      } catch (err) {
+        reject(err)
+      }
+    }
+    img.onerror = reject
+    img.src = path
+  })
+  _outlinedTextureCache.set(path, promise)
+  return promise
+}
 
 // ── Classic mode: 8 pre-defined blocks ──
 
@@ -485,9 +518,300 @@ const VoronoiMesh = React.forwardRef(function VoronoiMesh({ fragment, texture, a
 
 // ── Main export: dispatches to classic or user creation ──
 
-export default function ShatterScene({ isOpen, isFist, imageUrl }) {
+export default function ShatterScene({ isOpen, isFist, imageUrl, placements }) {
+  if (placements && placements.length > 0) {
+    return <UserPlacementScene placements={placements} isOpen={isOpen} isFist={isFist} />
+  }
   if (imageUrl) {
     return <UserCreationScene imageUrl={imageUrl} isOpen={isOpen} isFist={isFist} />
   }
   return <ClassicScene isOpen={isOpen} isFist={isFist} />
 }
+
+// ── User placement mode: each placed element is its own fragment ──
+
+const PLACEMENT_TOTAL_SIZE = 2.8
+
+function UserPlacementScene({ placements, isOpen, isFist }) {
+  // Resolve each placement's element file, dedupe and load processed (outlined) textures in parallel
+  const elementFiles = useMemo(() => {
+    const seen = new Set()
+    const files = []
+    for (const p of placements) {
+      const el = ELEMENT_MANIFEST.elements.find(e => e.id === p.id)
+      if (!el) continue
+      const path = `/elements/${el.file}`
+      if (!seen.has(path)) {
+        seen.add(path)
+        files.push(path)
+      }
+    }
+    return files
+  }, [placements])
+
+  const [textureByPath, setTextureByPath] = useState(() => {
+    // Seed from cache so already-processed textures (re-visits) show instantly
+    const m = new Map()
+    for (const path of elementFiles) {
+      const cached = _outlinedTextureCache.get(path)
+      if (cached && !(cached instanceof Promise)) m.set(path, cached)
+    }
+    return m
+  })
+
+  useEffect(() => {
+    if (elementFiles.length === 0) return
+    let cancelled = false
+    Promise.all(elementFiles.map(path => loadOutlinedTexture(path).then(tex => [path, tex])))
+      .then(entries => {
+        if (cancelled) return
+        setTextureByPath(new Map(entries))
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [elementFiles])
+
+  const items = useMemo(() => {
+    return placements.map((p) => {
+      const el = ELEMENT_MANIFEST.elements.find(e => e.id === p.id)
+      const path = el ? `/elements/${el.file}` : null
+      const texture = path ? textureByPath.get(path) : null
+      const sx = ((p.x ?? 512) / 1024 - 0.5) * PLACEMENT_TOTAL_SIZE
+      const sy = (0.5 - (p.y ?? 512) / 1024) * PLACEMENT_TOTAL_SIZE
+      const baseSize = ((p.scale ?? 1) * (p.size ?? 100)) / 1024 * PLACEMENT_TOTAL_SIZE
+      return {
+        texture,
+        home: { x: sx, y: sy, z: 0 },
+        size: baseSize,
+        rotation: p.rotation ?? 0,
+      }
+    })
+  }, [placements, textureByPath])
+
+  // Spring state per fragment
+  const stateRef = useRef(null)
+  const isShattered = useRef(false)
+  const prevOpen = useRef(false)
+  const prevFist = useRef(false)
+  const lightRef = useRef()
+
+  if (!stateRef.current) {
+    stateRef.current = items.map((item) => {
+      const angle = Math.atan2(item.home.y, item.home.x) + (Math.random() - 0.5) * 0.8
+      const dist = 2.2 + Math.random() * 1.5
+      return {
+        home: { ...item.home },
+        homeRotationZ: item.rotation,
+        position: { ...item.home },
+        target: { ...item.home },
+        velocity: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: item.rotation },
+        targetRotation: { x: 0, y: 0, z: item.rotation },
+        rotVelocity: { x: 0, y: 0, z: 0 },
+        shatterPos: {
+          x: Math.cos(angle) * dist + (Math.random() - 0.5) * 0.6,
+          y: Math.sin(angle) * dist + (Math.random() - 0.5) * 0.6,
+          z: (Math.random() - 0.5) * 1.0,
+        },
+        shatterRot: {
+          x: (Math.random() - 0.5) * 0.6,
+          y: (Math.random() - 0.5) * 0.5,
+          z: item.rotation + (Math.random() - 0.5) * 0.4,
+        },
+        isAssembling: true,
+      }
+    })
+  }
+
+  // Threads: connect each fragment to its 2 nearest home-position neighbors
+  const neighborPairs = useMemo(() => {
+    if (items.length < 2) return []
+    const pairs = []
+    const seen = new Set()
+    for (let i = 0; i < items.length; i++) {
+      const candidates = items
+        .map((it, j) => ({ j, d: Math.hypot(it.home.x - items[i].home.x, it.home.y - items[i].home.y) }))
+        .filter(x => x.j !== i)
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 2)
+      for (const { j } of candidates) {
+        const key = Math.min(i, j) + '-' + Math.max(i, j)
+        if (!seen.has(key)) {
+          seen.add(key)
+          pairs.push([i, j])
+        }
+      }
+    }
+    return pairs
+  }, [items])
+
+  const threadGeos = useMemo(() =>
+    neighborPairs.map(() => {
+      const g = new THREE.BufferGeometry()
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3))
+      return g
+    }),
+  [neighborPairs])
+
+  useFrame((state3d, delta) => {
+    const dt = Math.min(delta, 0.05)
+    const t = state3d.clock.elapsedTime
+
+    if (lightRef.current) {
+      lightRef.current.position.x = Math.sin(t * 0.3) * 3
+      lightRef.current.position.y = Math.cos(t * 0.2) * 2
+      lightRef.current.position.z = 3 + Math.sin(t * 0.4) * 0.5
+    }
+
+    const pieces = stateRef.current
+    if (!pieces) return
+
+    if (isOpen && !prevOpen.current && !isShattered.current) {
+      isShattered.current = true
+      for (const st of pieces) {
+        st.target = { ...st.shatterPos }
+        st.targetRotation = { ...st.shatterRot }
+        st.isAssembling = false
+      }
+    }
+    if (isFist && !prevFist.current && isShattered.current) {
+      isShattered.current = false
+      for (const st of pieces) {
+        st.target = { ...st.home }
+        st.targetRotation = { x: 0, y: 0, z: st.homeRotationZ }
+        st.isAssembling = true
+      }
+    }
+    prevOpen.current = isOpen
+    prevFist.current = isFist
+
+    for (const st of pieces) {
+      const spring = st.isAssembling ? ASSEMBLE_SPRING : SHATTER_SPRING
+      for (const a of ['x', 'y', 'z']) {
+        const r = updateSpring(st.position[a], st.target[a], st.velocity[a], spring.stiffness, spring.damping, dt)
+        st.position[a] = r.position
+        st.velocity[a] = r.velocity
+      }
+      for (const a of ['x', 'y', 'z']) {
+        const r = updateSpring(st.rotation[a], st.targetRotation[a], st.rotVelocity[a], ROTATION_SPRING.stiffness, ROTATION_SPRING.damping, dt)
+        st.rotation[a] = r.position
+        st.rotVelocity[a] = r.velocity
+      }
+    }
+
+    // Threads between neighbor pairs
+    for (let ti = 0; ti < neighborPairs.length; ti++) {
+      const [a, b] = neighborPairs[ti]
+      const geo = threadGeos[ti]
+      if (!geo || !pieces[a] || !pieces[b]) continue
+      const stA = pieces[a], stB = pieces[b]
+      const dx = stA.position.x - stB.position.x
+      const dy = stA.position.y - stB.position.y
+      const dz = stA.position.z - stB.position.z
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
+      const pos = geo.attributes.position
+      if (dist > BREAK_DISTANCE || dist < 0.05) {
+        pos.setXYZ(0, 0, 0, 0); pos.setXYZ(1, 0, 0, 0); pos.setXYZ(2, 0, 0, 0)
+        pos.needsUpdate = true
+        continue
+      }
+      const opacity = Math.max(0, 1 - dist / BREAK_DISTANCE)
+      const midX = (stA.position.x + stB.position.x) / 2
+      const midY = (stA.position.y + stB.position.y) / 2
+      const midZ = (stA.position.z + stB.position.z) / 2
+      const sag = dist * 0.08
+      pos.setXYZ(0, stA.position.x, stA.position.y, stA.position.z)
+      pos.setXYZ(1, midX, midY - sag, midZ)
+      pos.setXYZ(2, stB.position.x, stB.position.y, stB.position.z)
+      pos.needsUpdate = true
+      const mat = geo.userData.matRef
+      if (mat) mat.opacity = opacity * 0.8
+    }
+  })
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.code !== 'Space') return
+      e.preventDefault()
+      const pieces = stateRef.current
+      if (!pieces) return
+      if (isShattered.current) {
+        isShattered.current = false
+        for (const st of pieces) {
+          st.target = { ...st.home }
+          st.targetRotation = { x: 0, y: 0, z: st.homeRotationZ }
+          st.isAssembling = true
+        }
+      } else {
+        isShattered.current = true
+        for (const st of pieces) {
+          st.target = { ...st.shatterPos }
+          st.targetRotation = { ...st.shatterRot }
+          st.isAssembling = false
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [])
+
+  return (
+    <group>
+      <ambientLight intensity={0.8} />
+      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#F2D58A" />
+
+      {items.map((item, i) => (
+        <PlacementMesh
+          key={i}
+          texture={item.texture}
+          size={item.size}
+          animState={stateRef.current[i]}
+        />
+      ))}
+
+      <group>
+        {threadGeos.map((geo, i) => (
+          <line key={i} geometry={geo}>
+            <lineBasicMaterial
+              ref={(el) => { if (el) geo.userData.matRef = el }}
+              color={GOLD_COLOR}
+              transparent
+              opacity={0}
+              blending={THREE.AdditiveBlending}
+            />
+          </line>
+        ))}
+      </group>
+    </group>
+  )
+}
+
+const PlacementMesh = React.forwardRef(function PlacementMesh({ texture, size, animState }, ref) {
+  const internalRef = useRef()
+  const geometry = useMemo(() => new THREE.PlaneGeometry(size, size), [size])
+
+  useFrame(() => {
+    const mesh = internalRef.current
+    if (!mesh || !animState) return
+    mesh.position.set(animState.position.x, animState.position.y, animState.position.z)
+    mesh.rotation.set(animState.rotation.x, animState.rotation.y, animState.rotation.z)
+  })
+
+  return (
+    <mesh
+      ref={(el) => {
+        internalRef.current = el
+        if (typeof ref === 'function') ref(el)
+        else if (ref) ref.current = el
+      }}
+      geometry={geometry}
+    >
+      <meshBasicMaterial
+        map={texture || undefined}
+        transparent
+        side={THREE.DoubleSide}
+        opacity={0.95}
+      />
+    </mesh>
+  )
+})

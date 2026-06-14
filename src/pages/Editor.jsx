@@ -1,211 +1,181 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useApp } from '../store/AppState'
-import { getPatternById, getPatternImage } from '../store/patternData'
+import { getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
 import PatternImage from '../components/common/PatternImage'
-import { SYMMETRY_MODES, drawSymmetric } from '../engine/symmetry'
-import ProductScene from '../components/products/ProductScene'
-import ProductSwitcher from '../components/products/ProductSwitcher'
+import ReliefScene from '../components/relief/ReliefScene'
 
-const MODES = Object.values(SYMMETRY_MODES)
+const RARITY_COLOR = {
+  ssr: '#C9A23C',
+  rare: '#BC6B2F',
+  common: '#666',
+}
+
+// Group by series (in a defined order), then by rarity inside each group —
+// so the selector reads as "all my clouds, then all my dragons, ..." instead
+// of "what I pulled most recently first".
+const SERIES_ORDER = ['cloud', 'taotie', 'dragon', 'scroll', 'geometric', 'floral', 'corner', 'tile', 'shanjing', 'qinghua']
+const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
 
 export default function Editor() {
   const { data } = useApp()
-  const canvasRef = useRef(null)
-  const offscreenRef = useRef(null)
-  const [textureSource, setTextureSource] = useState(null)
   const [selectedPattern, setSelectedPattern] = useState(data.library[0] || null)
-  const [symmetryMode, setSymmetryMode] = useState(SYMMETRY_MODES.ROTATE_4)
-  const [activeProduct, setActiveProduct] = useState('mug')
 
   const myPatterns = useMemo(
-    () => data.library.map(id => getPatternById(id)).filter(Boolean),
+    () => data.library
+      .map(id => getPatternById(id))
+      .filter(Boolean)
+      .sort((a, b) => {
+        const sa = SERIES_ORDER.indexOf(a.series)
+        const sb = SERIES_ORDER.indexOf(b.series)
+        if (sa !== sb) return (sa === -1 ? 999 : sa) - (sb === -1 ? 999 : sb)
+        return (RARITY_ORDER[a.rarity] ?? 2) - (RARITY_ORDER[b.rarity] ?? 2)
+      }),
     [data.library]
   )
 
-  // Create offscreen canvas once
-  if (!offscreenRef.current) {
-    offscreenRef.current = document.createElement('canvas')
-    offscreenRef.current.width = 512
-    offscreenRef.current.height = 512
-  }
+  const selected = myPatterns.find(p => p.id === selectedPattern)
+  const imageUrl = selected ? getPatternImage(selected) : null
 
-  // Capture canvas DOM element via callback ref
-  const canvasCallbackRef = useCallback((node) => {
-    canvasRef.current = node
-    if (node) setTextureSource(offscreenRef.current)
-  }, [])
-
-  // Copy visible canvas → offscreen with circular crop + white fill
-  const syncOffscreen = useCallback(() => {
-    const src = canvasRef.current
-    const off = offscreenRef.current
-    if (!src || !off) return
-    const ctx = off.getContext('2d')
-    const s = off.width
-    const cx = s / 2, cy = s / 2
-
-    ctx.clearRect(0, 0, s, s)
-    // White background
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, s, s)
-    // Circular clip — only copy the center pattern
-    ctx.save()
-    ctx.beginPath()
-    ctx.arc(cx, cy, s * 0.42, 0, Math.PI * 2)
-    ctx.clip()
-    ctx.drawImage(src, 0, 0)
-    ctx.restore()
-  }, [])
-
-  // Auto-generate pattern when params change (debounced)
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const timer = setTimeout(() => {
-      const ctx = canvas.getContext('2d')
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      const pat = myPatterns.find(p => p.id === selectedPattern)
-
-      if (getPatternImage(pat)) {
-        const img = new Image()
-        img.onload = () => {
-          const drawFn = (ctx, cx, cy, size) => {
-            const s = size * 0.3
-            ctx.drawImage(img, cx - s / 2, cy - s / 2, s, s)
-          }
-          drawSymmetric(ctx, drawFn, symmetryMode, canvas.width)
-          syncOffscreen()
-        }
-        img.src = getPatternImage(pat)
-      } else {
-        const drawFn = (ctx, cx, cy, size) => {
-          ctx.save()
-          ctx.fillStyle = '#D4AF6A'
-          ctx.beginPath()
-          const r = size * 0.12
-          ctx.arc(cx - r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
-          ctx.arc(cx + r * 0.5, cy - r * 0.3, r, 0, Math.PI * 2)
-          ctx.arc(cx, cy + r * 0.2, r * 0.8, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.restore()
-        }
-        drawSymmetric(ctx, drawFn, symmetryMode, canvas.width)
-        syncOffscreen()
-      }
-    }, 50)
-
-    return () => clearTimeout(timer)
-  }, [symmetryMode, selectedPattern, myPatterns, syncOffscreen])
+  // Pick material preset based on the pattern family:
+  //   - qinghua / shanjing are photographic (opaque) — render as glazed porcelain
+  //   - everything else (gold-line transparent PNGs) — render as raised metal relief
+  const isPorcelain = selected && (selected.series === 'qinghua' || selected.series === 'shanjing')
+  const reliefParams = isPorcelain
+    ? { porcelain: true, metalness: 0.08, roughness: 0.6, baseColor: '#F5EFE0', normalScale: 1.2 }
+    : { porcelain: false, metalness: 0.7, roughness: 0.35, baseColor: '#C4A265', normalScale: 1.6 }
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
       height: 'calc(100vh - 64px)',
       overflow: 'hidden',
+      position: 'relative',
     }}>
-      {/* ── Editor Section (top) ── */}
+      {/* ── Header ── */}
       <div style={{
-        padding: '12px 16px',
+        padding: '14px 16px 12px',
         flex: '0 0 auto',
-        overflowY: 'auto',
+        borderBottom: '1px solid rgba(212,175,106,0.08)',
+        background: 'rgba(8,6,4,0.4)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
       }}>
-        <h1 style={{
-          fontSize: '20px', fontWeight: 700,
-          color: 'var(--text-primary)', marginBottom: '10px',
-        }}>
-          创作
-        </h1>
-
-        {/* Canvas */}
-        <div style={{
-          background: 'var(--bg-secondary)',
-          borderRadius: '12px',
-          border: '1px solid var(--border-gold)',
-          padding: '8px',
-          marginBottom: '10px',
-        }}>
-          <canvas
-            ref={canvasCallbackRef}
-            width={512}
-            height={512}
-            style={{
-              width: '100%', maxWidth: '200px',
-              height: 'auto', display: 'block', margin: '0 auto',
-              borderRadius: '8px', background: '#0F0F10',
-            }}
-          />
-        </div>
-
-        {/* Symmetry mode */}
-        <div style={{ marginBottom: '10px' }}>
-          <h3 style={{
-            fontSize: '12px', fontWeight: 600,
-            color: 'var(--text-primary)', marginBottom: '4px',
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 10 }}>
+          <h1 style={{
+            fontFamily: 'Noto Serif SC, serif', fontSize: 20, fontWeight: 600,
+            color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
           }}>
-            对称模式
-          </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-            {MODES.map(mode => (
-              <button
-                key={mode.id}
-                onClick={() => setSymmetryMode(mode)}
-                style={{
-                  padding: '3px 8px',
-                  borderRadius: '5px',
-                  border: `1px solid ${symmetryMode.id === mode.id ? 'var(--gold-main)' : 'rgba(255,255,255,0.1)'}`,
-                  background: symmetryMode.id === mode.id ? 'rgba(212,175,106,0.15)' : 'var(--bg-secondary)',
-                  color: symmetryMode.id === mode.id ? 'var(--gold-main)' : 'var(--text-secondary)',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                }}
-              >
-                {mode.name}
-              </button>
-            ))}
-          </div>
+            纹样浮雕
+          </h1>
+          <span style={{
+            fontSize: 9, color: '#8A6A30', letterSpacing: '0.3em',
+            textTransform: 'uppercase', fontWeight: 500,
+          }}>
+            Relief
+          </span>
         </div>
 
         {/* Pattern selector */}
         <div>
-          <h3 style={{
-            fontSize: '12px', fontWeight: 600,
-            color: 'var(--text-primary)', marginBottom: '4px',
+          <div style={{
+            fontFamily: 'Noto Serif SC, serif', fontSize: 11, fontWeight: 600,
+            color: '#A09682', marginBottom: 6, letterSpacing: '0.15em',
           }}>
             选择纹样
-          </h3>
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+          </div>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
             {myPatterns.map(p => (
               <div
                 key={p.id}
                 onClick={() => setSelectedPattern(p.id)}
                 style={{
-                  minWidth: '48px', height: '48px', borderRadius: '8px',
-                  background: 'var(--bg-secondary)',
-                  border: `2px solid ${selectedPattern === p.id ? 'var(--gold-main)' : 'transparent'}`,
+                  flex: '0 0 auto', width: 56, height: 56, borderRadius: 10,
+                  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
+                  border: selectedPattern === p.id
+                    ? '2px solid rgba(212,175,106,0.55)'
+                    : '1px solid rgba(212,175,106,0.15)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', overflow: 'hidden',
+                  transition: 'all 0.25s ease',
+                  boxShadow: selectedPattern === p.id
+                    ? '0 0 14px rgba(212,175,106,0.3), inset 0 1px 0 rgba(212,175,106,0.1)'
+                    : 'none',
                 }}
               >
-                <PatternImage src={getPatternImage(p)} alt={p.name} fallbackSize={20} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <PatternImage src={getPatternImage(p)} alt={p.name} fallbackSize={20}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
+            {myPatterns.length === 0 && (
+              <div style={{
+                fontSize: 12, color: '#5A4A30', padding: '14px 0',
+                fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
+              }}>
+                请先在抽卡中获得纹样
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ── Product Switcher ── */}
-      <ProductSwitcher active={activeProduct} onChange={setActiveProduct} />
-
-      {/* ── 3D Preview Section (bottom) ── */}
+      {/* ── 3D Relief (full remaining space) ── */}
       <div style={{
-        flex: '1 1 auto',
-        minHeight: 0,
-        background: '#0F0F10',
+        flex: '1 1 auto', minHeight: 0, position: 'relative',
+        background: '#0A0807',
       }}>
-        <ProductScene texture={textureSource} activeProduct={activeProduct} />
+        {imageUrl ? (
+          <ReliefScene image={imageUrl} {...reliefParams} />
+        ) : null}
+
+        {/* Floating pattern name chip — bottom center */}
+        {selected && (
+          <div style={{
+            position: 'absolute', bottom: 20, left: 0, right: 0,
+            display: 'flex', justifyContent: 'center', pointerEvents: 'none',
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: 'rgba(8,6,4,0.72)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              padding: '8px 18px 8px 14px', borderRadius: 22,
+              border: '1px solid rgba(212,175,106,0.18)',
+            }}>
+              <div style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: RARITY_COLOR[selected.rarity] || '#888',
+                boxShadow: `0 0 6px ${RARITY_COLOR[selected.rarity] || '#888'}`,
+              }} />
+              <span style={{
+                fontFamily: 'Noto Serif SC, serif', fontSize: 14,
+                color: '#F2D58A', letterSpacing: '0.15em', fontWeight: 500,
+              }}>
+                {selected.name}
+              </span>
+              <span style={{
+                fontSize: 10, color: '#7A7060',
+                fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
+                padding: '2px 8px', borderRadius: 10,
+                background: 'rgba(212,175,106,0.06)',
+                border: '1px solid rgba(212,175,106,0.1)',
+              }}>
+                {getRarityLabel(selected.rarity)}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Hint — top right corner */}
+        <div style={{
+          position: 'absolute', top: 12, right: 12,
+          fontSize: 10, color: '#5A4A30', letterSpacing: '0.15em',
+          fontFamily: 'Noto Serif SC, serif',
+          background: 'rgba(8,6,4,0.5)',
+          padding: '4px 10px', borderRadius: 12,
+          border: '1px solid rgba(212,175,106,0.08)',
+        }}>
+          拖动旋转 · 滚轮缩放
+        </div>
       </div>
     </div>
   )

@@ -110,8 +110,16 @@ function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
 export default function Showcase() {
   const { isOpen, isFist, isReady, error, allLandmarks, videoEl } = useHandGesture()
   const [userImage, setUserImage] = useState(null)
+  const [placements, setPlacements] = useState(null)
 
   useEffect(() => {
+    const placementData = sessionStorage.getItem('showcase_placements')
+    if (placementData) {
+      try {
+        setPlacements(JSON.parse(placementData))
+        sessionStorage.removeItem('showcase_placements')
+      } catch {}
+    }
     const data = sessionStorage.getItem('showcase_image')
     if (data) {
       setUserImage(data)
@@ -131,6 +139,7 @@ export default function Showcase() {
             isOpen={isOpen}
             isFist={isFist}
             imageUrl={userImage}
+            placements={placements}
           />
         </Suspense>
       </Canvas>
@@ -155,7 +164,7 @@ export default function Showcase() {
         isFist={isFist}
         isReady={isReady}
         error={error}
-        hasImage={!!userImage}
+        hasImage={!!(placements || userImage)}
       />
     </div>
   )

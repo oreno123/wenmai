@@ -4,6 +4,7 @@ import { HandSwipeDetector } from './HandSwipeDetector'
 import { ParticleRenderer } from './ParticleRenderer'
 import type { Pattern, Rarity } from '../store/patternData'
 import { getPatternImage, getRarityLabel } from '../store/patternData'
+import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
 
 // ── Types ──────────────────────────────────────────────
 
@@ -49,6 +50,8 @@ const RARITY_COLORS: Record<Rarity, string> = {
 }
 
 function CardInfo({ pattern }: { pattern: Pattern }) {
+  const desc = PATTERN_DESCRIPTIONS[pattern.id]
+
   return (
     <div style={{ padding: '12px 16px' }}>
       <div
@@ -57,11 +60,39 @@ function CardInfo({ pattern }: { pattern: Pattern }) {
           fontSize: 16,
           fontWeight: 600,
           color: '#2A2016',
-          marginBottom: 8,
+          marginBottom: 4,
         }}
       >
         {pattern.name}
       </div>
+
+      {desc ? (
+        <>
+          <div style={{ fontSize: 11, color: '#7A6A50', marginBottom: 6, letterSpacing: '0.05em' }}>
+            {desc.dynasty} · {desc.period}
+          </div>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: '#4A3A20',
+              lineHeight: 1.55,
+              marginBottom: 10,
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {desc.history}
+          </div>
+        </>
+      ) : (
+        <div style={{ fontSize: 11, color: '#7A6A50', marginBottom: 10, letterSpacing: '0.03em' }}>
+          {pattern.type}
+          {pattern.tags.length > 0 && ` · ${pattern.tags.slice(0, 4).join('、')}`}
+        </div>
+      )}
+
       <span
         style={{
           display: 'inline-block',

@@ -266,7 +266,7 @@ export default function PuzzlePage() {
         const el = dragFromTray.element
         setPlacements(prev => {
           const withoutTemp = prev.filter(p => !p._temp)
-          return [...withoutTemp, { id: el.id, x: pos.x, y: pos.y, size: 120, rotation: 0, _temp: true }]
+          return [...withoutTemp, { id: el.id, x: pos.x, y: pos.y, size: 280, rotation: 0, _temp: true }]
         })
       }
     }
@@ -343,57 +343,87 @@ export default function PuzzlePage() {
   return (
     <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>
       {/* Header */}
-      <div style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>纹样创作</span>
+      <div style={{
+        padding: '14px 16px 10px',
+        borderBottom: '1px solid rgba(212,175,106,0.08)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{
+              fontFamily: 'Noto Serif SC, serif', fontSize: 20, fontWeight: 600,
+              color: '#F2D58A', letterSpacing: '0.15em',
+            }}>
+              纹样创作
+            </span>
+            <span style={{
+              fontSize: 9, color: '#8A6A30', letterSpacing: '0.3em',
+              textTransform: 'uppercase', fontWeight: 500,
+            }}>
+              Compose
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={clearCanvas} style={ghostBtnStyle}>清空</button>
+            <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
+              ...ghostBtnStyle,
+              background: saved ? 'rgba(100,180,100,0.12)' : placements.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,106,0.1)',
+              color: saved ? '#8BC387' : placements.length === 0 ? '#4A4A4A' : '#F2D58A',
+              border: saved ? '1px solid rgba(100,180,100,0.25)' : placements.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(212,175,106,0.25)',
+              opacity: placements.length === 0 ? 0.6 : 1,
+            }}>{saved ? '已保存' : '保存'}</button>
+            <button onClick={exportPNG} style={ghostBtnStyle}>导出</button>
+            <button
+              onClick={finishCreation}
+              disabled={placements.length === 0}
+              style={{
+                padding: '6px 18px', borderRadius: 9, fontSize: 12,
+                fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em', fontWeight: 500,
+                background: placements.length === 0
+                  ? 'rgba(255,255,255,0.03)'
+                  : 'linear-gradient(145deg, #C9943A, #8B6914)',
+                color: placements.length === 0 ? '#4A4A4A' : '#F5F1E8',
+                border: placements.length === 0
+                  ? '1px solid rgba(255,255,255,0.05)'
+                  : '1px solid rgba(201,148,58,0.45)',
+                opacity: placements.length === 0 ? 0.7 : 1,
+                cursor: placements.length === 0 ? 'not-allowed' : 'pointer',
+                boxShadow: placements.length === 0 ? 'none' : '0 2px 12px rgba(201,148,58,0.18)',
+                transition: 'all 0.2s',
+              }}
+            >完成创作</button>
+          </div>
+        </div>
+
+        {/* Secondary nav */}
+        <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={() => navigate('/jigsaw')}
-            style={{ fontSize: 10, color: '#6A6A6A', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={navBtnStyle}
           >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M5 5h6v2c0 1 1 2 2 2s2-1 2-2V5h4v6h-2c-1 0-2 1-2 2s1 2 2 2h2v6h-6v-2c0-1-1-2-2-2s-2 1-2 2v2H5v-6h2c1 0 2-1 2-2s-1-2-2-2H5V5z" />
+            </svg>
             经典拼图
           </button>
           <button
             onClick={() => navigate('/curate')}
-            style={{ fontSize: 10, color: '#6A6A6A', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={navBtnStyle}
           >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M3 6h18M6 12h12M10 18h4" />
+            </svg>
             筛选元素
           </button>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={clearCanvas} style={btnStyle}>清空</button>
-          <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
-            ...btnStyle,
-            background: saved ? 'rgba(100,180,100,0.15)' : placements.length === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(212,175,106,0.12)',
-            color: saved ? '#6B6' : placements.length === 0 ? '#5A5A5A' : '#D4AF6A',
-            opacity: placements.length === 0 ? 0.5 : 1,
-          }}>{saved ? '已保存' : '保存'}</button>
-          <button onClick={exportPNG} style={btnStyle}>导出</button>
-          <button
-            onClick={finishCreation}
-            disabled={placements.length === 0}
-            style={{
-              ...btnStyle,
-              background: placements.length === 0
-                ? 'rgba(255,255,255,0.04)'
-                : 'linear-gradient(145deg, #C9943A, #8B6914)',
-              color: placements.length === 0 ? '#5A5A5A' : '#F5F1E8',
-              border: placements.length === 0
-                ? '1px solid rgba(255,255,255,0.06)'
-                : '1px solid rgba(201,148,58,0.4)',
-              opacity: placements.length === 0 ? 0.5 : 1,
-              transition: 'all 0.2s',
-            }}
-          >完成创作</button>
         </div>
       </div>
 
       {/* Canvas */}
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 16px' }}>
         <div style={{
           width: '100%', maxWidth: DISPLAY_SIZE, aspectRatio: '1',
           borderRadius: 12, overflow: 'hidden',
-          border: '1px solid rgba(160,140,100,0.2)',
-          boxShadow: '0 0 30px rgba(0,0,0,0.3)',
+          border: '1px solid rgba(160,140,100,0.25)',
+          boxShadow: '0 0 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,175,106,0.05)',
         }}>
           <canvas
             ref={canvasRef}
@@ -407,14 +437,41 @@ export default function PuzzlePage() {
         </div>
       </div>
 
-      {/* Controls for selected */}
+      {/* Controls for selected — SVG icons */}
       {selectedIdx >= 0 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '8px 16px' }}>
-          <button onClick={() => rotateSelected(-15)} style={btnStyle}>↺</button>
-          <button onClick={() => rotateSelected(15)} style={btnStyle}>↻</button>
-          <button onClick={() => scaleSelected(-15)} style={btnStyle}>−</button>
-          <button onClick={() => scaleSelected(15)} style={btnStyle}>+</button>
-          <button onClick={deleteSelected} style={{ ...btnStyle, color: '#E85D5D' }}>删</button>
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: 8,
+          padding: '6px 16px 10px',
+        }}>
+          <button onClick={() => rotateSelected(-15)} style={iconBtnStyle} title="逆时针旋转">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 3-6.7" />
+              <path d="M3 4v5h5" />
+            </svg>
+          </button>
+          <button onClick={() => rotateSelected(15)} style={iconBtnStyle} title="顺时针旋转">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <path d="M21 4v5h-5" />
+            </svg>
+          </button>
+          <div style={{ width: 1, background: 'rgba(212,175,106,0.1)', margin: '4px 2px' }} />
+          <button onClick={() => scaleSelected(-15)} style={iconBtnStyle} title="缩小">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14" />
+            </svg>
+          </button>
+          <button onClick={() => scaleSelected(15)} style={iconBtnStyle} title="放大">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+          <div style={{ width: 1, background: 'rgba(212,175,106,0.1)', margin: '4px 2px' }} />
+          <button onClick={deleteSelected} style={{ ...iconBtnStyle, color: '#E85D5D', borderColor: 'rgba(232,93,93,0.2)' }} title="删除">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" />
+            </svg>
+          </button>
         </div>
       )}
 
@@ -488,6 +545,7 @@ export default function PuzzlePage() {
       {showPreview && completedImage && (
         <PreviewScaleModal
           imageUrl={completedImage}
+          placements={placements}
           onClose={() => setShowPreview(false)}
         />
       )}
@@ -495,13 +553,20 @@ export default function PuzzlePage() {
   )
 }
 
-function pillStyle(active) {
+function pillStyle(active, accent) {
+  const c = accent || '#F2D58A'
   return {
-    padding: '4px 12px', borderRadius: 12, fontSize: 11, whiteSpace: 'nowrap',
-    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
-    color: active ? '#F2D58A' : '#6A6A6A',
-    border: active ? '1px solid rgba(212,175,106,0.2)' : '1px solid transparent',
-    cursor: 'pointer', fontFamily: 'inherit',
+    padding: '5px 14px', borderRadius: 14, fontSize: 12, whiteSpace: 'nowrap',
+    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.02)',
+    color: active ? c : '#7A7060',
+    border: active
+      ? `1px solid ${c === '#F2D58A' ? 'rgba(212,175,106,0.3)' : c + '40'}`
+      : '1px solid rgba(255,255,255,0.04)',
+    cursor: 'pointer',
+    fontFamily: 'Noto Serif SC, serif',
+    letterSpacing: '0.05em',
+    fontWeight: active ? 500 : 400,
+    transition: 'all 0.2s',
   }
 }
 
@@ -510,4 +575,36 @@ const btnStyle = {
   background: 'rgba(255,255,255,0.04)',
   color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
   cursor: 'pointer', fontFamily: 'inherit',
+}
+
+const ghostBtnStyle = {
+  padding: '6px 14px', borderRadius: 9, fontSize: 12,
+  background: 'rgba(255,255,255,0.02)',
+  color: '#A09682',
+  border: '1px solid rgba(255,255,255,0.05)',
+  cursor: 'pointer',
+  fontFamily: 'Noto Serif SC, serif',
+  letterSpacing: '0.08em',
+  transition: 'all 0.2s',
+}
+
+const navBtnStyle = {
+  display: 'flex', alignItems: 'center', gap: 5,
+  padding: '4px 10px', borderRadius: 12,
+  background: 'rgba(255,255,255,0.02)',
+  color: '#7A7060',
+  border: '1px solid rgba(255,255,255,0.04)',
+  fontSize: 10, cursor: 'pointer',
+  fontFamily: 'inherit', letterSpacing: '0.05em',
+  transition: 'all 0.2s',
+}
+
+const iconBtnStyle = {
+  width: 34, height: 34, borderRadius: 9,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
+  color: '#F2D58A',
+  border: '1px solid rgba(212,175,106,0.2)',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
 }

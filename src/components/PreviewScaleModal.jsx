@@ -1,19 +1,22 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from './common/Router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useApp } from '../store/AppState'
 
 const MIN_SCALE = 0.3
 const MAX_SCALE = 3.0
 const FRAME_SIZE = 320
 
-export default function PreviewScaleModal({ imageUrl, onClose }) {
+export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
   const navigate = useNavigate()
+  const { saveCreation } = useApp()
   const frameRef = useRef(null)
   const [scale, setScale] = useState(1.0)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [rotation, setRotation] = useState(0)
   const [dragging, setDragging] = useState(null)
   const [showRotation, setShowRotation] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const clampScale = useCallback((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s)), [])
   const clampOffset = useCallback((ox, oy, s) => {
@@ -67,7 +70,42 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
     }
   }, [dragging, handlePointerMove, handlePointerUp])
 
+  const handleSave = useCallback(() => {
+    if (!imageUrl) return
+    saveCreation(imageUrl, 'puzzle', placements)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [imageUrl, saveCreation, placements])
+
   const goToShowcase = useCallback(() => {
+    // Apply global scale + rotation to placements, persist for Showcase.
+    // Each placement keeps its element id so Showcase can render the original
+    // element texture (not the rasterized composite).
+    if (placements && placements.length > 0) {
+      const rad = rotation * Math.PI / 180
+      const cos = Math.cos(rad)
+      const sin = Math.sin(rad)
+      const transformed = placements.map(p => {
+        // Re-center to canvas midpoint (512, 512), rotate, scale, restore
+        const cx = (p.x || 0) - 512
+        const cy = (p.y || 0) - 512
+        const rx = cx * cos - cy * sin
+        const ry = cx * sin + cy * cos
+        return {
+          id: p.id,
+          x: rx * scale + 512,
+          y: ry * scale + 512,
+          size: (p.size || 100) * scale,
+          rotation: (p.rotation || 0) + rad,
+          scale: p.scale || 1,
+        }
+      })
+      try {
+        sessionStorage.setItem('showcase_placements', JSON.stringify(transformed))
+      } catch {}
+    }
+
+    // Also keep the rasterized image as a fallback path.
     try {
       const img = new Image()
       img.crossOrigin = 'anonymous'
@@ -82,7 +120,7 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
           ctx.fillRect(0, 0, size, size)
           ctx.save()
           ctx.translate(size / 2, size / 2)
-          ctx.rotate(rotation * Math.PI / 180)
+          ctx.rotate(rad)
           ctx.scale(scale, scale)
           ctx.drawImage(img, -img.width / 2, -img.height / 2)
           ctx.restore()
@@ -95,7 +133,7 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
     } catch {
       navigate('/showcase')
     }
-  }, [imageUrl, scale, rotation, navigate])
+  }, [imageUrl, placements, scale, rotation, navigate])
 
   return (
     <AnimatePresence>
@@ -307,27 +345,54 @@ export default function PreviewScaleModal({ imageUrl, onClose }) {
           </p>
 
           {/* CTA */}
-          <motion.button
-            whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(201,148,58,0.4)' }}
-            whileTap={{ scale: 0.97 }}
-            onClick={goToShowcase}
-            style={{
-              marginTop: 4,
-              padding: '12px 48px',
-              borderRadius: 14,
-              background: 'linear-gradient(145deg, #C9943A, #8B6914)',
-              border: '1px solid rgba(201,148,58,0.4)',
-              color: '#F5F1E8',
-              fontSize: 16, fontWeight: 600,
-              letterSpacing: 2,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              boxShadow: '0 2px 16px rgba(201,148,58,0.2)',
-              transition: 'box-shadow 0.3s',
-            }}
-          >
-            前往展示 →
-          </motion.button>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <motion.button
+              whileHover={{ scale: saved ? 1 : 1.03 }}
+              whileTap={{ scale: saved ? 1 : 0.97 }}
+              onClick={handleSave}
+              disabled={saved}
+              style={{
+                marginTop: 4,
+                padding: '12px 24px',
+                borderRadius: 14,
+                background: saved
+                  ? 'rgba(100,180,100,0.15)'
+                  : 'rgba(255,255,255,0.05)',
+                border: saved
+                  ? '1px solid rgba(100,180,100,0.3)'
+                  : '1px solid rgba(255,255,255,0.1)',
+                color: saved ? '#8BC387' : '#D4AF6A',
+                fontSize: 14, fontWeight: 600,
+                letterSpacing: 2,
+                cursor: saved ? 'default' : 'pointer',
+                fontFamily: 'inherit',
+                transition: 'all 0.2s',
+              }}
+            >
+              {saved ? '已保存' : '保存到作品集'}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(201,148,58,0.4)' }}
+              whileTap={{ scale: 0.97 }}
+              onClick={goToShowcase}
+              style={{
+                marginTop: 4,
+                padding: '12px 48px',
+                borderRadius: 14,
+                background: 'linear-gradient(145deg, #C9943A, #8B6914)',
+                border: '1px solid rgba(201,148,58,0.4)',
+                color: '#F5F1E8',
+                fontSize: 16, fontWeight: 600,
+                letterSpacing: 2,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                boxShadow: '0 2px 16px rgba(201,148,58,0.2)',
+                transition: 'box-shadow 0.3s',
+              }}
+            >
+              前往展示 →
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

@@ -11,9 +11,11 @@ const MODEL_URL =
   'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task'
 
 // Detection constants
-const SWIPE_FRAMES = 3
-const SWIPE_THRESHOLD = 0.04 // minimum x delta per frame to count as swipe
+const SWIPE_NOISE_THRESHOLD = 0.012 // per-frame movement below this counts as noise / hand not moving
+const SWIPE_TOTAL_THRESHOLD = 0.10 // accumulated displacement required to fire a swipe (~64px on a 640px frame)
+const SWIPE_FAST_RETRIGGER_THRESHOLD = 0.07 // smaller threshold for same-direction fast consecutive swipes
 const SWIPE_COOLDOWN_MS = 300
+const STILL_FRAMES_TO_REARM = 18 // consecutive still frames (~300ms) required before an opposite-direction swipe can fire
 const SCALE_CHANGE_THRESHOLD = 0.15 // 15% change triggers scale event
 const NO_HAND_TIMEOUT_MS = 3000
 
@@ -38,8 +40,12 @@ export class HandSwipeDetector {
   private noHandSince = 0
 
   // Swipe detection
-  private swipeDirections: Array<'left' | 'right'> = []
+  private accumDeltaX = 0 // signed accumulated x displacement
+  private accumDirection: 'left' | 'right' | null = null
   private lastSwipeFireTime = 0
+  private lastFiredDirection: 'left' | 'right' | null = null
+  private armed = true // disarmed after a swipe fires; re-armed after hand stops moving
+  private stillFrameCount = 0
 
   // Scale detection
   private prevTwoHandDistance: number | null = null
@@ -240,70 +246,126 @@ export class HandSwipeDetector {
       this.transitionTo('TRACKING')
     }
 
-    // Swipe detection: single hand
+    // Swipe detection: single hand — track index fingertip
     if (numHands >= 1 && (this.state === 'TRACKING' || this.state === 'SWIPING')) {
-      this.detectSwipe(hands[0].palmCenter, now)
+      const indexTip = hands[0].landmarks[8]
+      if (indexTip) this.detectSwipe(indexTip, now)
     }
   }
 
-  private detectSwipe(palm: { x: number; y: number; z: number }, now: number): void {
+  private detectSwipe(point: { x: number; y: number; z: number }, now: number): void {
     // Cooldown: if we just fired a swipe, don't start a new one
     if (now - this.lastSwipeFireTime < SWIPE_COOLDOWN_MS) {
-      this.swipeDirections = []
+      this.accumDeltaX = 0
+      this.accumDirection = null
       if (this.state === 'SWIPING') {
         this.transitionTo('TRACKING')
       }
       return
     }
 
-    // On the first tracking frame after cooldown or state entry, record position
-    // but don't compute delta (there's no "previous" yet)
-    // We store the last palm position on each frame and compute direction on next frame.
-    // Use the previous palm center from the last detection call.
     const prevPalm = this.lastPalm
-    this.lastPalm = { x: palm.x, y: palm.y, z: palm.z }
+    this.lastPalm = { x: point.x, y: point.y, z: point.z }
 
     if (!prevPalm) return // no previous frame to compare
 
     // Mirror correction: MediaPipe x increases when hand moves LEFT on mirrored display.
     // So delta = prevX - currentX. Positive delta = screen-right movement.
-    const deltaX = prevPalm.x - palm.x
+    const deltaX = prevPalm.x - point.x
 
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
-      // Movement too small, reset direction streak
-      this.swipeDirections = []
-      return
-    }
-
-    const direction: 'left' | 'right' = deltaX > 0 ? 'right' : 'left'
-    this.swipeDirections.push(direction)
-
-    // Only keep last SWIPE_FRAMES entries
-    if (this.swipeDirections.length > SWIPE_FRAMES) {
-      this.swipeDirections = this.swipeDirections.slice(-SWIPE_FRAMES)
-    }
-
-    // Check if all recent directions agree
-    if (this.swipeDirections.length >= SWIPE_FRAMES) {
-      const allSame = this.swipeDirections.every((d) => d === this.swipeDirections[0])
-      if (allSame) {
-        const velocity = Math.abs(deltaX) / (1000 / 60) // approximate px/ms → units/ms
-        const event: SwipeEvent = {
-          direction: this.swipeDirections[0],
-          velocity,
+    // Disarmed: wait for the hand to actually stop before allowing an opposite-direction swipe,
+    // but allow same-direction fast re-trigger so continuous swiping in one direction keeps up.
+    if (!this.armed) {
+      if (Math.abs(deltaX) < SWIPE_NOISE_THRESHOLD) {
+        this.stillFrameCount++
+        if (this.stillFrameCount >= STILL_FRAMES_TO_REARM) {
+          this.armed = true
+          this.accumDeltaX = 0
+          this.accumDirection = null
         }
+        return
+      }
+
+      // Hand is moving while disarmed
+      this.stillFrameCount = 0
+      const dir: 'left' | 'right' = deltaX > 0 ? 'right' : 'left'
+
+      // Reverse direction (e.g. back-and-forth) — must wait for the still period
+      if (this.lastFiredDirection === null || dir !== this.lastFiredDirection) {
+        this.accumDeltaX = 0
+        this.accumDirection = null
+        return
+      }
+
+      // Same direction — accumulate and allow fast re-trigger
+      if (this.accumDirection !== dir) {
+        this.accumDirection = dir
+        this.accumDeltaX = deltaX
+      } else {
+        this.accumDeltaX += deltaX
+      }
+
+      if (Math.abs(this.accumDeltaX) >= SWIPE_FAST_RETRIGGER_THRESHOLD) {
+        const velocity = Math.abs(this.accumDeltaX) / (SWIPE_COOLDOWN_MS / 1000)
+        const event: SwipeEvent = { direction: dir, velocity }
         this.callbacks.onSwipe(event)
         this.lastSwipeFireTime = now
-        this.swipeDirections = []
+        this.accumDeltaX = 0
+        this.accumDirection = null
         this.transitionTo('SWIPING')
-
-        // Auto-return to TRACKING after cooldown period
         setTimeout(() => {
           if (this.state === 'SWIPING') {
             this.transitionTo('TRACKING')
           }
         }, SWIPE_COOLDOWN_MS)
       }
+      return
+    }
+
+    // Hand essentially still — clear any half-accumulated movement so the next
+    // deliberate swipe starts fresh.
+    if (Math.abs(deltaX) < SWIPE_NOISE_THRESHOLD) {
+      this.accumDeltaX = 0
+      this.accumDirection = null
+      return
+    }
+
+    const direction: 'left' | 'right' = deltaX > 0 ? 'right' : 'left'
+
+    // Reset accumulator if direction reversed (e.g. user changed their mind, or big noise spike)
+    if (this.accumDirection !== null && this.accumDirection !== direction) {
+      this.accumDeltaX = 0
+      this.accumDirection = null
+    }
+
+    if (this.accumDirection === null) {
+      this.accumDirection = direction
+      this.accumDeltaX = deltaX
+    } else {
+      this.accumDeltaX += deltaX
+    }
+
+    // Trigger once accumulated displacement crosses the threshold
+    if (Math.abs(this.accumDeltaX) >= SWIPE_TOTAL_THRESHOLD) {
+      const velocity = Math.abs(this.accumDeltaX) / (SWIPE_COOLDOWN_MS / 1000)
+      const event: SwipeEvent = {
+        direction: this.accumDirection,
+        velocity,
+      }
+      this.callbacks.onSwipe(event)
+      this.lastSwipeFireTime = now
+      this.lastFiredDirection = this.accumDirection
+      this.accumDeltaX = 0
+      this.accumDirection = null
+      this.armed = false
+      this.stillFrameCount = 0
+      this.transitionTo('SWIPING')
+
+      setTimeout(() => {
+        if (this.state === 'SWIPING') {
+          this.transitionTo('TRACKING')
+        }
+      }, SWIPE_COOLDOWN_MS)
     }
   }
 
@@ -317,13 +379,18 @@ export class HandSwipeDetector {
     // Reset tracking-specific state on transitions
     if (newState === 'IDLE') {
       this.lastPalm = null
-      this.swipeDirections = []
+      this.accumDeltaX = 0
+      this.accumDirection = null
+      this.lastFiredDirection = null
       this.prevTwoHandDistance = null
+      this.armed = true
+      this.stillFrameCount = 0
     }
     if (newState === 'TRACKING') {
       // Allow swipe accumulation to start fresh when entering tracking
       if (performance.now() - this.lastSwipeFireTime >= SWIPE_COOLDOWN_MS) {
-        this.swipeDirections = []
+        this.accumDeltaX = 0
+        this.accumDirection = null
       }
     }
   }

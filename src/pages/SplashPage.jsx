@@ -14,18 +14,26 @@ export default function SplashPage() {
 
     let disposed = false
 
+    // Render at 25% resolution — clouds are soft, low-res is invisible
+    const RENDER_SCALE = 0.25
+    const W = Math.round(window.innerWidth * RENDER_SCALE)
+    const H = Math.round(window.innerHeight * RENDER_SCALE)
+
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(1)
+    renderer.setSize(W, H, false)
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    container.appendChild(renderer.domElement)
+    const canvas = renderer.domElement
+    canvas.style.width = '100%'
+    canvas.style.height = '100%'
+    canvas.style.filter = 'blur(1.5px)'
+    container.appendChild(canvas)
 
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
 
-    const dpr = renderer.getPixelRatio()
     const uniforms = {
-      u_resolution: { value: new THREE.Vector3(window.innerWidth * dpr, window.innerHeight * dpr, 1.0) },
+      u_resolution: { value: new THREE.Vector3(W, H, 1.0) },
       u_time: { value: 0.0 },
       u_noiseTexture: { value: new THREE.Texture() },
       u_noiseSize: { value: new THREE.Vector2(1.0, 1.0) },
@@ -42,13 +50,25 @@ export default function SplashPage() {
     })
     scene.add(new THREE.Mesh(geometry, material))
 
-    // Load noise texture
+    const cleanup = () => {
+      geometry.dispose()
+      material.dispose()
+      try {
+        if (uniforms.u_noiseTexture.value && uniforms.u_noiseTexture.value.dispose) {
+          uniforms.u_noiseTexture.value.dispose()
+        }
+      } catch {}
+      renderer.dispose()
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas)
+    }
+
     fetch('/shaders/noise_base64.txt')
       .then(r => r.text())
       .then(b64 => {
         if (disposed) return
         const img = new Image()
         img.onload = () => {
+          if (disposed) return
           const tex = new THREE.Texture(img)
           tex.wrapS = THREE.RepeatWrapping
           tex.wrapT = THREE.RepeatWrapping
@@ -57,35 +77,42 @@ export default function SplashPage() {
           tex.needsUpdate = true
           uniforms.u_noiseTexture.value = tex
           uniforms.u_noiseSize.value.set(img.width, img.height)
+
+          // Throttle to 30fps, run for 3 seconds, then snapshot
+          let frame = 0
+          const TOTAL_FRAMES = 90 // 3s @ 30fps
+          const FRAME_INTERVAL = 1000 / 30
+          let lastTime = 0
+
+          const animate = (now) => {
+            if (disposed) return
+            if (now - lastTime < FRAME_INTERVAL) {
+              requestAnimationFrame(animate)
+              return
+            }
+            lastTime = now
+            uniforms.u_time.value += 0.016
+            renderer.render(scene, camera)
+            frame++
+            if (frame < TOTAL_FRAMES) {
+              requestAnimationFrame(animate)
+            } else {
+              // Snapshot last frame as static background
+              const dataURL = canvas.toDataURL('image/jpeg', 0.85)
+              container.style.backgroundImage = `url(${dataURL})`
+              container.style.backgroundSize = 'cover'
+              container.style.backgroundPosition = 'center'
+              cleanup()
+            }
+          }
+          requestAnimationFrame(animate)
         }
         img.src = b64.startsWith('data:image') ? b64 : `data:image/png;base64,${b64}`
       })
 
-    const onResize = () => {
-      const w = window.innerWidth, h = window.innerHeight
-      renderer.setSize(w, h)
-      uniforms.u_resolution.value.set(w * dpr, h * dpr, 1.0)
-    }
-    window.addEventListener('resize', onResize)
-
-    let raf
-    const animate = () => {
-      if (disposed) return
-      raf = requestAnimationFrame(animate)
-      uniforms.u_time.value += 0.016
-      renderer.render(scene, camera)
-    }
-    animate()
-
     return () => {
       disposed = true
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', onResize)
-      geometry.dispose()
-      material.dispose()
-      if (uniforms.u_noiseTexture.value) uniforms.u_noiseTexture.value.dispose()
-      renderer.dispose()
-      if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement)
+      cleanup()
     }
   }, [])
 
@@ -105,7 +132,6 @@ export default function SplashPage() {
     >
       <div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
 
-      {/* Dark overlay for readability */}
       <div style={{
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.4) 100%)',

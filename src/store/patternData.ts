@@ -1,5 +1,6 @@
 import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/proceduralPatterns'
 import { RARITY_WEIGHTS, PITY_THRESHOLD, SOFT_PITY_START } from '../constants'
+import { QINGHUA_PATTERNS } from '../data/qinghuaPatterns'
 
 // ── Types ──────────────────────────────────────────────
 
@@ -15,6 +16,7 @@ export type SeriesId =
   | 'corner'
   | 'tile'
   | 'shanjing'
+  | 'qinghua'
 
 export interface Pattern {
   id: string
@@ -104,6 +106,7 @@ const PATTERN_LIBRARY: Pattern[] = [
   { id: 'sj-23', name: '鷧·双首四足纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/鷧·双首四足纹.webp' },
   { id: 'sj-24', name: '诸犍·一目豹行纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/诸犍·一目豹行纹.webp' },
   { id: 'sj-25', name: '相繇·九首蛇身纹', type: '山海经', series: 'shanjing', rarity: 'ssr', tags: ['山海经', '异兽'], image: '/patterns/shanjing/相繇·九首蛇身纹.webp' },
+  ...QINGHUA_PATTERNS,
 ]
 
 // 稀有度权重（抽卡概率）— 从 constants 导入，这里 re-export
@@ -120,6 +123,7 @@ const SERIES_INFO: Record<SeriesId, SeriesInfo> = {
   corner: { name: '角花集', description: '转角处的惊喜', color: '#F0E68C' },
   tile: { name: '四方连续', description: '无限延展的纹样世界', color: '#B0C4DE' },
   shanjing: { name: '山海经', description: '上古神兽，千年纹影', color: '#C41E3A' },
+  qinghua: { name: '青花瓷纹', description: '335款青花瓷纹样，蓝白之间尽显东方雅韵', color: '#1E4D8C' },
 }
 
 // 程序化纹样 SVG 缓存
