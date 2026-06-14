@@ -13,7 +13,7 @@ const RARITY_COLOR = {
 // Group by series (in a defined order), then by rarity inside each group —
 // so the selector reads as "all my clouds, then all my dragons, ..." instead
 // of "what I pulled most recently first".
-const SERIES_ORDER = ['cloud', 'taotie', 'dragon', 'scroll', 'geometric', 'floral', 'corner', 'tile', 'shanjing', 'qinghua']
+const SERIES_ORDER = ['cloud', 'taotie', 'dragon', 'scroll', 'floral', 'geometric', 'corner', 'tile', 'shanjing', 'qinghua']
 const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
 
 export default function Editor() {

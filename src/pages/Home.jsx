@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
@@ -430,41 +430,95 @@ export default function Home() {
 }
 
 function SeriesCarousel({ series, navigate }) {
+  const ref = useRef(null)
+  const [paused, setPaused] = useState(false)
+
+  // Auto-scroll loop — duplicates the items enough times to fill ≥2 screens
+  // so we can scroll forever by wrapping back by half when we pass it.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let raf
+    const speed = 0.4
+    const tick = () => {
+      if (!paused) {
+        el.scrollLeft += speed
+        const half = el.scrollWidth / 2
+        if (el.scrollLeft >= half) el.scrollLeft -= half
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [paused])
+
   if (!series.patterns.length) return null
+
+  // Duplicate patterns so the carousel can scroll seamlessly.
+  const copies = Math.max(2, Math.ceil(20 / Math.max(series.patterns.length, 1)))
+  const items = Array.from({ length: copies }, () => series.patterns).flat()
 
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontFamily: 'serif', fontSize: 15, color: series.color || '#F2D58A' }}>
+        <span style={{
+          fontFamily: 'Noto Serif SC, serif', fontSize: 15, fontWeight: 600,
+          color: series.color || '#F2D58A', letterSpacing: '0.1em',
+        }}>
           {series.name}
         </span>
-        <span style={{ fontSize: 11, color: '#666' }}>{series.patterns.length} 款</span>
+        <span style={{
+          fontSize: 11, color: '#7A7060',
+          fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
+        }}>
+          {series.patterns.length} 款
+        </span>
       </div>
-      <div style={{
-        display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8,
-        scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch',
-        scrollbarWidth: 'none',
-      }}>
-        {series.patterns.map(p => {
+      <div
+        ref={ref}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
+        style={{
+          display: 'flex', gap: 10,
+          overflowX: 'auto', paddingBottom: 8,
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          paddingLeft: 16, paddingRight: 16,
+          marginLeft: -16, marginRight: -16,
+        }}
+      >
+        {items.map((p, i) => {
           const imgSrc = getPatternImage(p)
           return (
-            <div key={p.id} onClick={() => navigate('/pattern/' + p.id)}
+            <div key={`${p.id}-${i}`} onClick={() => navigate('/pattern/' + p.id)}
               style={{
-                flex: '0 0 auto', width: 100, cursor: 'pointer',
-                scrollSnapAlign: 'start',
+                flex: '0 0 auto', width: 96, cursor: 'pointer',
               }}>
               <div style={{
                 aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
                 background: '#111',
                 border: `1px solid ${series.color}22`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
+                transition: 'transform 0.2s, border-color 0.2s',
+              }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.borderColor = series.color + '55'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.borderColor = series.color + '22'
+                }}
+              >
                 <PatternImage src={imgSrc} alt={p.name} fallbackSize={28}
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div style={{
                 fontSize: 10, color: '#999', marginTop: 5,
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                fontFamily: 'Noto Serif SC, serif',
               }}>
                 {p.name}
               </div>

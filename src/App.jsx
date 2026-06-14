@@ -67,11 +67,12 @@ function Layout() {
   const isSplash = pathname === '/' || pathname === ''
   const isLanding = pathname === '/landing'
   const isShowcase = pathname === '/showcase'
+  const isAuth = pathname === '/auth'
 
   return (
     <>
       <Pages />
-      {!isSplash && !isLanding && !isShowcase && <BottomNav />}
+      {!isSplash && !isLanding && !isShowcase && !isAuth && <BottomNav />}
     </>
   )
 }

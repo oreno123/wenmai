@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../store/AppState'
 import { getRandomPattern, getRarityLabel, getPatternImage, getTenPullPatterns, getSeriesInfo } from '../store/patternData'
 import { PULL_COST, TEN_PULL_COST } from '../constants'
@@ -50,18 +51,55 @@ export default function GachaPage() {
   const [showBurst, setShowBurst] = useState(false)
   const [sharing, setSharing] = useState(false)
 
+  const [sharePreview, setSharePreview] = useState(null)
+
   const handleShare = useCallback(async (pattern) => {
     if (sharing) return
     setSharing(true)
     try {
       const series = getSeriesInfo(pattern.series)
       const blob = await generateShareCard(pattern, series)
-      await shareImage(blob, `wenmai-${pattern.id}.png`)
+      if (!blob) {
+        console.error('Share card generation returned null blob')
+        return
+      }
+      const url = URL.createObjectURL(blob)
+      setSharePreview({ url, pattern, filename: `wenmai-${pattern.id}.png` })
     } catch (e) {
       console.error('Share failed:', e)
     }
     setSharing(false)
   }, [sharing])
+
+  const handleDownloadShare = useCallback(() => {
+    if (!sharePreview) return
+    const a = document.createElement('a')
+    a.href = sharePreview.url
+    a.download = sharePreview.filename
+    a.click()
+  }, [sharePreview])
+
+  const handleNativeShare = useCallback(async () => {
+    if (!sharePreview) return
+    try {
+      const resp = await fetch(sharePreview.url)
+      const blob = await resp.blob()
+      const file = new File([blob], sharePreview.filename, { type: 'image/png' })
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] })
+      } else {
+        // Browser doesn't support native share → fall back to download
+        handleDownloadShare()
+      }
+    } catch (e) {
+      if (e?.name !== 'AbortError') handleDownloadShare()
+    }
+  }, [sharePreview, handleDownloadShare])
+
+  const handleCloseShare = useCallback(() => {
+    if (sharePreview) URL.revokeObjectURL(sharePreview.url)
+    setSharePreview(null)
+  }, [sharePreview])
 
   const cost = data.freePulls > 0 ? 0 : PULL_COST
   const canAfford = data.freePulls > 0 || data.points >= cost
@@ -527,6 +565,118 @@ export default function GachaPage() {
           </div>
         </div>
       )}
+
+      {/* ── Share preview modal ── */}
+      <AnimatePresence>
+        {sharePreview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={handleCloseShare}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              background: 'rgba(8,6,4,0.88)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              padding: '20px', overflowY: 'auto',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%', maxWidth: 340,
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                width: '100%', marginBottom: 14,
+              }}>
+                <span style={{
+                  fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600,
+                  color: '#F2D58A', letterSpacing: '0.2em',
+                }}>
+                  分享卡片
+                </span>
+                <button
+                  onClick={handleCloseShare}
+                  style={{
+                    width: 28, height: 28, borderRadius: 8,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    color: '#8A8A8A', fontSize: 16, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >×</button>
+              </div>
+
+              {/* Preview image */}
+              <div style={{
+                borderRadius: 14, overflow: 'hidden',
+                border: '1px solid rgba(212,175,106,0.25)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 24px rgba(212,175,106,0.1)',
+                maxHeight: '60vh',
+              }}>
+                <img
+                  src={sharePreview.url}
+                  alt={sharePreview.pattern.name}
+                  style={{ display: 'block', width: '100%', height: 'auto' }}
+                />
+              </div>
+
+              {/* Hint */}
+              <p style={{
+                fontSize: 11, color: '#7A7060', textAlign: 'center', marginTop: 14,
+                fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
+              }}>
+                长按图片或点击下方按钮保存
+              </p>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 10, marginTop: 10, width: '100%' }}>
+                <button
+                  onClick={handleNativeShare}
+                  style={{
+                    flex: 1, padding: '13px',
+                    borderRadius: 11, fontSize: 13, fontWeight: 600,
+                    fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.2em',
+                    background: 'linear-gradient(145deg, #C9943A, #8B6914)',
+                    color: '#F5F1E8',
+                    border: '1px solid rgba(201,148,58,0.45)',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(201,148,58,0.22)',
+                  }}
+                >
+                  分 享
+                </button>
+                <button
+                  onClick={handleDownloadShare}
+                  style={{
+                    flex: 1, padding: '13px',
+                    borderRadius: 11, fontSize: 13,
+                    fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.2em',
+                    background: 'rgba(212,175,106,0.08)',
+                    color: '#F2D58A',
+                    border: '1px solid rgba(212,175,106,0.25)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  下 载
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

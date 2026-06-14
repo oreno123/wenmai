@@ -12,22 +12,25 @@ export default function GoldBackground() {
     const ctx = cv.getContext("2d");
     ctx.scale(devicePixelRatio, devicePixelRatio);
 
-    const rays = Array.from({ length: 16 }, () => ({
+    // Toned down from 16 rays / 80 particles — too much motion was competing
+    // with foreground cards. Half the density, half the alpha = atmospheric
+    // without being noisy.
+    const rays = Array.from({ length: 6 }, () => ({
       x: W * (0.15 + Math.random() * 0.7),
       y: H * (0.0 + Math.random() * 0.4),
       angle: -Math.PI / 2 + (Math.random() - 0.5) * 1.1,
       len: 250 + Math.random() * 300,
       w: 1.2 + Math.random() * 3.5,
-      alpha: 0.08 + Math.random() * 0.12,
+      alpha: 0.04 + Math.random() * 0.06,
       speed: 0.0015 + Math.random() * 0.003,
       t: Math.random() * Math.PI * 2,
     }));
 
-    const particles = Array.from({ length: 80 }, () => ({
+    const particles = Array.from({ length: 40 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: 0.5 + Math.random() * 2,
-      alpha: 0.15 + Math.random() * 0.4,
+      alpha: 0.08 + Math.random() * 0.2,
       vx: (Math.random() - 0.5) * 0.15,
       vy: -0.06 - Math.random() * 0.2,
       t: Math.random() * Math.PI * 2,
@@ -38,27 +41,26 @@ export default function GoldBackground() {
     function draw() {
       ctx.clearRect(0, 0, W, H);
 
-      // 右上主光晕
+      // Halved glow alpha so the dark base reads through and foreground
+      // content stays the focal point.
       const g1 = ctx.createRadialGradient(W * 0.85, H * 0.02, 0, W * 0.85, H * 0.02, W * 0.85);
-      g1.addColorStop(0, "rgba(120,80,18,0.85)");
-      g1.addColorStop(0.2, "rgba(80,50,10,0.55)");
-      g1.addColorStop(0.55, "rgba(35,22,5,0.25)");
+      g1.addColorStop(0, "rgba(120,80,18,0.45)");
+      g1.addColorStop(0.2, "rgba(80,50,10,0.28)");
+      g1.addColorStop(0.55, "rgba(35,22,5,0.12)");
       g1.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, W, H);
 
-      // 中央顶部补光
       const g3 = ctx.createRadialGradient(W * 0.5, 0, 0, W * 0.5, 0, W * 0.6);
-      g3.addColorStop(0, "rgba(90,60,12,0.45)");
-      g3.addColorStop(0.5, "rgba(40,25,5,0.18)");
+      g3.addColorStop(0, "rgba(90,60,12,0.22)");
+      g3.addColorStop(0.5, "rgba(40,25,5,0.09)");
       g3.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g3;
       ctx.fillRect(0, 0, W, H);
 
-      // 左下暗红光晕
       const g2 = ctx.createRadialGradient(W * 0.05, H * 0.95, 0, W * 0.05, H * 0.95, W * 0.55);
-      g2.addColorStop(0, "rgba(100,30,8,0.35)");
-      g2.addColorStop(0.5, "rgba(50,15,4,0.15)");
+      g2.addColorStop(0, "rgba(100,30,8,0.18)");
+      g2.addColorStop(0.5, "rgba(50,15,4,0.07)");
       g2.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g2;
       ctx.fillRect(0, 0, W, H);

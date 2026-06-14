@@ -85,7 +85,9 @@ export interface GameStore {
 const DEFAULT_DATA: GameData = {
   points: INITIAL_POINTS,
   freePulls: DAILY_FREE_PULLS,
-  library: ['basic-1', 'basic-2', 'basic-3'],
+  // New-user welcome bundle: 3 commons + 1 SSR (团龙纹) so first-time
+  // visitors have something to play with in the editor/showcase immediately.
+  library: ['basic-1', 'basic-2', 'basic-3', 'dragon-4'],
   series: {},
   dailyPull: { date: null, used: false },
   creations: [],

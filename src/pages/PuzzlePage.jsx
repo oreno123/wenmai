@@ -1,71 +1,62 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
-import APPROVED_IDS from '../../public/elements/approved.json'
+import { getPatternById, getPatternImage, getAllSeries } from '../store/patternData'
 import { createOutlinedBlock } from '../utils/blockOutline'
 import PreviewScaleModal from '../components/PreviewScaleModal'
-
-const STORAGE_KEY = 'wenmai_approved_elements'
-
-function getApprovedSet() {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  const builtIn = APPROVED_IDS.length > 0 ? APPROVED_IDS : ELEMENT_MANIFEST.elements.map(e => e.id)
-  if (saved) {
-    try {
-      const savedSet = new Set(JSON.parse(saved))
-      // Merge: auto-approve any new elements added to built-in list
-      builtIn.forEach(id => savedSet.add(id))
-      return savedSet
-    } catch {}
-  }
-  return new Set(builtIn)
-}
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
 const SCALE = DISPLAY_SIZE / CANVAS_SIZE
 
-const SOURCE_NAMES = {
-  tuanlong: '团龙', yunlei: '云雷', huiwen: '回纹',
-  lianhua: '莲花', juanco2: '卷草', shanjing: '山海经',
-}
-
 export default function PuzzlePage() {
   const canvasRef = useRef(null)
   const navigate = useNavigate()
-  const { saveCreation } = useApp()
-  const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation }
+  const { data, saveCreation } = useApp()
+  const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation, scale }
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [dragging, setDragging] = useState(null)
   const [dragFromTray, setDragFromTray] = useState(null)
   const [loadedImages, setLoadedImages] = useState({})
   const [outlinedBlocks, setOutlinedBlocks] = useState({})
-  const [sourceFilter, setSourceFilter] = useState('all')
+  const [outlinedUrls, setOutlinedUrls] = useState({})
+  const [seriesFilter, setSeriesFilter] = useState('all')
   const [showTray, setShowTray] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
   const [completedImage, setCompletedImage] = useState(null)
   const [saved, setSaved] = useState(false)
 
-  const approvedSet = getApprovedSet()
-  const allApproved = ELEMENT_MANIFEST.elements.filter(e => approvedSet.has(e.id))
-  const filteredElements = sourceFilter === 'all'
-    ? allApproved
-    : allApproved.filter(e => e.source === sourceFilter)
+  // Only patterns the user actually owns can be used in compositions.
+  // Replaces the old ELEMENT_MANIFEST-based tray.
+  const myPatterns = useMemo(
+    () => data.library.map(id => getPatternById(id)).filter(Boolean),
+    [data.library]
+  )
+  const seriesList = getAllSeries()
 
-  // Preload images + pre-render outlined blocks
+  const filteredElements = seriesFilter === 'all'
+    ? myPatterns
+    : myPatterns.filter(p => p.series === seriesFilter)
+
+  // Preload images + pre-render outlined blocks for owned patterns only
   useEffect(() => {
-    ELEMENT_MANIFEST.elements.forEach(el => {
-      if (loadedImages[el.id]) return
+    myPatterns.forEach(p => {
+      if (loadedImages[p.id]) return
       const img = new Image()
-      img.src = `/elements/${el.file}`
+      img.src = getPatternImage(p)
       img.onload = () => {
-        setLoadedImages(prev => ({ ...prev, [el.id]: img }))
+        setLoadedImages(prev => ({ ...prev, [p.id]: img }))
         const block = createOutlinedBlock(img)
-        setOutlinedBlocks(prev => ({ ...prev, [el.id]: block }))
+        setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
+        // Also expose a dataURL so the tray thumbnail (an <img>) can show
+        // the shape-stamped version, not the original square image.
+        try {
+          const url = block.toDataURL('image/png')
+          setOutlinedUrls(prev => ({ ...prev, [p.id]: url }))
+        } catch {}
       }
     })
-  }, [])
+  }, [myPatterns, loadedImages])
 
   // ── Drawing ──────────────────────────────────────────
 
@@ -491,13 +482,13 @@ export default function PuzzlePage() {
         </button>
       </div>
 
-      {/* Source filter */}
+      {/* Series filter */}
       {showTray && (
         <div style={{ display: 'flex', gap: 6, padding: '4px 16px 6px', overflowX: 'auto' }}>
-          <button onClick={() => setSourceFilter('all')} style={pillStyle(sourceFilter === 'all')}>全部</button>
-          {ELEMENT_MANIFEST.sources.map(s => (
-            <button key={s} onClick={() => setSourceFilter(s)} style={pillStyle(sourceFilter === s)}>
-              {SOURCE_NAMES[s] || s}
+          <button onClick={() => setSeriesFilter('all')} style={pillStyle(seriesFilter === 'all')}>全部</button>
+          {seriesList.map(s => (
+            <button key={s.id} onClick={() => setSeriesFilter(s.id)} style={pillStyle(seriesFilter === s.id, s.color)}>
+              {s.name}
             </button>
           ))}
         </div>
@@ -509,10 +500,10 @@ export default function PuzzlePage() {
           display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))',
           gap: 6, padding: '0 16px 8px', maxHeight: '35vh', overflowY: 'auto',
         }}>
-          {filteredElements.map(el => (
+          {filteredElements.map(p => (
             <div
-              key={el.id}
-              onPointerDown={(e) => handleTrayPointerDown(e, el)}
+              key={p.id}
+              onPointerDown={(e) => handleTrayPointerDown(e, p)}
               style={{
                 background: 'rgba(255,255,255,0.03)',
                 border: '1px solid rgba(255,255,255,0.05)',
@@ -522,23 +513,37 @@ export default function PuzzlePage() {
               }}
             >
               <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {loadedImages[el.id] ? (
+                {outlinedUrls[p.id] ? (
                   <img
-                    src={`/elements/${el.file}`}
-                    alt={el.id}
+                    src={outlinedUrls[p.id]}
+                    alt={p.name}
                     style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    loading="lazy"
                     draggable={false}
                   />
                 ) : (
                   <span style={{ fontSize: 9, color: '#4A4A4A' }}>...</span>
                 )}
               </div>
-              <span style={{ fontSize: 8, color: '#6A6A6A', textAlign: 'center' }}>
-                {el.name || SOURCE_NAMES[el.source] || el.source}
+              <span style={{
+                fontSize: 8, color: '#6A6A6A', textAlign: 'center',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}>
+                {p.name}
               </span>
             </div>
           ))}
+          {filteredElements.length === 0 && (
+            <div style={{
+              gridColumn: '1 / -1', padding: '32px 12px', textAlign: 'center',
+              color: '#5A4A30', fontSize: 12,
+              fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
+            }}>
+              {myPatterns.length === 0
+                ? '尚未收集纹样，去抽卡吧'
+                : '该系列下暂无纹样'}
+            </div>
+          )}
         </div>
       )}
 

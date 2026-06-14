@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { updateSpring } from './springPhysics'
 import { voronoiShatter } from './voronoiShatter'
 import { SHATTER_SPRING, ASSEMBLE_SPRING, ROTATION_SPRING, GOLD_COLOR, BREAK_DISTANCE, FRAGMENT_COUNT } from './constants'
-import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
+import { getPatternById, getPatternImage } from '../store/patternData'
 import { createOutlinedBlock } from '../utils/blockOutline'
 
 // Module-level cache: same element file is processed once across all Showcase sessions.
@@ -533,18 +533,19 @@ export default function ShatterScene({ isOpen, isFist, imageUrl, placements }) {
 const PLACEMENT_TOTAL_SIZE = 2.8
 
 function UserPlacementScene({ placements, isOpen, isFist }) {
-  // Resolve each placement's element file, dedupe and load processed (outlined) textures in parallel
+  // Resolve each placement's pattern image URL via the pattern store.
+  // Placements now reference pattern IDs (cloud-4, qh-50, etc.) rather than
+  // element IDs, so we can pull from the full PATTERN_LIBRARY.
   const elementFiles = useMemo(() => {
     const seen = new Set()
     const files = []
     for (const p of placements) {
-      const el = ELEMENT_MANIFEST.elements.find(e => e.id === p.id)
-      if (!el) continue
-      const path = `/elements/${el.file}`
-      if (!seen.has(path)) {
-        seen.add(path)
-        files.push(path)
-      }
+      const pat = getPatternById(p.id)
+      if (!pat) continue
+      const path = getPatternImage(pat)
+      if (!path || seen.has(path)) continue
+      seen.add(path)
+      files.push(path)
     }
     return files
   }, [placements])
@@ -573,8 +574,8 @@ function UserPlacementScene({ placements, isOpen, isFist }) {
 
   const items = useMemo(() => {
     return placements.map((p) => {
-      const el = ELEMENT_MANIFEST.elements.find(e => e.id === p.id)
-      const path = el ? `/elements/${el.file}` : null
+      const pat = getPatternById(p.id)
+      const path = pat ? getPatternImage(pat) : null
       const texture = path ? textureByPath.get(path) : null
       const sx = ((p.x ?? 512) / 1024 - 0.5) * PLACEMENT_TOTAL_SIZE
       const sy = (0.5 - (p.y ?? 512) / 1024) * PLACEMENT_TOTAL_SIZE
