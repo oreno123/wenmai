@@ -240,7 +240,7 @@ export function extractShapeData(img, { clearCorners = true } = {}) {
  *   series that are photographic (qinghua — porcelain photos have no
  *   watermark and overpainting corners shows up as visible squares).
  */
-export function createOutlinedBlock(img, { clearCorners = true } = {}) {
+export function createOutlinedBlock(img, { clearCorners = true, mode = 'stamp' } = {}) {
   const size = OUTLINE_SIZE
   const canvas = document.createElement('canvas')
   canvas.width = size
@@ -333,6 +333,30 @@ export function createOutlinedBlock(img, { clearCorners = true } = {}) {
   const bgRatio = bgCount / raw.length
 
   ctx.clearRect(0, 0, size, size)
+
+  // 'line' mode: skip the stamp composite entirely. Render only the
+  // raw alpha silhouette — original pixels where the pattern is, fully
+  // transparent elsewhere. This makes 金线 read as actual brushwork on
+  // a paper-colored canvas instead of as embossed metal on a dark chip.
+  if (mode === 'line') {
+    const imgData = ctx.createImageData(size, size)
+    const d = imgData.data
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i]) {
+        d[i*4]   = data[i*4]
+        d[i*4+1] = data[i*4+1]
+        d[i*4+2] = data[i*4+2]
+        d[i*4+3] = 255
+      }
+    }
+    ctx.putImageData(imgData, 0, 0)
+    const cornerSize = size * 0.18
+    ctx.clearRect(0, 0, cornerSize, cornerSize)
+    ctx.clearRect(size - cornerSize, 0, cornerSize, cornerSize)
+    ctx.clearRect(0, size - cornerSize, cornerSize, cornerSize)
+    ctx.clearRect(size - cornerSize, size - cornerSize, cornerSize, cornerSize)
+    return canvas
+  }
 
   if (bgRatio > 0.55) {
     // ── Continuous-pattern mode: pure alpha mask, no backing, no outline.

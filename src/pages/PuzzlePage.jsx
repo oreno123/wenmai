@@ -10,6 +10,7 @@ import {
   computeDeformationTowards,
   getSuggestedPositions,
 } from '../engine/shapeInteraction'
+import { TEMPLATES, getTemplateById } from '../data/templates'
 import { SNAP_THRESHOLD, SNAP_STRENGTH } from '../constants'
 import PreviewScaleModal from '../components/PreviewScaleModal'
 
@@ -36,6 +37,8 @@ export default function PuzzlePage() {
   const [completedImage, setCompletedImage] = useState(null)
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportSize, setExportSize] = useState(2048)
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+  const [activeTemplateId, setActiveTemplateId] = useState(null)
   const [saved, setSaved] = useState(false)
 
   // Only patterns the user actually owns can be used in compositions.
@@ -67,7 +70,7 @@ export default function PuzzlePage() {
           processSrc = sliceTopLeftQuadrant(img)
         }
         setLoadedImages(prev => ({ ...prev, [p.id]: processSrc }))
-        const block = createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua' })
+        const block = createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua', mode: 'line' })
         setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
         // Compute shape mask + contour + flexibility flag for collision/snapping/deformation
         try {
@@ -101,15 +104,26 @@ export default function PuzzlePage() {
     c.width = CANVAS_SIZE
     c.height = CANVAS_SIZE
     const cx = c.getContext('2d')
-    cx.fillStyle = '#F5F0E6'
+    // 宣纸色 base — slightly cooler than the previous warm cream, reads
+    // as paper rather than as parchment. Two-stop radial adds a faint
+    // vignette so the center reads as the "page" and the corners recede.
+    const grad = cx.createRadialGradient(
+      CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.1,
+      CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.7,
+    )
+    grad.addColorStop(0, '#F2EBDB')
+    grad.addColorStop(1, '#E8DFC8')
+    cx.fillStyle = grad
     cx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-    cx.fillStyle = 'rgba(0,0,0,0.015)'
-    for (let i = 0; i < 200; i++) {
+    // Subtle paper grain — coarser than before to read as 宣纸 fiber
+    cx.fillStyle = 'rgba(120,100,60,0.025)'
+    for (let i = 0; i < 240; i++) {
       const x = Math.random() * CANVAS_SIZE
       const y = Math.random() * CANVAS_SIZE
-      cx.fillRect(x, y, 2, 2)
+      const s = 1 + Math.random() * 2
+      cx.fillRect(x, y, s, s)
     }
-    cx.strokeStyle = 'rgba(160,140,100,0.3)'
+    cx.strokeStyle = 'rgba(160,140,100,0.28)'
     cx.lineWidth = 4
     cx.strokeRect(8, 8, CANVAS_SIZE - 16, CANVAS_SIZE - 16)
     bgCanvasRef.current = c
@@ -125,6 +139,37 @@ export default function PuzzlePage() {
 
     // Draw each placed element
     placements.forEach((p, idx) => {
+      // Empty template slot — dashed outline + label
+      if (p.isEmpty) {
+        ctx.save()
+        ctx.translate(p.x, p.y)
+        ctx.rotate((p.rotation || 0) * Math.PI / 180)
+        ctx.strokeStyle = 'rgba(212,175,106,0.45)'
+        ctx.lineWidth = 2
+        ctx.setLineDash([10, 6])
+        const half = p.size / 2
+        ctx.strokeRect(-half, -half, p.size, p.size)
+        ctx.setLineDash([])
+        // Inner tint so the slot reads as "intentional empty" not "broken"
+        ctx.fillStyle = 'rgba(212,175,106,0.04)'
+        ctx.fillRect(-half, -half, p.size, p.size)
+        // Centered label
+        ctx.fillStyle = 'rgba(212,175,106,0.65)'
+        ctx.font = `${Math.max(14, Math.floor(p.size * 0.09))}px "Noto Serif SC", serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(p.slotLabel || '空位', 0, 0)
+        if (drawSelection && idx === selectedIdx) {
+          ctx.strokeStyle = 'rgba(201,168,76,0.9)'
+          ctx.lineWidth = 2.5
+          ctx.setLineDash([6, 4])
+          ctx.strokeRect(-half - 4, -half - 4, p.size + 8, p.size + 8)
+          ctx.setLineDash([])
+        }
+        ctx.restore()
+        return
+      }
+
       const block = outlinedBlocks[p.id] || loadedImages[p.id]
       if (!block) return
 
@@ -538,7 +583,58 @@ export default function PuzzlePage() {
   const clearCanvas = useCallback(() => {
     setPlacements([])
     setSelectedIdx(-1)
+    setActiveTemplateId(null)
   }, [])
+
+  // Apply a composition template: clear placements, materialize template
+  // slots as placements, auto-fill from the user's library by type, mark
+  // unmatched slots as empty placeholders.
+  const applyTemplate = useCallback((template) => {
+    // Group library patterns by type so multiple slots of the same type
+    // pull distinct elements when available (e.g. 4 corner slots get 4
+    // different 角花 if the user owns that many).
+    const patternsByType = new Map()
+    for (const p of myPatterns) {
+      if (!patternsByType.has(p.type)) patternsByType.set(p.type, [])
+      patternsByType.get(p.type).push(p)
+    }
+    const cursorByType = new Map()
+
+    const newPlacements = template.slots.map(slot => {
+      const x = slot.x * CANVAS_SIZE
+      const y = slot.y * CANVAS_SIZE
+      const list = patternsByType.get(slot.typeConstraint) || []
+      const cursor = cursorByType.get(slot.typeConstraint) || 0
+      const pattern = list[cursor] || list[0]
+      cursorByType.set(slot.typeConstraint, cursor + 1)
+
+      if (pattern) {
+        return {
+          id: pattern.id,
+          x, y,
+          size: slot.size,
+          rotation: slot.rotation,
+          scaleX: 1, scaleY: 1,
+          slotId: slot.id,
+        }
+      }
+      // Empty placeholder slot — rendered as a dashed outline + label
+      return {
+        id: '__empty__',
+        x, y,
+        size: slot.size,
+        rotation: slot.rotation,
+        scaleX: 1, scaleY: 1,
+        slotId: slot.id,
+        isEmpty: true,
+        slotLabel: slot.label || slot.typeConstraint,
+      }
+    })
+    setPlacements(newPlacements)
+    setSelectedIdx(-1)
+    setActiveTemplateId(template.id)
+    setShowTemplateModal(false)
+  }, [myPatterns])
 
   // ── Render ──────────────────────────────────────────
 
@@ -565,6 +661,15 @@ export default function PuzzlePage() {
             </span>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => setShowTemplateModal(true)}
+              style={{
+                ...ghostBtnStyle,
+                color: activeTemplateId ? '#F2D58A' : '#A09682',
+                borderColor: activeTemplateId ? 'rgba(212,175,106,0.3)' : 'rgba(255,255,255,0.05)',
+                background: activeTemplateId ? 'rgba(212,175,106,0.1)' : 'rgba(255,255,255,0.02)',
+              }}
+            >模板{activeTemplateId ? ` · ${getTemplateById(activeTemplateId)?.name}` : ''}</button>
             <button onClick={clearCanvas} style={ghostBtnStyle}>清空</button>
             <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
               ...ghostBtnStyle,
@@ -782,6 +887,15 @@ export default function PuzzlePage() {
           onConfirm={() => exportPNG(exportSize)}
         />
       )}
+
+      {showTemplateModal && (
+        <TemplatePickerModal
+          activeId={activeTemplateId}
+          library={myPatterns}
+          onSelect={applyTemplate}
+          onCancel={() => setShowTemplateModal(false)}
+        />
+      )}
     </div>
   )
 }
@@ -893,6 +1007,114 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
             cursor: 'pointer',
             boxShadow: '0 2px 12px rgba(201,148,58,0.18)',
           }}>导出 {currentSize}×{currentSize}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
+  // For each template, count how many slots the user's library can fill
+  const coverage = (template) => {
+    const have = new Map()
+    for (const p of library) {
+      have.set(p.type, (have.get(p.type) || 0) + 1)
+    }
+    const need = new Map()
+    for (const s of template.slots) {
+      need.set(s.typeConstraint, (need.get(s.typeConstraint) || 0) + 1)
+    }
+    let filled = 0
+    let total = 0
+    for (const [t, n] of need) {
+      total += n
+      filled += Math.min(n, have.get(t) || 0)
+    }
+    return { filled, total }
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 100,
+      background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 16,
+    }} onClick={onCancel}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: 420, maxHeight: '85vh', overflowY: 'auto',
+          background: 'linear-gradient(160deg, #1F1D17, #14120D)',
+          border: '1px solid rgba(212,175,106,0.25)',
+          borderRadius: 16, padding: 20,
+          boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
+          fontFamily: 'Noto Serif SC, serif',
+        }}
+      >
+        <div style={{ marginBottom: 14 }}>
+          <span style={{
+            fontSize: 16, fontWeight: 600, color: '#F2D58A', letterSpacing: '0.12em',
+          }}>选择构图模板</span>
+          <span style={{
+            marginLeft: 8, fontSize: 9, color: '#8A6A30',
+            letterSpacing: '0.3em', textTransform: 'uppercase',
+          }}>Template</span>
+        </div>
+        <div style={{ fontSize: 11, color: '#7A7060', marginBottom: 14, fontFamily: 'inherit' }}>
+          应用模板后自动从你的图鉴填充元素 · 缺失的位置显示为虚线空位
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {TEMPLATES.map(tpl => {
+            const c = coverage(tpl)
+            const full = c.filled === c.total
+            const isActive = activeId === tpl.id
+            return (
+              <div
+                key={tpl.id}
+                onClick={() => onSelect(tpl)}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  background: isActive
+                    ? 'rgba(212,175,106,0.15)'
+                    : 'rgba(255,255,255,0.02)',
+                  border: isActive
+                    ? '1px solid rgba(212,175,106,0.45)'
+                    : '1px solid rgba(255,255,255,0.05)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  marginBottom: 4,
+                }}>
+                  <span style={{
+                    fontSize: 14, color: isActive ? '#F2D58A' : '#E0D4B0',
+                    fontFamily: 'inherit', letterSpacing: '0.08em', fontWeight: 500,
+                  }}>{tpl.name}</span>
+                  <span style={{
+                    fontSize: 10,
+                    color: full ? '#8BC387' : '#C9943A',
+                    fontFamily: 'inherit',
+                    background: full ? 'rgba(100,180,100,0.1)' : 'rgba(201,148,58,0.1)',
+                    padding: '2px 7px', borderRadius: 8,
+                  }}>{c.filled}/{c.total} 可填</span>
+                </div>
+                <div style={{
+                  fontSize: 11, color: '#7A7060', fontFamily: 'inherit',
+                  lineHeight: 1.5,
+                }}>{tpl.description}</div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div style={{
+          display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end',
+        }}>
+          <button onClick={onCancel} style={ghostBtnStyle}>取消</button>
         </div>
       </div>
     </div>

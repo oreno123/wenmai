@@ -20,6 +20,25 @@ export default function Editor() {
   const { data } = useApp()
   const [selectedPattern, setSelectedPattern] = useState(data.library[0] || null)
 
+  // Composition mode: when navigated from the puzzle "完成创作" preview,
+  // sessionStorage carries the rasterized composition image. Render the
+  // whole piece as a single relief (no pattern selector).
+  const [compositionImage, setCompositionImage] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem('editor_composition_image')
+      if (stored) return stored
+    } catch {}
+    return null
+  })
+
+  const exitCompositionMode = () => {
+    try {
+      sessionStorage.removeItem('editor_composition_image')
+      sessionStorage.removeItem('editor_composition_placements')
+    } catch {}
+    setCompositionImage(null)
+  }
+
   const myPatterns = useMemo(
     () => data.library
       .map(id => getPatternById(id))
@@ -34,12 +53,13 @@ export default function Editor() {
   )
 
   const selected = myPatterns.find(p => p.id === selectedPattern)
-  const imageUrl = selected ? getPatternImage(selected) : null
+  const patternImageUrl = selected ? getPatternImage(selected) : null
 
-  // Pick material preset based on the pattern family:
-  //   - qinghua / shanjing are photographic (opaque) — render as glazed porcelain
-  //   - everything else (gold-line transparent PNGs) — render as raised metal relief
-  const isPorcelain = selected && (selected.series === 'qinghua' || selected.series === 'shanjing')
+  // In composition mode use the cached composition image; otherwise the
+  // single-pattern image. Composition defaults to relief (gold) since
+  // the piece is mostly paper-bg with gold lines.
+  const imageUrl = compositionImage || patternImageUrl
+  const isPorcelain = !compositionImage && selected && (selected.series === 'qinghua' || selected.series === 'shanjing')
   const reliefParams = isPorcelain
     ? { porcelain: true, metalness: 0.08, roughness: 0.6, baseColor: '#F5EFE0', normalScale: 1.2 }
     : { porcelain: false, metalness: 0.7, roughness: 0.35, baseColor: '#C4A265', normalScale: 1.6 }
@@ -65,7 +85,7 @@ export default function Editor() {
             fontFamily: 'Noto Serif SC, serif', fontSize: 20, fontWeight: 600,
             color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
           }}>
-            纹样浮雕
+            {compositionImage ? '作品浮雕' : '纹样浮雕'}
           </h1>
           <span style={{
             fontSize: 9, color: '#8A6A30', letterSpacing: '0.3em',
@@ -73,9 +93,22 @@ export default function Editor() {
           }}>
             Relief
           </span>
+          {compositionImage && (
+            <button
+              onClick={exitCompositionMode}
+              style={{
+                marginLeft: 'auto', padding: '4px 12px', borderRadius: 9,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                color: '#A09682', fontSize: 11, cursor: 'pointer',
+                fontFamily: 'inherit', letterSpacing: '0.1em',
+              }}
+            >← 返回单纹样</button>
+          )}
         </div>
 
-        {/* Pattern selector */}
+        {/* Pattern selector — hidden in composition mode */}
+        {!compositionImage && (
         <div>
           <div style={{
             fontFamily: 'Noto Serif SC, serif', fontSize: 11, fontWeight: 600,
@@ -116,6 +149,7 @@ export default function Editor() {
             )}
           </div>
         </div>
+        )}
       </div>
 
       {/* ── 3D Relief (full remaining space) ── */}

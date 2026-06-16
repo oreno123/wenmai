@@ -77,6 +77,20 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
     setTimeout(() => setSaved(false), 2000)
   }, [imageUrl, saveCreation, placements])
 
+  const goToRelief = useCallback(() => {
+    // Persist the rasterized composition so Editor can pick it up and
+    // render the whole piece as a relief (not just a single pattern).
+    if (imageUrl) {
+      try {
+        sessionStorage.setItem('editor_composition_image', imageUrl)
+        if (placements) {
+          sessionStorage.setItem('editor_composition_placements', JSON.stringify(placements))
+        }
+      } catch {}
+    }
+    navigate('/editor')
+  }, [imageUrl, placements, navigate])
+
   const goToShowcase = useCallback(() => {
     // Apply global scale + rotation to placements, persist for Showcase.
     // Each placement keeps its element id so Showcase can render the original
@@ -370,6 +384,26 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
               }}
             >
               {saved ? '已保存' : '保存到作品集'}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={goToRelief}
+              style={{
+                marginTop: 4,
+                padding: '12px 24px',
+                borderRadius: 14,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(212,175,106,0.25)',
+                color: '#F2D58A',
+                fontSize: 14, fontWeight: 600,
+                letterSpacing: 2,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                transition: 'all 0.2s',
+              }}
+            >
+              看浮雕
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(201,148,58,0.4)' }}
