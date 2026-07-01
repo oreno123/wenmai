@@ -12,6 +12,55 @@ const fadeUp = {
   animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 }
 
+// ── 故事旅程 4 章节 ──
+const STORY_CHAPTERS = [
+  {
+    key: 'see', num: '壹', cn: '看 见', en: 'SEE',
+    desc: '千年纹样触手可及',
+    cta: '进入图鉴', path: '/library',
+    deco: (
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+        <circle cx="24" cy="24" r="18" />
+        <circle cx="24" cy="24" r="11" />
+        <circle cx="24" cy="24" r="5" />
+      </svg>
+    ),
+  },
+  {
+    key: 'hear', num: '贰', cn: '听 见', en: 'HEAR',
+    desc: '每条纹样都在低语',
+    cta: '听 故 事', path: '/library',
+    deco: (
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+        <path d="M14 18a10 10 0 0 1 20 0v8a10 10 0 0 1-20 0z" />
+        <path d="M10 26a4 4 0 0 0 4 4M38 26a4 4 0 0 1-4 4" />
+      </svg>
+    ),
+  },
+  {
+    key: 'create', num: '叁', cn: '创 作', en: 'CREATE',
+    desc: '拼出属于你的纹样',
+    cta: '开始创作', path: '/puzzle',
+    deco: (
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+        <path d="M14 6l4 4-8 8 8 8-4 4-8-8 8-8z" />
+        <path d="M34 6l8 8-8 8M30 42l-4-4 8-8-8-8 4-4 8 8-8 8z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'own', num: '肆', cn: '拥 有', en: 'OWN',
+    desc: '把它变成实物',
+    cta: '看浮雕预览', path: '/editor',
+    deco: (
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+        <path d="M10 18l14-8 14 8v18l-14 8-14-8z" />
+        <path d="M10 18l14 8 14-8M24 26v18" />
+      </svg>
+    ),
+  },
+]
+
 /* 云雷纹简化 SVG */
 function CloudPattern({ size = 44, opacity = 0.85 }) {
   return (
@@ -59,6 +108,14 @@ function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
         <path d="M9 11V5a1.8 1.8 0 1 1 3.6 0v5" />
         <path d="M12.6 9V4a1.8 1.8 0 1 1 3.6 0v6" />
         <path d="M16.2 11V6a1.8 1.8 0 1 1 3.6 0v8a8 8 0 0 1-8 8h-1c-3 0-4.5-1-6.5-3l-3-3c-1-1 0-2.5 1.5-2l3 2V9a1.8 1.8 0 1 1 3.6 0v3" />
+      </>
+    ),
+    gallery: (
+      <>
+        <rect x="3" y="3" width="7.5" height="7.5" rx="1" />
+        <rect x="13.5" y="3" width="7.5" height="7.5" rx="1" />
+        <rect x="3" y="13.5" width="7.5" height="7.5" rx="1" />
+        <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1" />
       </>
     ),
   }
@@ -267,49 +324,196 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* ── 五个功能入口 ── */}
+          {/* ── 故事旅程（壹看见 → 贰听见 → 叁创作 → 肆拥有）── */}
+          <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
+            <motion.div variants={fadeUp} style={{
+              textAlign: 'center',
+              padding: '12px 16px 18px',
+              marginBottom: 4,
+            }}>
+              <div style={{
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 19, fontWeight: 500,
+                color: '#F2D58A', letterSpacing: '0.18em',
+                lineHeight: 1.6,
+              }}>
+                每一道纹样，都是某个人的呼吸
+              </div>
+              <div style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                fontStyle: 'italic',
+                fontSize: 12, color: '#8A6A30',
+                marginTop: 4, letterSpacing: '0.1em',
+              }}>
+                千年纹样在此复活，等你接续
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeUp} style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 8,
+            }}>
+              {STORY_CHAPTERS.map((ch, i) => (
+                <motion.div key={ch.key} variants={fadeUp}
+                  onClick={() => navigate(ch.path)}
+                  style={{
+                    position: 'relative',
+                    background: 'linear-gradient(155deg, #1A1812 0%, #0E0C08 100%)',
+                    border: '1px solid rgba(212,175,106,0.22)',
+                    borderRadius: 14,
+                    padding: '14px 10px 12px',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.55)'
+                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(0,0,0,0.45), 0 0 18px rgba(212,175,106,0.15)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  {/* 顶部红章 + 章节号 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <span style={{
+                      display: 'inline-block',
+                      background: '#BC1F28',
+                      color: '#F5F1E8',
+                      fontFamily: 'Noto Serif SC, serif',
+                      fontWeight: 600,
+                      padding: '1px 6px',
+                      fontSize: 9, letterSpacing: '0.18em',
+                      borderRadius: 2,
+                    }}>{ch.num}</span>
+                    <span style={{
+                      fontFamily: 'Cormorant Garamond, serif',
+                      fontStyle: 'italic',
+                      fontSize: 9, color: '#8A6A30',
+                      letterSpacing: '0.18em',
+                    }}>{ch.en}</span>
+                  </div>
+
+                  {/* 中文标题 */}
+                  <div style={{
+                    fontFamily: 'Noto Serif SC, serif',
+                    fontSize: 18, fontWeight: 500,
+                    color: '#F2D58A', letterSpacing: '0.15em',
+                    marginBottom: 6,
+                  }}>{ch.cn}</div>
+
+                  {/* 描述 */}
+                  <div style={{
+                    fontFamily: 'Noto Serif SC, serif',
+                    fontSize: 10, color: '#8A8A8A',
+                    lineHeight: 1.7, marginBottom: 10,
+                    fontWeight: 300,
+                  }}>{ch.desc}</div>
+
+                  {/* CTA */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    fontFamily: 'Noto Serif SC, serif',
+                    fontSize: 10, color: '#D4AF37',
+                    letterSpacing: '0.15em',
+                    fontWeight: 500,
+                  }}>
+                    {ch.cta}
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 5l7 7-7 7" />
+                    </svg>
+                  </div>
+
+                  {/* 装饰小纹样（左下角淡） */}
+                  <div style={{
+                    position: 'absolute', bottom: -6, right: -6,
+                    width: 38, height: 38, opacity: 0.08,
+                    pointerEvents: 'none',
+                  }}>
+                    {ch.deco}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* 广场副 CTA */}
+            <motion.div variants={fadeUp}
+              onClick={() => navigate('/gallery')}
+              style={{
+                marginTop: 10,
+                padding: '12px 16px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                background: 'rgba(188,31,40,0.06)',
+                border: '1px solid rgba(188,31,40,0.28)',
+                borderRadius: 10,
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(188,31,40,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(188,31,40,0.5)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(188,31,40,0.06)'
+                e.currentTarget.style.borderColor = 'rgba(188,31,40,0.28)'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.5">
+                <rect x="3" y="3" width="7.5" height="7.5" rx="1" />
+                <rect x="13.5" y="3" width="7.5" height="7.5" rx="1" />
+                <rect x="3" y="13.5" width="7.5" height="7.5" rx="1" />
+                <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1" />
+              </svg>
+              <span style={{
+                fontFamily: 'Noto Serif SC, serif',
+                fontSize: 12, color: '#F2D58A',
+                letterSpacing: '0.15em',
+              }}>
+                或看看别人怎么做的 · 进入广场
+              </span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </motion.div>
+          </motion.div>
+
+          {/* ── 更多工具（折叠的次要入口）── */}
           <motion.div variants={stagger} initial="initial" animate="animate"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 28 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 14 }}
           >
             {[
               { icon: 'camera', label: '找相似', path: '/photo-match' },
-              { icon: 'compose', label: '创 作', path: '/puzzle' },
               { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
-              { icon: 'cube', label: '纹样浮雕', path: '/editor' },
               { icon: 'hand', label: '手势展示', path: '/showcase' },
+              { icon: 'compose', label: '自由拼', path: '/puzzle' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
                 <div style={{
-                  width: 54, height: 54,
-                  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
-                  border: '1px solid rgba(212,175,106,0.2)',
-                  borderRadius: 14,
+                  width: 44, height: 44,
+                  background: 'linear-gradient(145deg, #1A1812, #0F0D08)',
+                  border: '1px solid rgba(212,175,106,0.15)',
+                  borderRadius: 11,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  position: 'relative',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,106,0.05)',
                   transition: 'all 0.25s ease',
                 }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.45)'
-                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4), 0 0 16px rgba(212,175,106,0.12), inset 0 1px 0 rgba(212,175,106,0.1)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.2)'
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212,175,106,0.05)'
+                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.15)'
                   }}
                 >
-                  <FeatureIcon name={item.icon} size={22} color="#F2D58A" />
-                  <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    width: 3, height: 3, borderRadius: '50%',
-                    background: '#BC1F28', opacity: 0.55,
-                  }} />
+                  <FeatureIcon name={item.icon} size={18} color="#A09682" />
                 </div>
                 <span style={{
-                  fontSize: 11, color: '#A09682', marginTop: 8,
+                  fontSize: 10, color: '#7A7060', marginTop: 6,
                   fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
                 }}>
                   {item.label}

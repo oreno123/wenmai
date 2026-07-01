@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate, useLocation } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage, getAllSeries } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
@@ -13,6 +13,9 @@ import {
 import { TEMPLATES, getTemplateById } from '../data/templates'
 import { SNAP_THRESHOLD, SNAP_STRENGTH } from '../constants'
 import PreviewScaleModal from '../components/PreviewScaleModal'
+import PublishModal from '../components/gallery/PublishModal'
+import { useAuth } from '../lib/auth'
+import { getWork } from '../lib/galleryApi'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -22,6 +25,8 @@ const MASK_DIM = 32
 export default function PuzzlePage() {
   const canvasRef = useRef(null)
   const navigate = useNavigate()
+  const { search } = useLocation()
+  const { user } = useAuth()
   const { data, saveCreation } = useApp()
   const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation, scale }
   const [selectedIdx, setSelectedIdx] = useState(-1)
@@ -41,17 +46,54 @@ export default function PuzzlePage() {
   const [activeTemplateId, setActiveTemplateId] = useState(null)
   const [saved, setSaved] = useState(false)
 
+  // ── Gallery integration ───────────────────────────────
+  const [forkSource, setForkSource] = useState(null)        // { id, title, author }
+  const [showPublish, setShowPublish] = useState(false)
+  const [publishCoverBlob, setPublishCoverBlob] = useState(null)
+  const [extraPatterns, setExtraPatterns] = useState([])    // fork 引入的 pattern（绕过 library 过滤）
+
   // Only patterns the user actually owns can be used in compositions.
   // Replaces the old ELEMENT_MANIFEST-based tray.
-  const myPatterns = useMemo(
-    () => data.library.map(id => getPatternById(id)).filter(Boolean),
-    [data.library]
-  )
+  // Fork 时把源作品引用的 pattern 也并入（即使不在当前 user library）
+  const myPatterns = useMemo(() => {
+    const lib = data.library.map(id => getPatternById(id)).filter(Boolean)
+    const extras = extraPatterns.filter(p => !lib.find(x => x.id === p.id))
+    return [...lib, ...extras]
+  }, [data.library, extraPatterns])
   const seriesList = getAllSeries()
 
   const filteredElements = seriesFilter === 'all'
     ? myPatterns
     : myPatterns.filter(p => p.series === seriesFilter)
+
+  // ── Fork entry: read ?fork=workId and preload source placements ──
+  useEffect(() => {
+    const params = new URLSearchParams(search)
+    const forkId = params.get('fork')
+    if (!forkId) return
+    let cancelled = false
+    getWork(forkId).then(({ data: src }) => {
+      if (cancelled || !src) return
+      setForkSource({ id: src.id, title: src.title, author: src.author })
+      if (Array.isArray(src.placements) && src.placements.length > 0) {
+        // placements 的 id 字段就是 patternId（PuzzlePage 设计如此），
+        // 保留原值让 renderScene 能查到 outlinedBlocks / loadedImages / shapeCache
+        const usedPatternIds = [...new Set(src.placements.map(p => p.id).filter(Boolean))]
+        // 把这些 pattern 注入 extraPatterns，让 image preload 流程能跑到（绕过 library 过滤）
+        const extras = usedPatternIds
+          .map(pid => getPatternById(pid))
+          .filter(Boolean)
+        if (extras.length > 0) {
+          setExtraPatterns(prev => {
+            const existing = new Set(prev.map(p => p.id))
+            return [...prev, ...extras.filter(p => !existing.has(p.id))]
+          })
+        }
+        setPlacements(src.placements)
+      }
+    })
+    return () => { cancelled = true }
+  }, [search])
 
   // Preload images + pre-render outlined blocks for owned patterns only
   useEffect(() => {
@@ -580,6 +622,32 @@ export default function PuzzlePage() {
     setTimeout(() => setSaved(false), 2000)
   }, [placements.length, saveCreation])
 
+  // 把当前 canvas 导出成 1536×1536 WebP Blob（广场封面用）
+  const exportCoverBlob = useCallback(async () => {
+    const src = canvasRef.current
+    if (!src) return null
+    const out = document.createElement('canvas')
+    out.width = 1536
+    out.height = 1536
+    const ctx = out.getContext('2d')
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    // 直接 drawImage 把 1024 canvas 放大到 1536（背景纹理会被放大但视觉可接受）
+    ctx.drawImage(src, 0, 0, 1536, 1536)
+    return new Promise(resolve => {
+      out.toBlob(resolve, 'image/webp', 0.92)
+    })
+  }, [])
+
+  // 点击「发布到广场」
+  const handlePublishClick = useCallback(async () => {
+    if (!user) { navigate('/auth'); return }
+    if (placements.length === 0) return
+    const blob = await exportCoverBlob()
+    setPublishCoverBlob(blob)
+    setShowPublish(true)
+  }, [user, placements.length, navigate, exportCoverBlob])
+
   const clearCanvas = useCallback(() => {
     setPlacements([])
     setSelectedIdx(-1)
@@ -704,6 +772,25 @@ export default function PuzzlePage() {
                 transition: 'all 0.2s',
               }}
             >完成创作</button>
+            <button
+              onClick={handlePublishClick}
+              disabled={placements.length === 0}
+              style={{
+                padding: '6px 14px', borderRadius: 9, fontSize: 11,
+                fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em', fontWeight: 500,
+                background: placements.length === 0
+                  ? 'rgba(255,255,255,0.02)'
+                  : 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
+                color: placements.length === 0 ? '#4A4A4A' : '#0A0806',
+                border: placements.length === 0
+                  ? '1px solid rgba(255,255,255,0.04)'
+                  : '1px solid rgba(212,175,55,0.45)',
+                opacity: placements.length === 0 ? 0.6 : 1,
+                cursor: placements.length === 0 ? 'not-allowed' : 'pointer',
+                boxShadow: placements.length === 0 ? 'none' : '0 2px 10px rgba(212,175,55,0.2)',
+                transition: 'all 0.2s',
+              }}
+            >发 布 到 广 场</button>
           </div>
         </div>
 
@@ -875,6 +962,32 @@ export default function PuzzlePage() {
           placements={placements}
           onClose={() => setShowPreview(false)}
         />
+      )}
+
+      <PublishModal
+        open={showPublish}
+        onClose={() => setShowPublish(false)}
+        userId={user?.id}
+        placements={placements}
+        coverBlob={publishCoverBlob}
+        forkedFrom={forkSource?.id || null}
+        defaultTemplate={forkSource ? '复用' : '自由创作'}
+        onPublished={() => {
+          setShowPublish(false)
+          navigate('/gallery')
+        }}
+      />
+
+      {forkSource && (
+        <div style={{
+          position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)',
+          background: 'rgba(196,30,58,0.92)', color: '#F2EBDB',
+          padding: '6px 16px', borderRadius: 6,
+          fontFamily: 'Noto Serif SC, serif', fontSize: 11, letterSpacing: '0.15em',
+          boxShadow: '0 4px 16px rgba(196,30,58,0.4)', zIndex: 90,
+        }}>
+          复 用 自 「{forkSource.title}」 · by {forkSource.author?.username || '匿名'}
+        </div>
       )}
 
       {showExportModal && (

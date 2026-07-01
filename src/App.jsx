@@ -22,6 +22,9 @@ const PatternDetailPage = lazy(() => import('./pages/PatternDetailPage'))
 const PhotoMatchPage = lazy(() => import('./pages/PhotoMatchPage'))
 const QinghuaBrowser = lazy(() => import('./pages/QinghuaBrowser'))
 const AuthPage = lazy(() => import('./pages/AuthPage'))
+const GalleryPage = lazy(() => import('./pages/GalleryPage'))
+const WorkDetailPage = lazy(() => import('./pages/WorkDetailPage'))
+const AdminReviewPage = lazy(() => import('./pages/AdminReviewPage'))
 
 function PageLoader() {
   return (
@@ -52,6 +55,9 @@ function Pages() {
   else if (pathname === '/photo-match') Page = PhotoMatchPage
   else if (pathname === '/qinghua') Page = QinghuaBrowser
   else if (pathname === '/auth') Page = AuthPage
+  else if (pathname === '/gallery') Page = GalleryPage
+  else if (pathname.startsWith('/work/')) Page = WorkDetailPage
+  else if (pathname === '/admin') Page = AdminReviewPage
   else if (pathname === '/landing') Page = Landing
   else Page = SplashPage
 

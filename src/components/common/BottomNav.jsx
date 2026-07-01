@@ -4,7 +4,7 @@ const TABS = [
   { path: '/home', label: '首页', icon: 'home' },
   { path: '/library', label: '图鉴', icon: 'book' },
   { path: '/puzzle', label: '创作', icon: 'compose', center: true },
-  { path: '/gacha', label: '抽卡', icon: 'card' },
+  { path: '/gallery', label: '广场', icon: 'gallery' },
   { path: '/qinghua', label: '总览', icon: 'vase' },
 ]
 
@@ -22,6 +22,14 @@ const ICONS = {
   card: (color) => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="18" height="18" rx="3" /><path d="M12 8v8M8 12h8" />
+    </svg>
+  ),
+  gallery: (color) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="3" width="8" height="8" rx="1.5" />
+      <rect x="3" y="13" width="8" height="8" rx="1.5" />
+      <rect x="13" y="13" width="8" height="8" rx="1.5" />
     </svg>
   ),
   compose: (color) => (
