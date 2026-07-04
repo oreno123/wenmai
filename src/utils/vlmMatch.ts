@@ -127,3 +127,104 @@ export function matchPattern(vlmNames: string[], library: Pattern[]): MatchResul
     matchedCandidate: null,
   }
 }
+
+const STEPFUN_ENDPOINT = 'https://api.stepfun.com/v1/chat/completions'
+const STEPFUN_MODEL = 'step-3.7-flash'
+
+const VLM_PROMPT = `识别图中的中国传统纹样。
+
+输出规则：
+- 只输出纹样名，不要解释、不要标点
+- 多主题时按主次输出 1-3 个，用 | 分隔
+- 示例：团龙纹 / 缠枝纹 / 龙|云纹|海水 / 莲瓣纹
+
+常见纹样参考（不限于）：团龙纹、行龙纹、蟠龙纹、云雷纹、回纹、卷草纹、缠枝纹、莲瓣纹、如意云纹、海水江崖纹、宝相花、冰裂纹、万字纹、绳纹、饕餮纹、凤鸟纹、牡丹纹、菊花纹、兰花纹、青花龙纹、青花山水
+
+最终用一行输出：
+答案：纹样名`
+
+export interface VlmCallOptions {
+  apiKey: string
+  imageBase64: string  // 不带 data: 前缀的纯 base64
+  signal?: AbortSignal
+}
+
+export interface VlmCallResult {
+  rawOutput: string
+  candidates: string[]
+}
+
+/**
+ * 调用 Step Fun step-3.7-flash。
+ *
+ * 关键坑（来自 reference_stepfun-api.md）：
+ * 1. content 字段经常空，真实输出在 reasoning_content / reasoning
+ * 2. max_tokens 给 4000+（reasoning 模型会先思考）
+ * 3. 错误时抛异常，调用方 try/catch 走 fallback
+ */
+export async function callStepFunVision(opts: VlmCallOptions): Promise<VlmCallResult> {
+  const body = {
+    model: STEPFUN_MODEL,
+    max_tokens: 4000,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: VLM_PROMPT },
+          {
+            type: 'image_url',
+            image_url: { url: `data:image/jpeg;base64,${opts.imageBase64}` },
+          },
+        ],
+      },
+    ],
+  }
+
+  const resp = await fetch(STEPFUN_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${opts.apiKey}`,
+    },
+    body: JSON.stringify(body),
+    signal: opts.signal,
+  })
+
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => '')
+    throw new Error(`Step Fun API ${resp.status}: ${errText.slice(0, 200)}`)
+  }
+
+  const data = await resp.json()
+  const msg = data?.choices?.[0]?.message ?? {}
+  // content / reasoning_content / reasoning 三段 fallback
+  const rawOutput =
+    (typeof msg.content === 'string' && msg.content) ||
+    (typeof msg.reasoning_content === 'string' && msg.reasoning_content) ||
+    (typeof msg.reasoning === 'string' && msg.reasoning) ||
+    ''
+
+  if (!rawOutput) {
+    throw new Error('Step Fun API 返回空内容（content/reasoning_content/reasoning 都为空）')
+  }
+
+  return {
+    rawOutput,
+    candidates: parseVlmNames(rawOutput),
+  }
+}
+
+/** 把 File 转成 base64 字符串（不带 data: 前缀） */
+export function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      // 去掉 "data:image/xxx;base64," 前缀
+      const base64 = result.split(',')[1] ?? ''
+      resolve(base64)
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
