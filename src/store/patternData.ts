@@ -1,6 +1,7 @@
 import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/proceduralPatterns'
 import { RARITY_WEIGHTS, PITY_THRESHOLD, SOFT_PITY_START } from '../constants'
 import { QINGHUA_PATTERNS } from '../data/qinghuaPatterns'
+import { AI_ASSETS, AiAsset } from '../data/aiAssets'
 
 // ── Types ──────────────────────────────────────────────
 
@@ -17,6 +18,7 @@ export type SeriesId =
   | 'tile'
   | 'shanjing'
   | 'qinghua'
+  | 'ai'
 
 export interface Pattern {
   id: string
@@ -109,6 +111,49 @@ const PATTERN_LIBRARY: Pattern[] = [
   ...QINGHUA_PATTERNS,
 ]
 
+// ── AI 生成元素库（来自 chinese-pattern-dataset Phase 7）──────────
+//
+// 这些元素来自独立的 AI 生成 pipeline，按 purpose（standalone/corner/filler/
+// border/tile/hero）+ type 双维度分类。我们将其映射到 Pattern 接口并入档，
+// 但**不加入 PATTERN_LIBRARY**——后者是抽卡池，AI 元素是免费开放素材，
+// 不应该被抽到。
+//
+// 角花特殊处理：所有 purpose='corner' 的元素 type 设为 '角花'，与现有
+// templates.ts 的 typeConstraint='角花' 匹配，让 4 角对称模板能直接消费。
+const AI_TYPE_MAP: Record<string, string> = {
+  '宝相花': '花卉纹',
+  '莲花纹': '花卉纹',
+  '牡丹纹': '花卉纹',
+  '缠枝莲': '卷草纹',
+  '卷草纹': '卷草纹',
+  '如意云纹': '云纹',
+  '回纹': '几何纹',
+  '几何边饰': '几何纹',
+  '凤纹': '凤纹',
+  '龙纹': '龙纹',
+  '海水江崖': '海水纹',
+  '山水纹': '山水纹',
+  '八宝纹': '八宝纹',
+}
+
+function aiAssetToPattern(asset: AiAsset): Pattern {
+  const type = asset.purpose === 'corner'
+    ? '角花'
+    : (AI_TYPE_MAP[asset.type_zh] || asset.type_zh)
+  return {
+    id: asset.id,
+    name: `AI · ${asset.name}`,
+    type,
+    series: 'ai',
+    rarity: 'rare',
+    tags: asset.tags,
+    image: asset.image,
+  }
+}
+
+// 全部 AI 元素转 Pattern（203 个，覆盖 6 purpose × 多 type）
+const AI_PATTERNS: Pattern[] = AI_ASSETS.map(aiAssetToPattern)
+
 // 稀有度权重（抽卡概率）— 从 constants 导入，这里 re-export
 export { RARITY_WEIGHTS }
 
@@ -124,13 +169,19 @@ const SERIES_INFO: Record<SeriesId, SeriesInfo> = {
   tile: { name: '四方连续', description: '无限延展的纹样世界', color: '#B0C4DE' },
   shanjing: { name: '山海经', description: '上古神兽，千年纹影', color: '#C41E3A' },
   qinghua: { name: '青花瓷纹', description: '335款青花瓷纹样，蓝白之间尽显东方雅韵', color: '#1E4D8C' },
+  ai: { name: 'AI 元素库', description: 'AI 生成的开放纹样元素，可直接拼贴', color: '#9b59b6' },
 }
 
 // 程序化纹样 SVG 缓存
 const _svgCache = new Map<string, string>()
 
 export function getPatternById(id: string): Pattern | undefined {
-  return PATTERN_LIBRARY.find(p => p.id === id)
+  return PATTERN_LIBRARY.find(p => p.id === id) || AI_PATTERNS.find(p => p.id === id)
+}
+
+// 获取全部 AI 元素 Pattern（不入抽卡池，仅用于拼贴素材库）
+export function getAiPatterns(): Pattern[] {
+  return AI_PATTERNS
 }
 
 /**
@@ -161,7 +212,9 @@ export function getAllSeries(): SeriesWithPatterns[] {
   return (Object.entries(SERIES_INFO) as [SeriesId, SeriesInfo][]).map(([id, info]) => ({
     id,
     ...info,
-    patterns: PATTERN_LIBRARY.filter(p => p.series === id),
+    patterns: id === 'ai'
+      ? AI_PATTERNS
+      : PATTERN_LIBRARY.filter(p => p.series === id),
   }))
 }
 

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import { getPatternById, getPatternImage, getAllSeries } from '../store/patternData'
+import { getPatternById, getPatternImage, getAllSeries, getAiPatterns } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
 import {
   extractContour,
@@ -55,10 +55,12 @@ export default function PuzzlePage() {
   // Only patterns the user actually owns can be used in compositions.
   // Replaces the old ELEMENT_MANIFEST-based tray.
   // Fork 时把源作品引用的 pattern 也并入（即使不在当前 user library）
+  // AI 元素库（chinese-pattern-dataset Phase 7）作为免费开放素材全量并入
   const myPatterns = useMemo(() => {
     const lib = data.library.map(id => getPatternById(id)).filter(Boolean)
     const extras = extraPatterns.filter(p => !lib.find(x => x.id === p.id))
-    return [...lib, ...extras]
+    const ais = getAiPatterns()
+    return [...lib, ...extras, ...ais]
   }, [data.library, extraPatterns])
   const seriesList = getAllSeries()
 
