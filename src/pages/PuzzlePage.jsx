@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import { getPatternById, getPatternImage, getAllSeries, getAiPatterns } from '../store/patternData'
+import { getPatternById, getPatternImage, getAllSeries, getAiPatterns, getAiPurpose } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
 import {
   extractContour,
@@ -37,6 +37,7 @@ export default function PuzzlePage() {
   const [outlinedUrls, setOutlinedUrls] = useState({})
   const shapeCache = useRef({}) // patternId -> { mask: Uint8Array(64*64), boundingRadius }
   const [seriesFilter, setSeriesFilter] = useState('all')
+  const [aiPurposeFilter, setAiPurposeFilter] = useState('all') // 二级筛选：all/corner/filler/border/standalone/tile/hero
   const [showTray, setShowTray] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
   const [completedImage, setCompletedImage] = useState(null)
@@ -52,21 +53,33 @@ export default function PuzzlePage() {
   const [publishCoverBlob, setPublishCoverBlob] = useState(null)
   const [extraPatterns, setExtraPatterns] = useState([])    // fork 引入的 pattern（绕过 library 过滤）
 
-  // Only patterns the user actually owns can be used in compositions.
-  // Replaces the old ELEMENT_MANIFEST-based tray.
-  // Fork 时把源作品引用的 pattern 也并入（即使不在当前 user library）
-  // AI 元素库（chinese-pattern-dataset Phase 7）作为免费开放素材全量并入
-  const myPatterns = useMemo(() => {
+  // 用户已收集的纹样（library + fork 引入的 extras），不含 AI 元素
+  const libPatterns = useMemo(() => {
     const lib = data.library.map(id => getPatternById(id)).filter(Boolean)
     const extras = extraPatterns.filter(p => !lib.find(x => x.id === p.id))
-    const ais = getAiPatterns()
-    return [...lib, ...extras, ...ais]
+    return [...lib, ...extras]
   }, [data.library, extraPatterns])
+
+  // AI 元素库（chinese-pattern-dataset Phase 7）— 免费开放素材
+  const aiPatterns = useMemo(() => getAiPatterns(), [])
+
+  // 全量素材：library + extras + AI 元素（用于 applyTemplate 自动匹配 + fork 渲染）
+  const myPatterns = useMemo(() => [...libPatterns, ...aiPatterns], [libPatterns, aiPatterns])
+
   const seriesList = getAllSeries()
 
-  const filteredElements = seriesFilter === 'all'
-    ? myPatterns
-    : myPatterns.filter(p => p.series === seriesFilter)
+  // Tray 显示规则：
+  // - 'all'：仅 library + extras（避免 200+ AI 元素淹没日常创作）
+  // - 'ai'：AI 元素，二级 purpose 筛选生效
+  // - 其他 series：对应 series 的 library 元素
+  const filteredElements = useMemo(() => {
+    if (seriesFilter === 'all') return libPatterns
+    if (seriesFilter === 'ai') {
+      if (aiPurposeFilter === 'all') return aiPatterns
+      return aiPatterns.filter(p => getAiPurpose(p) === aiPurposeFilter)
+    }
+    return libPatterns.filter(p => p.series === seriesFilter)
+  }, [seriesFilter, aiPurposeFilter, libPatterns, aiPatterns])
 
   // ── Fork entry: read ?fork=workId and preload source placements ──
   useEffect(() => {
@@ -900,6 +913,32 @@ export default function PuzzlePage() {
           {seriesList.map(s => (
             <button key={s.id} onClick={() => setSeriesFilter(s.id)} style={pillStyle(seriesFilter === s.id, s.color)}>
               {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* AI purpose 二级筛选（仅 seriesFilter='ai' 时显示） */}
+      {showTray && seriesFilter === 'ai' && (
+        <div style={{ display: 'flex', gap: 6, padding: '2px 16px 6px', overflowX: 'auto', opacity: 0.85 }}>
+          {[
+            { id: 'all', label: '全部 AI' },
+            { id: 'corner', label: '角花' },
+            { id: 'filler', label: '填充' },
+            { id: 'border', label: '边饰' },
+            { id: 'standalone', label: '独立' },
+            { id: 'tile', label: '四方连续' },
+            { id: 'hero', label: '主图' },
+          ].map(p => (
+            <button
+              key={p.id}
+              onClick={() => setAiPurposeFilter(p.id)}
+              style={{
+                ...pillStyle(aiPurposeFilter === p.id, '#9b59b6'),
+                fontSize: 11, padding: '4px 10px',
+              }}
+            >
+              {p.label}
             </button>
           ))}
         </div>

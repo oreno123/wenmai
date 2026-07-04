@@ -154,6 +154,19 @@ function aiAssetToPattern(asset: AiAsset): Pattern {
 // 全部 AI 元素转 Pattern（203 个，覆盖 6 purpose × 多 type）
 const AI_PATTERNS: Pattern[] = AI_ASSETS.map(aiAssetToPattern)
 
+// 从 Pattern.tags 反推 AI 元素的 purpose（standalone/corner/filler/border/tile/hero）
+// 非 AI 元素返回 null。供 tray 二级筛选使用。
+export type AiPurpose = 'standalone' | 'corner' | 'filler' | 'border' | 'tile' | 'hero'
+export function getAiPurpose(p: Pattern): AiPurpose | null {
+  if (!p.id.startsWith('ai-element-')) return null
+  if (p.tags.includes('element-corner')) return 'corner'
+  if (p.tags.includes('element-border')) return 'border'
+  if (p.tags.includes('element-filler')) return 'filler'
+  if (p.tags.includes('tile')) return 'tile'
+  if (p.tags.includes('hero')) return 'hero'
+  return 'standalone'
+}
+
 // 稀有度权重（抽卡概率）— 从 constants 导入，这里 re-export
 export { RARITY_WEIGHTS }
 
