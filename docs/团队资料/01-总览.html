@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹脉 · 团队同步 01 — 全项目总览</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-sub:#f6f8fa; --fg:#1f2328; --fg-sub:#57606a; --fg-soft:#818b98;
+    --border:#d0d7de; --accent:#0969da; --accent-bg:#ddf4ff; --green:#1a7f37; --green-bg:#dafbe1;
+    --amber:#9a6700; --amber-bg:#fff8c5; --red:#cf222e; --red-bg:#ffebe9;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Helvetica,Arial,sans-serif; background:var(--bg-sub); color:var(--fg); line-height:1.65; font-size:15px;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  /* 顶部导航 */
+  .topnav{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);}
+  .topnav-inner{max-width:960px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 20px; overflow-x:auto; white-space:nowrap;}
+  .brand{font-weight:700; font-size:15px; color:var(--fg);}
+  .brand small{color:var(--fg-soft); font-weight:400;}
+  .nav-links{display:flex; gap:6px;}
+  .nav-links a{font-size:13px; padding:4px 10px; border-radius:99px; color:var(--fg-sub); border:1px solid transparent;}
+  .nav-links a:hover{text-decoration:none; color:var(--accent); background:var(--accent-bg); border-color:#7bc0ff;}
+  .nav-links a.cur{background:var(--accent-bg); color:var(--accent); border-color:#7bc0ff; font-weight:600;}
+  .wrap{max-width:960px; margin:0 auto; padding:28px 20px 60px;}
+  header.hero{padding:26px 0 22px; border-bottom:1px solid var(--border); margin-bottom:26px;}
+  header.hero h1{font-size:26px; font-weight:800; letter-spacing:-0.5px;}
+  header.hero .tagline{margin-top:8px; font-size:16px; color:var(--fg-sub);}
+  header.hero .slogan{margin-top:10px; font-size:14px; color:var(--amber); background:var(--amber-bg); border:1px solid #d4a72c66; border-radius:6px; display:inline-block; padding:3px 10px;}
+  h2{font-size:20px; font-weight:700; margin:38px 0 14px; padding-top:8px;}
+  h2 .num{color:var(--accent); font-family:var(--mono); font-size:15px; margin-right:8px;}
+  h3{font-size:16px; font-weight:700; margin:20px 0 8px;}
+  p{margin:8px 0;}
+  .card{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px 18px; margin:12px 0;}
+  .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px;}
+  .grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;}
+  /* 身份卡 */
+  .idcard{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;}
+  .idcard .item{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px 14px;}
+  .idcard .item .k{font-size:12px; color:var(--fg-soft);}
+  .idcard .item .v{font-size:14px; font-weight:600; margin-top:2px;}
+  .idcard .item .v.mono{font-family:var(--mono); font-weight:500; font-size:13px;}
+  /* 徽章 */
+  .badge{display:inline-block; font-size:12px; font-weight:600; padding:2px 9px; border-radius:99px; margin-right:6px;}
+  .b-green{background:var(--green-bg); color:var(--green); border:1px solid #2da44e55;}
+  .b-blue{background:var(--accent-bg); color:var(--accent); border:1px solid #54aeff55;}
+  .b-amber{background:var(--amber-bg); color:var(--amber); border:1px solid #d4a72c55;}
+  .b-red{background:var(--red-bg); color:var(--red); border:1px solid #cf222e55;}
+  .b-gray{background:var(--bg-sub); color:var(--fg-sub); border:1px solid var(--border);}
+  /* 模块卡 */
+  .mod{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+  .mod .t{font-weight:700; font-size:15px; display:flex; align-items:center; gap:8px;}
+  .mod .t .core{font-size:11px; font-weight:700; color:var(--red); border:1px solid #cf222e66; border-radius:4px; padding:0 6px;}
+  .mod p{font-size:13.5px; color:var(--fg-sub); margin-top:6px;}
+  .mod .tech{font-size:12px; color:var(--fg-soft); margin-top:6px; font-family:var(--mono);}
+  /* 表格 */
+  table{width:100%; border-collapse:collapse; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; font-size:13.5px;}
+  th{text-align:left; background:var(--bg-sub); font-weight:600; color:var(--fg-sub); padding:9px 12px; border-bottom:1px solid var(--border); font-size:13px;}
+  td{padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  /* 时间线 */
+  .timeline{list-style:none; border-left:2px solid var(--border); margin:14px 0 0 6px; padding-left:20px;}
+  .timeline li{position:relative; margin-bottom:14px;}
+  .timeline li::before{content:""; position:absolute; left:-27px; top:6px; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid #fff; box-shadow:0 0 0 1px var(--accent);}
+  .timeline li.done::before{background:var(--green); box-shadow:0 0 0 1px var(--green);}
+  .timeline li.cur::before{background:var(--amber); box-shadow:0 0 0 1px var(--amber);}
+  .timeline .date{font-family:var(--mono); font-size:12px; color:var(--fg-soft);}
+  .timeline .what{font-size:14px;}
+  .foot{margin-top:40px; padding-top:16px; border-top:1px solid var(--border); color:var(--fg-soft); font-size:12.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .foot a{font-size:12.5px;}
+  code{font-family:var(--mono); font-size:12.5px; background:var(--bg-sub); border:1px solid var(--border); border-radius:4px; padding:1px 5px;}
+  ul.list{margin:8px 0 8px 22px;}
+  ul.list li{margin:4px 0;}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="brand">纹脉 Pattern Veins <small>· 团队同步资料</small></span>
+    <div class="nav-links">
+      <a href="01-总览.html" class="cur">01 总览</a>
+      <a href="02-上手.html">02 上手</a>
+      <a href="03-参赛.html">03 参赛</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <h1>纹脉 · 全项目总览</h1>
+  <div class="tagline">中国传统纹样抽卡与创作 Web 应用 —— 收集、探索、拼合千年纹样之美，预览实物并印成周边。</div>
+  <div class="slogan">「你看见的每一道纹样，都是某个人的呼吸」</div>
+</header>
+
+<h2><span class="num">01</span>项目身份卡</h2>
+<div class="idcard">
+  <div class="item"><div class="k">作者</div><div class="v">孔子聪</div></div>
+  <div class="item"><div class="k">学校 / 专业</div><div class="v">南京大学 · 软工 + 商双</div></div>
+  <div class="item"><div class="k">仓库</div><div class="v mono">github.com/oreno123/wenmai</div></div>
+  <div class="item"><div class="k">技术栈</div><div class="v mono">Vite · React 19 · Three.js · Tailwind 4 · Supabase</div></div>
+  <div class="item"><div class="k">当前状态</div><div class="v"><span class="badge b-green">MVP 完成</span><span class="badge b-blue">8 大模块</span><span class="badge b-amber">3 赛材料齐备</span></div></div>
+</div>
+
+<h2><span class="num">02</span>一句话理解</h2>
+<div class="card">
+  <p>用户像玩抽卡游戏一样收集中国传统纹样（团龙、莲花、回纹、青花、山海经异兽……），再把纹样的「元素块」在画布上自由拼贴成作品，实时预览印到马克杯 / 手机壳 / 盘子 / 丝巾上的效果，未来可直接下单定制。</p>
+  <p style="margin-top:6px;"><b>闭环</b>：<code>抽卡收集 → 拼图创作 → 3D 预览 → 分享 / 发布社区 → （远期）下单印刷</code></p>
+</div>
+
+<h2><span class="num">03</span>八大模块速览</h2>
+<div class="grid2">
+  <div class="mod">
+    <div class="t">纹样图鉴</div>
+    <p>9 个系列收藏浏览 + 稀有度筛选；586 行结构化百科卡片（朝代、文化意义、用途、冷知识）。</p>
+    <div class="tech">Library · PatternDetailPage</div>
+  </div>
+  <div class="mod">
+    <div class="t">抽卡收集</div>
+    <p>单抽 / 十连双模式，3 档稀有度（common / rare / SSR），软保底 75 抽 + 硬保底 90 抽，每日免费 10 次自动重置。</p>
+    <div class="tech">GachaPage · gameStore</div>
+  </div>
+  <div class="mod">
+    <div class="t">拼图创作 <span class="core">核心</span></div>
+    <p>形状级物理交互：mask 像素碰撞 + 边缘吸附 + 柔性块自动变形贴合；角花 4 角对称；6 个预设构图模板；宣纸色画布渲染。金线元素块 + AI 元素库（purpose 二级筛选）。</p>
+    <div class="tech">PuzzlePage · engine/jigsawEngine · shapeInteraction</div>
+  </div>
+  <div class="mod">
+    <div class="t">3D 浮雕预览</div>
+    <p>金线纹样 → Sobel 算子法线贴图 → 金属浮雕；青花瓷 → meshPhysicalMaterial + clearcoat 釉面瓷盘；马克杯 / 手机壳 / 盘子 / 丝巾实时贴图预览。</p>
+    <div class="tech">react-three-fiber · shaders/</div>
+  </div>
+  <div class="mod">
+    <div class="t">拍照找相似</div>
+    <p>pHash + dHash 双哈希加权汉明距离，库内原图 100% 命中；可选 StepFun Vision VLM 做关键词级匹配升级。</p>
+    <div class="tech">PhotoMatchPage · VITE_STEPFUN_API_KEY</div>
+  </div>
+  <div class="mod">
+    <div class="t">手势卡片</div>
+    <p>MediaPipe Hands 摄像头手势：左右滑动翻页 + 双手缩放；金色粒子特效（指尖尾迹、滑动弧光、双手间金色丝线）。</p>
+    <div class="tech">gesture-cards/ · MediaPipe</div>
+  </div>
+  <div class="mod">
+    <div class="t">账号云同步</div>
+    <p>Supabase 邮箱注册（需邮件验证）；登录后积分 / 收藏 / 创作云端同步，1s debounce 推送；未登录纯 localStorage 零侵入。</p>
+    <div class="tech">AuthPage · lib/supabase · lib/auth</div>
+  </div>
+  <div class="mod">
+    <div class="t">广场社区</div>
+    <p>发布作品 → 管理员预审（pending / approved / rejected）→ 展示在广场；可复用（fork）他人作品二次创作。点赞 / 复用计数。</p>
+    <div class="tech">GalleryPage · AdminReviewPage · lib/galleryApi</div>
+  </div>
+</div>
+
+<h2><span class="num">04</span>素材库清单</h2>
+<table>
+  <tr><th style="width:190px;">素材</th><th>内容</th><th style="width:200px;">来源 / 状态</th></tr>
+  <tr><td>基础纹样</td><td>几何 / 植物 / 动物 / 青花等系列，含百科结构化数据（586 行）</td><td>人工整理 · 已入库</td></tr>
+  <tr><td>山海经异兽</td><td>25 张异兽纹样 + 传说故事</td><td>AI 生成 · 已入库</td></tr>
+  <tr><td>青花瓷</td><td>335 张青花瓷纹样，Claude Vision 元素级自动分类</td><td>分类复查 100% · 已入库</td></tr>
+  <tr><td>AI 生成元素</td><td>203 张 AI 纹样元素 + 15 个文化故事</td><td>导入主站 · 已入库</td></tr>
+  <tr><td>元素提取流水线</td><td>颜色阈值 → 连通域拆件 → DBSCAN 语义分组，产出 54 个干净元素 + SVG 矢量化</td><td>自研算法 · 脚本在 <code>scripts/</code></td></tr>
+  <tr><td>数据集子项目</td><td>1700+ 纹样 + 203 AI 素材 + 173 SVG + 15 故事（独立仓库 chinese-pattern-dataset）</td><td>纹脉衍生 · 数据层</td></tr>
+</table>
+
+<h2><span class="num">05</span>子项目</h2>
+<div class="grid3">
+  <div class="mod">
+    <div class="t">广场社区 v1</div>
+    <p>社区闭环（发布→审核→复用），已集成进主站；SQL 迁移在 <code>supabase/migrations/001_gallery.sql</code>。待办见「03 参赛 / 广场状态」。</p>
+  </div>
+  <div class="mod">
+    <div class="t">Showcase 手势展示</div>
+    <p>MediaPipe 手势控制纹样碎裂 / 拼合，弹簧物理动画。状态：待打磨对齐。</p>
+  </div>
+  <div class="mod">
+    <div class="t">鸿蒙适配</div>
+    <p><code>wenmai-harmony-template/</code>（Index.ets 模板）；对应鸿蒙赛道参赛材料。</p>
+  </div>
+  <div class="mod">
+    <div class="t">pattern-dataset</div>
+    <p>纹样数据集子项目（SQLite + potracer 矢量化），独立仓库维护。</p>
+  </div>
+</div>
+
+<h2><span class="num">06</span>里程碑时间线</h2>
+<ul class="timeline">
+  <li class="done"><span class="date">2026-05-22</span><div class="what">项目启动：概念 demo 与素材收集</div></li>
+  <li class="done"><span class="date">2026-06-14</span><div class="what">参赛文档 + 演示视频（纹脉demo.mp4）</div></li>
+  <li class="done"><span class="date">2026-06-18</span><div class="what">《项目可行性汇报》完成</div></li>
+  <li class="done"><span class="date">2026-06-30</span><div class="what">NOVA（港科大 + 腾讯）提案三材料提交</div></li>
+  <li class="done"><span class="date">2026-07-02</span><div class="what">EL 决赛答辩（可编辑 PPT 10 页）</div></li>
+  <li class="done"><span class="date">2026-07-01 ~ 07 中</span><div class="what">广场社区 v1 规划并集成进主站</div></li>
+  <li class="done"><span class="date">2026-07-26</span><div class="what">鸿蒙赛道三件套 final（作品说明 + 演示视频）</div></li>
+  <li class="cur"><span class="date">2026-08-11</span><div class="what">当前：整理团队同步资料（本套）</div></li>
+</ul>
+
+<div class="foot">
+  <span>生成于 2026-08-11 · 资料版本 01</span>
+  <span><a href="02-上手.html">→ 02 本地运行指南</a> · <a href="03-参赛.html">03 参赛交付物索引 →</a></span>
+</div>
+
+</div>
+</body>
+</html>

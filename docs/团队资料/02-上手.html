@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹脉 · 团队同步 02 — 本地运行指南</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-sub:#f6f8fa; --fg:#1f2328; --fg-sub:#57606a; --fg-soft:#818b98;
+    --border:#d0d7de; --accent:#0969da; --accent-bg:#ddf4ff; --green:#1a7f37; --green-bg:#dafbe1;
+    --amber:#9a6700; --amber-bg:#fff8c5; --red:#cf222e; --red-bg:#ffebe9;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Helvetica,Arial,sans-serif; background:var(--bg-sub); color:var(--fg); line-height:1.65; font-size:15px;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .topnav{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);}
+  .topnav-inner{max-width:960px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 20px; overflow-x:auto; white-space:nowrap;}
+  .brand{font-weight:700; font-size:15px; color:var(--fg);}
+  .brand small{color:var(--fg-soft); font-weight:400;}
+  .nav-links{display:flex; gap:6px;}
+  .nav-links a{font-size:13px; padding:4px 10px; border-radius:99px; color:var(--fg-sub); border:1px solid transparent;}
+  .nav-links a:hover{text-decoration:none; color:var(--accent); background:var(--accent-bg); border-color:#7bc0ff;}
+  .nav-links a.cur{background:var(--accent-bg); color:var(--accent); border-color:#7bc0ff; font-weight:600;}
+  .wrap{max-width:960px; margin:0 auto; padding:28px 20px 60px;}
+  header.hero{padding:26px 0 22px; border-bottom:1px solid var(--border); margin-bottom:26px;}
+  header.hero h1{font-size:26px; font-weight:800; letter-spacing:-0.5px;}
+  header.hero .tagline{margin-top:8px; font-size:16px; color:var(--fg-sub);}
+  h2{font-size:20px; font-weight:700; margin:38px 0 14px; padding-top:8px;}
+  h2 .num{color:var(--accent); font-family:var(--mono); font-size:15px; margin-right:8px;}
+  h3{font-size:16px; font-weight:700; margin:20px 0 8px;}
+  p{margin:8px 0;}
+  .card{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px 18px; margin:12px 0;}
+  pre{background:#0d1117; color:#e6edf3; border-radius:8px; padding:14px 16px; overflow-x:auto; font-family:var(--mono); font-size:13px; line-height:1.6; margin:10px 0;}
+  pre .c{color:#8b949e;} /* 注释 */
+  pre .k{color:#ff7b72;} /* 关键字 */
+  .toc{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px 18px;}
+  .toc a{display:inline-block; margin-right:16px; font-size:13.5px; color:var(--fg-sub);}
+  .toc a:hover{color:var(--accent);}
+  table{width:100%; border-collapse:collapse; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; font-size:13.5px;}
+  th{text-align:left; background:var(--bg-sub); font-weight:600; color:var(--fg-sub); padding:9px 12px; border-bottom:1px solid var(--border); font-size:13px;}
+  td{padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  code{font-family:var(--mono); font-size:12.5px; background:var(--bg-sub); border:1px solid var(--border); border-radius:4px; padding:1px 5px;}
+  .hint{border-left:3px solid var(--amber); background:var(--amber-bg); border-radius:0 6px 6px 0; padding:10px 14px; font-size:13.5px; color:#6b4e00; margin:12px 0;}
+  .ok{border-left:3px solid var(--green); background:var(--green-bg); border-radius:0 6px 6px 0; padding:10px 14px; font-size:13.5px; color:#0f4d23; margin:12px 0;}
+  .warn{border-left:3px solid var(--red); background:var(--red-bg); border-radius:0 6px 6px 0; padding:10px 14px; font-size:13.5px; color:#7d1e28; margin:12px 0;}
+  .foot{margin-top:40px; padding-top:16px; border-top:1px solid var(--border); color:var(--fg-soft); font-size:12.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .foot a{font-size:12.5px;}
+  .tree{font-family:var(--mono); font-size:13px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px 16px; overflow-x:auto; line-height:1.7; color:var(--fg-sub);}
+  .tree b{color:var(--fg); font-weight:600;}
+  .tree .cmt{color:var(--fg-soft);}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="brand">纹脉 Pattern Veins <small>· 团队同步资料</small></span>
+    <div class="nav-links">
+      <a href="01-总览.html">01 总览</a>
+      <a href="02-上手.html" class="cur">02 上手</a>
+      <a href="03-参赛.html">03 参赛</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <h1>纹脉 · 本地运行指南</h1>
+  <div class="tagline">照这份手册，一个新队友 10 分钟内把主站跑起来，并能找到任何模块的代码。</div>
+</header>
+
+<div class="toc">
+  <a href="#env">① 环境要求</a>
+  <a href="#run">② 克隆启动</a>
+  <a href="#config">③ 配置</a>
+  <a href="#cmd">④ 常用命令</a>
+  <a href="#tree">⑤ 目录结构</a>
+  <a href="#map">⑥ 代码地图</a>
+  <a href="#sync">⑦ 数据同步机制</a>
+</div>
+
+<h2 id="env"><span class="num">01</span>环境要求</h2>
+<table>
+  <tr><th style="width:220px;">依赖</th><th>要求</th></tr>
+  <tr><td>Node.js</td><td>≥ 20.19（Vite 8 要求）；推荐 LTS</td></tr>
+  <tr><td>包管理器</td><td>npm（默认）或 pnpm</td></tr>
+  <tr><td>Supabase 项目</td><td>需要你自己建一个免费项目并填 key（见第 ③ 节），否则功能降级为本地 localStorage</td></tr>
+  <tr><td>StepFun API Key（可选）</td><td>拍照识别 VLM 升级用；不填则降级为本地 pHash 匹配，核心功能不受影响</td></tr>
+</table>
+
+<h2 id="run"><span class="num">02</span>克隆并启动</h2>
+<pre><span class="c"># 1. 克隆（SSH）</span>
+git clone git@github.com:oreno123/wenmai.git
+<span class="c"># 或 HTTPS：git clone https://github.com/oreno123/wenmai.git</span>
+
+<span class="c"># 2. 安装依赖</span>
+npm install
+
+<span class="c"># 3. 配置 .env.local（见下一节）</span>
+cp .env.example .env.local
+
+<span class="c"># 4. 启动开发服务器</span>
+npm run dev
+<span class="c"># → 浏览器打开 http://localhost:5173</span></pre>
+<div class="ok">启动后首页就能跑：抽卡、图鉴、拼图、3D 预览等纯前端模块无需任何后端配置即可体验。</div>
+
+<h2 id="config"><span class="num">03</span>配置 .env.local</h2>
+<p>复制 <code>.env.example</code>，需要填两项（均可在 <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a> → Settings → API 找到）：</p>
+<pre>VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+<span class="c"># 拍照识别 VLM（可选，不填则本地 pHash）</span>
+VITE_STEPFUN_API_KEY=your_stepfun_api_key</pre>
+<div class="warn">本地已有 <code>.env.local</code>（已被 git 忽略，不会提交）。新队友首次克隆后需从 Supabase 项目复制自己的 key，或找队长要一份。</div>
+
+<h3>数据库建表（账号 + 广场）</h3>
+<p>Supabase 项目需要两张表：<code>profiles</code>（账号）与 <code>works</code>/<code>likes</code>（广场）。SQL 都有现成的：</p>
+<ul>
+  <li><b>账号表 profiles</b>：SQL 在仓库根目录 <code>README.md</code> 底部</li>
+  <li><b>广场表 works / likes + 存储桶 + RLS</b>：<code>supabase/migrations/001_gallery.sql</code>（整段粘贴到 SQL Editor 跑，跑完手动把自己设管理员，文件末尾有说明）</li>
+</ul>
+
+<h2 id="cmd"><span class="num">04</span>常用命令</h2>
+<table>
+  <tr><th style="width:230px;">命令</th><th>作用</th></tr>
+  <tr><td><code>npm run dev</code></td><td>本地开发（http://localhost:5173，热更新）</td></tr>
+  <tr><td><code>npm run build</code></td><td>生产构建，产物输出到 <code>dist/</code></td></tr>
+  <tr><td><code>npm run preview</code></td><td>本地预览构建产物</td></tr>
+  <tr><td><code>npm run lint</code></td><td>ESLint 检查</td></tr>
+  <tr><td><code>npm test</code></td><td>Vitest 单测（VLM 解析、关键词匹配等）</td></tr>
+  <tr><td><code>npm run test:watch</code></td><td>单测监听模式</td></tr>
+</table>
+
+<h2 id="tree"><span class="num">05</span>目录结构</h2>
+<div class="tree"><pre><b>wenmai/</b>
+├── <b>index.html</b>                入口页面
+├── <b>vite.config.js</b>
+├── <b>package.json</b>
+├── <b>public/</b>                 静态资源（elements 金线元素 / patterns 纹样 / models 3D / shaders / artifacts）
+├── <b>src/</b>
+│   ├── <b>main.jsx</b>            应用入口
+│   ├── <b>App.jsx</b>            路由
+│   ├── <b>pages/</b>             19 个页面（见代码地图）
+│   ├── <b>components/</b>       功能组件（gacha / gallery / preview3d / relief / editor / cards…）
+│   ├── <b>engine/</b>           核心算法（jigsaw 拼图 / snap 吸附 / shapeInteraction / symmetry 对称 / procedural 程序化生成）
+│   ├── <b>store/</b>            状态（AppState / gameStore 抽卡 / patternData）
+│   ├── <b>lib/</b>              服务（supabase / auth / galleryApi）
+│   ├── <b>data/</b>             数据（qinghuaPatterns / aiAssets / templates / patternDescriptions）
+│   ├── <b>styles/</b>           全局样式
+│   └── <b>shaders/</b>          WebGL 着色器
+├── <b>supabase/migrations/</b>  SQL 迁移（001_gallery.sql 广场）
+├── <b>scripts/</b>              Python 素材处理脚本（元素提取、批量生成）
+└── <b>dist/</b>                 构建产物</pre></div>
+
+<h2 id="map"><span class="num">06</span>代码地图（pages → 功能）</h2>
+<table>
+  <tr><th style="width:230px;">页面</th><th>功能 / 模块</th></tr>
+  <tr><td>Landing / Home / SplashPage</td><td>首页：品牌 Landing + 云海开场 + 故事旅程</td></tr>
+  <tr><td>GachaPage</td><td>抽卡：单抽 / 十连、保底、每日免费</td></tr>
+  <tr><td>Library</td><td>纹样图鉴：系列浏览 + 稀有度筛选</td></tr>
+  <tr><td>PatternDetailPage</td><td>纹样详情 / 百科卡片</td></tr>
+  <tr><td>QinghuaBrowser</td><td>青花瓷 335 张浏览器</td></tr>
+  <tr><td>PuzzlePage / JigsawPage</td><td>拼图创作（核心）：拖拽、磁吸、角花对称、模板</td></tr>
+  <tr><td>Editor / Composer</td><td>创作编辑器 / 构图</td></tr>
+  <tr><td>PhotoMatchPage</td><td>拍照找相似：pHash + dHash + VLM</td></tr>
+  <tr><td>Showcase</td><td>手势碎裂 / 拼合展示</td></tr>
+  <tr><td>CuratePage</td><td>策展 / 素材管理</td></tr>
+  <tr><td>GalleryPage</td><td>广场：作品瀑布流 + 复用（fork）</td></tr>
+  <tr><td>AdminReviewPage</td><td>管理员审核（/admin，需 is_admin）</td></tr>
+  <tr><td>AuthPage</td><td>登录注册（Supabase 邮箱）</td></tr>
+  <tr><td>WorkDetailPage</td><td>广场作品详情</td></tr>
+</table>
+
+<h2 id="sync"><span class="num">07</span>账号数据同步机制</h2>
+<div class="card">
+  <ul>
+    <li><b>登录瞬间</b>：从 Supabase <code>profiles</code> 拉数据覆盖本地（云端优先）</li>
+    <li><b>每次数据变更</b>：1s debounce 推送到云端</li>
+    <li><b>登出</b>：停止推送，本地数据保留</li>
+    <li><b>未登录</b>：纯 localStorage，零侵入</li>
+  </ul>
+  <p style="margin-top:8px;">坑：Supabase 默认开启邮箱验证，新注册账号必须去邮箱点确认链接才能登录。</p>
+</div>
+
+<div class="foot">
+  <span>生成于 2026-08-11 · 资料版本 01</span>
+  <span><a href="01-总览.html">← 01 总览</a> · <a href="03-参赛.html">03 参赛交付物索引 →</a></span>
+</div>
+
+</div>
+</body>
+</html>

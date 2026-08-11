@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹脉 · 团队同步 03 — 参赛交付物索引</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-sub:#f6f8fa; --fg:#1f2328; --fg-sub:#57606a; --fg-soft:#818b98;
+    --border:#d0d7de; --accent:#0969da; --accent-bg:#ddf4ff; --green:#1a7f37; --green-bg:#dafbe1;
+    --amber:#9a6700; --amber-bg:#fff8c5; --red:#cf222e; --red-bg:#ffebe9;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Helvetica,Arial,sans-serif; background:var(--bg-sub); color:var(--fg); line-height:1.65; font-size:15px;}
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .topnav{position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);}
+  .topnav-inner{max-width:960px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 20px; overflow-x:auto; white-space:nowrap;}
+  .brand{font-weight:700; font-size:15px; color:var(--fg);}
+  .brand small{color:var(--fg-soft); font-weight:400;}
+  .nav-links{display:flex; gap:6px;}
+  .nav-links a{font-size:13px; padding:4px 10px; border-radius:99px; color:var(--fg-sub); border:1px solid transparent;}
+  .nav-links a:hover{text-decoration:none; color:var(--accent); background:var(--accent-bg); border-color:#7bc0ff;}
+  .nav-links a.cur{background:var(--accent-bg); color:var(--accent); border-color:#7bc0ff; font-weight:600;}
+  .wrap{max-width:960px; margin:0 auto; padding:28px 20px 60px;}
+  header.hero{padding:26px 0 22px; border-bottom:1px solid var(--border); margin-bottom:26px;}
+  header.hero h1{font-size:26px; font-weight:800; letter-spacing:-0.5px;}
+  header.hero .tagline{margin-top:8px; font-size:16px; color:var(--fg-sub);}
+  h2{font-size:20px; font-weight:700; margin:38px 0 14px; padding-top:8px;}
+  h2 .num{color:var(--accent); font-family:var(--mono); font-size:15px; margin-right:8px;}
+  h3{font-size:16px; font-weight:700; margin:20px 0 8px;}
+  p{margin:8px 0;}
+  .card{background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px 18px; margin:12px 0;}
+  .badge{display:inline-block; font-size:12px; font-weight:600; padding:2px 9px; border-radius:99px; margin-right:6px;}
+  .b-green{background:var(--green-bg); color:var(--green); border:1px solid #2da44e55;}
+  .b-blue{background:var(--accent-bg); color:var(--accent); border:1px solid #54aeff55;}
+  .b-amber{background:var(--amber-bg); color:var(--amber); border:1px solid #d4a72c55;}
+  .b-red{background:var(--red-bg); color:var(--red); border:1px solid #cf222e55;}
+  .b-gray{background:var(--bg-sub); color:var(--fg-sub); border:1px solid var(--border);}
+  .race{background:var(--bg); border:1px solid var(--border); border-radius:10px; margin:16px 0; overflow:hidden;}
+  .race .head{padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .race .head .name{font-size:17px; font-weight:700;}
+  .race .head .sub{font-size:13px; color:var(--fg-sub); width:100%;}
+  .race .body{padding:14px 18px;}
+  table{width:100%; border-collapse:collapse; background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; font-size:13.5px;}
+  th{text-align:left; background:var(--bg-sub); font-weight:600; color:var(--fg-sub); padding:9px 12px; border-bottom:1px solid var(--border); font-size:13px;}
+  td{padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  code{font-family:var(--mono); font-size:12.5px; background:var(--bg-sub); border:1px solid var(--border); border-radius:4px; padding:1px 5px;}
+  .path{font-family:var(--mono); font-size:12.5px; background:var(--bg-sub); border-radius:4px; padding:1px 6px; color:var(--fg-sub);}
+  .ok{border-left:3px solid var(--green); background:var(--green-bg); border-radius:0 6px 6px 0; padding:10px 14px; font-size:13.5px; color:#0f4d23; margin:10px 0;}
+  .todo{border-left:3px solid var(--amber); background:var(--amber-bg); border-radius:0 6px 6px 0; padding:10px 14px; font-size:13.5px; color:#6b4e00; margin:10px 0;}
+  ul.list{margin:8px 0 8px 22px;}
+  ul.list li{margin:4px 0;}
+  .foot{margin-top:40px; padding-top:16px; border-top:1px solid var(--border); color:var(--fg-soft); font-size:12.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .foot a{font-size:12.5px;}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="brand">纹脉 Pattern Veins <small>· 团队同步资料</small></span>
+    <div class="nav-links">
+      <a href="01-总览.html">01 总览</a>
+      <a href="02-上手.html">02 上手</a>
+      <a href="03-参赛.html" class="cur">03 参赛</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <h1>纹脉 · 参赛交付物索引</h1>
+  <div class="tagline">三套赛事材料 + 广场社区进行中状态，每份文件在哪、什么版本、什么状态，一览即知。</div>
+</header>
+
+<div class="race">
+  <div class="head">
+    <span class="name">EL 决赛答辩</span>
+    <span class="badge b-green">已完成</span>
+  </div>
+  <div class="body">
+    <table>
+      <tr><th style="width:150px;">项</th><th>内容</th></tr>
+      <tr><td>当前版 PPT</td><td><span class="path">EL答辩/纹脉-EL答辩-editable-v3.pptx</span>（python-pptx 可编辑重建，10 页，含 BMC 9 宫格商业模式画布）</td></tr>
+      <tr><td>目录</td><td><span class="path">D:\desktop\纹脉\EL答辩\</span>（build 脚本、ppt_assets、多历史版本 v2/v3/v4、PDF 导出）</td></tr>
+      <tr><td>状态</td><td>答辩已完成；editable-v3 为对外当前版</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="race">
+  <div class="head">
+    <span class="name">NOVA 提案（港科大 + 腾讯 AI 创意赛）</span>
+    <span class="badge b-green">已提交 06-30</span>
+  </div>
+  <div class="body">
+    <p>三材料全部齐备，位于 <span class="path">D:\desktop\纹脉\NOVA\</span>：</p>
+    <ul class="list">
+      <li><b>01 项目摘要</b>：<span class="path">NOVA/01-项目摘要.md</span></li>
+      <li><b>02 演示文稿</b>：<span class="path">NOVA/02-演示文稿.html / .pptx / .pdf</span></li>
+      <li><b>03 AI 原创提示</b>：<span class="path">NOVA/03-AI原创提示.md</span></li>
+    </ul>
+    <p style="margin-top:6px;">另含比赛规程 <span class="path">2026-AI创意赛-通知规程.pdf</span> 与最终交付三件套（文創藝術+天之焦子 系列文件）。</p>
+  </div>
+</div>
+
+<div class="race">
+  <div class="head">
+    <span class="name">鸿蒙赛道（纹脉鸿蒙适配）</span>
+    <span class="badge b-amber">已交付待提交</span>
+  </div>
+  <div class="body">
+    <p>三件套（03 不交）均位于 <span class="path">D:\desktop\纹脉\</span> 根目录：</p>
+    <table>
+      <tr><th style="width:150px;">件</th><th>文件</th><th style="width:110px;">日期</th></tr>
+      <tr><td>01 作品说明</td><td><span class="path">01-作品说明文档+若子晴.pdf</span>（11 页）；可编辑底稿 <span class="path">鸿蒙赛道-作品说明文档-纹脉-final.docx</span>（历史 v2/v3/v4 同目录）</td><td>07-26</td></tr>
+      <tr><td>02 演示视频</td><td><span class="path">02-演示视频+若子晴.mp4</span>（3:51）</td><td>07-26</td></tr>
+      <tr><td>03 说明</td><td>该赛道第 3 件按规则不提交</td><td>—</td></tr>
+    </table>
+    <p style="margin-top:8px;">适配模板：<span class="path">D:\desktop\纹脉\wenmai-harmony-template\Index.ets</span>。</p>
+  </div>
+</div>
+
+<div class="race">
+  <div class="head">
+    <span class="name">广场社区（进行中）</span>
+    <span class="badge b-blue">已集成</span><span class="badge b-amber">待上线</span>
+  </div>
+  <div class="body">
+    <p>「创作 → 发布 → 审核 → 复用」社区闭环已开发完成并集成进主站：</p>
+    <ul class="list">
+      <li>代码：<code>GalleryPage.jsx</code>（浏览 / 复用）+ <code>AdminReviewPage.jsx</code>（/admin 审核）+ <code>lib/galleryApi.js</code></li>
+      <li>数据库：<span class="path">supabase/migrations/001_gallery.sql</span>（works / likes 表 + RLS + Storage 存储桶，整段粘贴跑即可）</li>
+      <li>机制：发布 <code>status=pending</code> → 管理员审核 → approved 进广场 / rejected 必填理由；复用 = fork 副本（标注 forked_from）</li>
+    </ul>
+    <div class="todo"><b>上线待办：</b>① 在 Supabase 跑 001_gallery.sql → ② 手动把自己设为管理员（文件末尾有 SQL）→ ③ 放 5 件种子作品（青花 / 山海 / 青铜 / 唐草 / 团龙 各一）→ ④ 用普通账号 + 管理员账号走一遍发布/审核闭环。</div>
+  </div>
+</div>
+
+<h2><span class="num">05</span>文档路径汇总</h2>
+<table>
+  <tr><th style="width:260px;">文档</th><th>路径</th></tr>
+  <tr><td>参赛文档</td><td><span class="path">D:\desktop\纹脉\参赛文档.md / .pdf</span></td></tr>
+  <tr><td>项目可行性汇报</td><td><span class="path">D:\desktop\纹脉\项目可行性汇报.md</span>（06-18）</td></tr>
+  <tr><td>主站 README</td><td><span class="path">wenmai/README.md</span>（含账号建表 SQL）</td></tr>
+  <tr><td>纹样资料库</td><td><span class="path">wenmai/docs/纹样资料.md</span>（素材整理）</td></tr>
+  <tr><td>规划文档</td><td><span class="path">纹脉\plans\</span>（广场 v1、EL 答辩等）</td></tr>
+  <tr><td>本套团队资料</td><td><span class="path">纹脉\团队资料\01-总览 / 02-上手 / 03-参赛</span></td></tr>
+</table>
+
+<div class="foot">
+  <span>生成于 2026-08-11 · 资料版本 01</span>
+  <span><a href="01-总览.html">← 01 总览</a> · <a href="02-上手.html">02 上手 ←</a></span>
+</div>
+
+</div>
+</body>
+</html>
