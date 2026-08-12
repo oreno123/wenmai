@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["./**/*.ts", "./**/*.tsx", "../vite-env.d.ts"]
+}
