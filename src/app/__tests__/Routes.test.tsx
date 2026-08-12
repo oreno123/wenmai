@@ -89,13 +89,13 @@ describe('AppRoutes', () => {
     expect(await screen.findByTestId('splash')).toBeTruthy()
   })
 
-  it('redirects /puzzle to /create (legacy)', () => {
+  it('redirects /puzzle to /create (legacy)', async () => {
     renderAt('/puzzle')
-    expect(screen.findByTestId('create')).toBeTruthy()
+    expect(await screen.findByTestId('create')).toBeTruthy()
   })
 
-  it('redirects /qinghua to /library (legacy)', () => {
+  it('redirects /qinghua to /library (legacy)', async () => {
     renderAt('/qinghua')
-    expect(screen.findByTestId('library')).toBeTruthy()
+    expect(await screen.findByTestId('library')).toBeTruthy()
   })
 })
