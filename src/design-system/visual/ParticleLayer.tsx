@@ -16,7 +16,7 @@ function ParticleLayerImpl({ type, className = '' }: ParticleLayerProps) {
 
   const options = useMemo<ISourceOptions | null>(() => {
     if (type === 'none' || reduced) return null
-    return PARTICLE_PRESETS[type] as unknown as ISourceOptions
+    return PARTICLE_PRESETS[type]
   }, [type, reduced])
 
   if (!options) return null
