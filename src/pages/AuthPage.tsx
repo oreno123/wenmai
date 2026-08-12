@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { signInWithEmail, signUpWithEmail, signOut } from '../lib/auth'
@@ -6,7 +7,7 @@ import { useAuth } from '../lib/auth'
 import FluidShaderBackground from '../components/common/FluidShaderBackground'
 
 /* 云雷纹装饰圆 — brand crest */
-function CrestMark({ size = 48, opacity = 0.9 }) {
+function CrestMark({ size = 48, opacity = 0.9 }: { size?: number; opacity?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" style={{ opacity }}>
       <circle cx="24" cy="24" r="20" stroke="#D4AF6A" strokeWidth="0.5" />
@@ -29,7 +30,6 @@ const ink = {
 }
 const accent = '#F2D58A'
 const accentDeep = '#D4AF6A'
-const accentRed = '#BC1F28'
 
 const features = [
   { label: '400+ 纹样', desc: '商周到明清，九大系列收藏' },
@@ -40,20 +40,20 @@ const features = [
 export default function AuthPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [mode, setMode] = useState('login')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [visible, setVisible] = useState(false)
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [visible, setVisible] = useState<boolean>(false)
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 60)
     return () => clearTimeout(t)
   }, [])
 
-  const handleSubmit = useCallback(async (e) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
@@ -69,7 +69,7 @@ export default function AuthPage() {
       }
       navigate('/home')
     } catch (err) {
-      setError(err.message || '操作失败')
+      setError((err as Error)?.message || '操作失败')
     } finally {
       setLoading(false)
     }
@@ -80,10 +80,10 @@ export default function AuthPage() {
     setMode('login')
   }, [])
 
-  const reveal = (delay) => ({
+  const reveal = (delay: number) => ({
     initial: { opacity: 0, y: 16 },
     animate: visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
-    transition: { duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] as const },
   })
 
   // ── Logged-in state ──
@@ -373,7 +373,29 @@ export default function AuthPage() {
 }
 
 /* Input with leading icon — matches the glass card aesthetic */
-function FieldInput({ icon, type, placeholder, value, onChange, required, minLength = 1 }) {
+interface FieldInputProps {
+  icon: ReactNode
+  type: string
+  placeholder: string
+  value: string
+  onChange: (v: string) => void
+  required?: boolean
+  minLength?: number
+}
+
+function FieldInput({ icon, type, placeholder, value, onChange, required, minLength = 1 }: FieldInputProps) {
+  const inputStyle = (): CSSProperties => ({
+    width: '100%',
+    padding: '12px 14px 12px 40px',
+    borderRadius: 10,
+    background: 'rgba(245,241,232,0.92)',
+    border: '1px solid rgba(200,180,150,0.25)',
+    color: '#2A2015', fontSize: 13.5,
+    fontFamily: 'inherit', letterSpacing: '0.04em',
+    outline: 'none',
+    transition: 'all 0.2s',
+  })
+
   return (
     <div style={{ position: 'relative' }}>
       <span style={{
@@ -393,17 +415,7 @@ function FieldInput({ icon, type, placeholder, value, onChange, required, minLen
         onChange={(e) => onChange(e.target.value)}
         required={required}
         minLength={minLength}
-        style={{
-          width: '100%',
-          padding: '12px 14px 12px 40px',
-          borderRadius: 10,
-          background: 'rgba(245,241,232,0.92)',
-          border: '1px solid rgba(200,180,150,0.25)',
-          color: '#2A2015', fontSize: 13.5,
-          fontFamily: 'inherit', letterSpacing: '0.04em',
-          outline: 'none',
-          transition: 'all 0.2s',
-        }}
+        style={inputStyle()}
         onFocus={(e) => {
           e.target.style.borderColor = 'rgba(201,148,58,0.6)'
           e.target.style.background = 'rgba(248,244,235,1)'

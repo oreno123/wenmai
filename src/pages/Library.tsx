@@ -1,32 +1,36 @@
 import { lazy, Suspense, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import PatternCard from '../components/cards/PatternCard'
-import { getPatternById, PATTERN_LIBRARY, getAllSeries, getRarityLabel } from '../store/patternData'
+import { getPatternById, PATTERN_LIBRARY, getAllSeries } from '../store/patternData'
+import type { Pattern, Rarity } from '../store/patternData'
 
 const GestureCardView = lazy(() => import('../gesture-cards/GestureCardView'))
 
-const TABS = [
+const TABS: { id: 'mine' | 'all'; label: string }[] = [
   { id: 'mine', label: '我的' },
   { id: 'all', label: '全部' },
 ]
 
-const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
+const RARITY_ORDER: Record<Rarity, number> = { ssr: 0, rare: 1, common: 2 }
 
 export default function Library() {
   const { data } = useApp()
   const navigate = useNavigate()
-  const [tab, setTab] = useState('mine')
-  const [seriesFilter, setSeriesFilter] = useState('all')
-  const [showGestureView, setShowGestureView] = useState(false)
+  const [tab, setTab] = useState<'mine' | 'all'>('mine')
+  const [seriesFilter, setSeriesFilter] = useState<string>('all')
+  const [showGestureView, setShowGestureView] = useState<boolean>(false)
 
-  const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
+  const myPatterns: Pattern[] = data.library
+    .map((id) => getPatternById(id))
+    .filter((p): p is Pattern => Boolean(p))
   const base = tab === 'mine' ? myPatterns : PATTERN_LIBRARY
   const seriesList = getAllSeries()
 
-  const displayPatterns = seriesFilter === 'all'
+  const displayPatterns: Pattern[] = seriesFilter === 'all'
     ? base
-    : base.filter(p => p.series === seriesFilter)
+    : base.filter((p) => p.series === seriesFilter)
 
   const collected = data.library.length
   const total = PATTERN_LIBRARY.length
@@ -106,7 +110,7 @@ export default function Library() {
         border: '1px solid rgba(212,175,106,0.08)',
         borderRadius: 12, padding: 4,
       }}>
-        {TABS.map(t => (
+        {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -132,7 +136,7 @@ export default function Library() {
           onClick={() => setSeriesFilter('all')}
           style={pillStyle(seriesFilter === 'all')}
         >全部</button>
-        {seriesList.map(s => (
+        {seriesList.map((s) => (
           <button key={s.id} onClick={() => setSeriesFilter(s.id)} style={pillStyle(seriesFilter === s.id, s.color)}>
             {s.name}
           </button>
@@ -142,8 +146,8 @@ export default function Library() {
       {/* 纹样网格 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
         {displayPatterns
-          .sort((a, b) => (RARITY_ORDER[a.rarity] || 2) - (RARITY_ORDER[b.rarity] || 2))
-          .map(p => {
+          .sort((a, b) => (RARITY_ORDER[a.rarity] ?? 2) - (RARITY_ORDER[b.rarity] ?? 2))
+          .map((p) => {
             const owned = data.library.includes(p.id)
             return (
               <div key={p.id} style={{ position: 'relative' }}>
@@ -193,7 +197,7 @@ export default function Library() {
   )
 }
 
-function pillStyle(active, accent) {
+function pillStyle(active: boolean, accent?: string): CSSProperties {
   const c = accent || '#F2D58A'
   return {
     padding: '5px 14px', borderRadius: 14, fontSize: 12, whiteSpace: 'nowrap',
