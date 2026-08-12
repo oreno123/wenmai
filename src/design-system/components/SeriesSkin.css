@@ -19,20 +19,23 @@
   pointer-events: none;
 }
 /* Layering stack (z-index):
-   0 — .series-bg-layer (background slot, currently empty — for future shader)
+   0 — .series-bg-layer + shader components (Cloud/Fluid)
    1 — .ds-particle-layer (particles drift)
-   2 — .ds-decoration-layer (decorations: cloud/seal/bronze/vine/splash)
+   2 — .ds-decoration-layer + .deco-silk-canvas (decorations + dragon silk)
    3 — children content (default) */
-.ds-series-skin .series-bg-layer {
+.ds-series-skin .series-bg-layer,
+.ds-series-skin [class*='ShaderComponent'] {
   z-index: 0;
 }
 .ds-series-skin .ds-particle-layer {
   z-index: 1;
 }
-.ds-series-skin .ds-decoration-layer {
+.ds-series-skin .ds-decoration-layer,
+.ds-series-skin .deco-silk-canvas {
   z-index: 2;
 }
-.ds-series-skin > *:not(.series-bg-layer):not(.ds-particle-layer):not(.ds-decoration-layer) {
+.ds-series-skin
+  > *:not(.series-bg-layer):not(.ds-particle-layer):not(.ds-decoration-layer):not(.deco-silk-canvas) {
   position: relative;
   z-index: 3;
 }
