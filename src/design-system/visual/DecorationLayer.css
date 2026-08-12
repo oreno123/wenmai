@@ -1,0 +1,30 @@
+.ds-decoration-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ds-decoration-layer .deco-cloud-svg {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  width: 100%;
+  height: 100px;
+}
+
+.ds-decoration-layer .deco-seal-svg {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+}
+
+.ds-decoration-layer .deco-bronze-svg {
+  position: absolute;
+  bottom: 32px;
+  left: 24px;
+  width: 120px;
+  height: 160px;
+}
