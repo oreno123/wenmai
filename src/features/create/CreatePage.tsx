@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import ModeTabs from './ModeTabs'
+import ModeTabs, { normalizeMode } from './ModeTabs'
 
 const FreeMode = lazy(() => import('./modes/FreeMode'))
 const GuidedMode = lazy(() => import('./modes/GuidedMode'))
@@ -8,7 +8,7 @@ const PreviewMode = lazy(() => import('./modes/PreviewMode'))
 
 export default function CreatePage() {
   const [searchParams] = useSearchParams()
-  const mode = searchParams.get('mode') ?? 'free'
+  const mode = normalizeMode(searchParams.get('mode'))
 
   return (
     <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>

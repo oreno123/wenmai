@@ -2,6 +2,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 
 export type CreateMode = 'free' | 'guided' | 'preview'
 
+export const VALID_MODES: CreateMode[] = ['free', 'guided', 'preview']
+
+export function normalizeMode(raw: string | null): CreateMode {
+  return VALID_MODES.includes(raw as CreateMode) ? (raw as CreateMode) : 'free'
+}
+
 const TABS: { mode: CreateMode; cn: string; en: string }[] = [
   { mode: 'free', cn: '自 由', en: 'FREE' },
   { mode: 'guided', cn: '引 导', en: 'GUIDED' },
@@ -11,7 +17,7 @@ const TABS: { mode: CreateMode; cn: string; en: string }[] = [
 export default function ModeTabs() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const current = (searchParams.get('mode') as CreateMode | null) ?? 'free'
+  const current = normalizeMode(searchParams.get('mode'))
 
   return (
     <div

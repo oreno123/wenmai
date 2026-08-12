@@ -47,6 +47,13 @@ describe('CreatePage', () => {
     expect(await findByTestId('preview-mode')).toBeTruthy()
   })
 
+  it('falls back to FreeMode when mode is unknown', async () => {
+    const { findByTestId, queryByTestId } = renderAt('/create?mode=garbage')
+    expect(await findByTestId('free-mode')).toBeTruthy()
+    expect(queryByTestId('guided-mode')).toBeNull()
+    expect(queryByTestId('preview-mode')).toBeNull()
+  })
+
   it('renders 3 mode tabs', () => {
     const { getAllByRole } = renderAt('/create')
     const tabs = getAllByRole('button').filter((b) =>
