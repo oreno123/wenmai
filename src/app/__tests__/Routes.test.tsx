@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Routes as RRDRoutes, Route } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import AppRoutes from '../Routes'
 
 // Stub all lazy-loaded pages. Each must `default` export a component.
