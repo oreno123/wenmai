@@ -4,6 +4,7 @@ import type { SeriesIntensity } from '../../types/series-theme'
 import { getSeriesTheme } from '../series/themes'
 import { ParticleLayer } from '../visual/ParticleLayer'
 import { DecorationLayer } from '../visual/DecorationLayer'
+import SilkCanvasDecoration from '../visual/decorations/SilkCanvasDecoration'
 import './SeriesSkin.css'
 
 // Lazy-loaded so Three.js + shader only ship when a shader-themed series renders.
@@ -59,6 +60,7 @@ export default function SeriesSkin({
           <FluidShader />
         </Suspense>
       )}
+      {intensity === 'full' && theme.silkCanvas && <SilkCanvasDecoration />}
       {children}
     </div>
   )
