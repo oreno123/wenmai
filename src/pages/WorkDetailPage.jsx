@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate, useLocation } from '../components/common/Router'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { getWork, listForksOf, toggleLike, hasLiked } from '../lib/galleryApi'
 
@@ -10,9 +10,8 @@ import { getWork, listForksOf, toggleLike, hasLiked } from '../lib/galleryApi'
 
 export default function WorkDetailPage() {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const { id: workId } = useParams()
   const { user } = useAuth()
-  const workId = pathname.split('/work/')[1]?.split('/')[0] || pathname.split('/work/')[1]
 
   const [work, setWork] = useState(null)
   const [forks, setForks] = useState([])
@@ -50,7 +49,7 @@ export default function WorkDetailPage() {
   const handleReuse = useCallback(() => {
     if (!user) { navigate('/auth'); return }
     if (!work) return
-    navigate(`/puzzle?fork=${work.id}`)
+    navigate(`/create?fork=${work.id}`)
   }, [user, work, navigate])
 
   if (loading) {

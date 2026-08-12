@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/patternData'
 import PatternImage from '../components/common/PatternImage'
 

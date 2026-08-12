@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component {
             {this.state.error?.message || '未知错误'}
           </div>
           <button
-            onClick={() => { this.setState({ hasError: false, error: null }); window.location.hash = '/home' }}
+            onClick={() => { this.setState({ hasError: false, error: null }); window.location.href = '/home' }}
             style={{
               marginTop: 12, padding: '10px 32px', borderRadius: 12,
               background: 'rgba(201,162,60,0.15)', color: '#D4AF6A',

@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
 import { useAuth } from '../lib/auth'
@@ -40,7 +40,7 @@ const STORY_CHAPTERS = [
   {
     key: 'create', num: '叁', cn: '创 作', en: 'CREATE',
     desc: '拼出属于你的纹样',
-    cta: '开始创作', path: '/puzzle',
+    cta: '开始创作', path: '/create',
     deco: (
       <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
         <path d="M14 6l4 4-8 8 8 8-4 4-8-8 8-8z" />

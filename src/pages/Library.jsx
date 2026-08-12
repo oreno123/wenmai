@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import PatternCard from '../components/cards/PatternCard'
 import { getPatternById, PATTERN_LIBRARY, getAllSeries, getRarityLabel } from '../store/patternData'

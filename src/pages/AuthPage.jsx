@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { signInWithEmail, signUpWithEmail, signOut } from '../lib/auth'
 import { useAuth } from '../lib/auth'
 import FluidShaderBackground from '../components/common/FluidShaderBackground'

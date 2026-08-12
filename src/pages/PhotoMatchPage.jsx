@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { PATTERN_LIBRARY, getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
 import { extractHashFromFileWithCrop, findTopMatches, buildLibraryHashes } from '../utils/imageComparison'

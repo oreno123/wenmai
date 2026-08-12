@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { useNavigate, useLocation } from '../components/common/Router'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage, getAllSeries, getAiPatterns, getAiPurpose } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
@@ -25,7 +25,7 @@ const MASK_DIM = 32
 export default function PuzzlePage() {
   const canvasRef = useRef(null)
   const navigate = useNavigate()
-  const { search } = useLocation()
+  const [searchParams] = useSearchParams()
   const { user } = useAuth()
   const { data, saveCreation } = useApp()
   const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation, scale }
@@ -83,8 +83,7 @@ export default function PuzzlePage() {
 
   // ── Fork entry: read ?fork=workId and preload source placements ──
   useEffect(() => {
-    const params = new URLSearchParams(search)
-    const forkId = params.get('fork')
+    const forkId = searchParams.get('fork')
     if (!forkId) return
     let cancelled = false
     getWork(forkId).then(({ data: src }) => {
@@ -108,7 +107,7 @@ export default function PuzzlePage() {
       }
     })
     return () => { cancelled = true }
-  }, [search])
+  }, [searchParams])
 
   // Preload images + pre-render outlined blocks for owned patterns only
   useEffect(() => {
@@ -812,7 +811,7 @@ export default function PuzzlePage() {
         {/* Secondary nav */}
         <div style={{ display: 'flex', gap: 6 }}>
           <button
-            onClick={() => navigate('/jigsaw')}
+            onClick={() => navigate('/create?mode=guided')}
             style={navBtnStyle}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -821,7 +820,7 @@ export default function PuzzlePage() {
             经典拼图
           </button>
           <button
-            onClick={() => navigate('/curate')}
+            onClick={() => navigate('/tools/curate')}
             style={navBtnStyle}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

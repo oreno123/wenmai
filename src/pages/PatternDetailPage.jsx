@@ -1,5 +1,4 @@
-import { useMemo } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage, getRarityLabel, getSeriesInfo } from '../store/patternData'
 import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
@@ -37,14 +36,8 @@ const RARITY_STYLES = {
 
 export default function PatternDetailPage() {
   const navigate = useNavigate()
+  const { id: patternId } = useParams()
   const { data } = useApp()
-
-  // Parse pattern ID from hash: #/pattern/cloud-1 -> "cloud-1"
-  const patternId = useMemo(() => {
-    const hash = window.location.hash.slice(1) // remove #
-    const match = hash.match(/^\/pattern\/(.+)$/)
-    return match ? match[1] : null
-  }, [])
 
   const pattern = patternId ? getPatternById(patternId) : undefined
   const description = patternId ? PATTERN_DESCRIPTIONS[patternId] : undefined

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import {
   generatePuzzle, drawPiece, findSnap, hitTestPiece, generateThumbnail,
 } from '../engine/jigsawEngine'
@@ -409,7 +409,7 @@ export default function JigsawPage() {
             {phase === 'complete' ? '拼图完成!' : '纹样拼图'}
           </span>
           <button
-            onClick={() => navigate('/puzzle')}
+            onClick={() => navigate('/create')}
             style={{ fontSize: 10, color: '#6A6A6A', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             返回创作

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { listWorks, toggleLike, hasLiked } from '../lib/galleryApi'
 import WorkCard from '../components/gallery/WorkCard'
@@ -83,7 +83,7 @@ export default function GalleryPage() {
       navigate('/auth')
       return
     }
-    navigate(`/puzzle?fork=${work.id}`)
+    navigate(`/create?fork=${work.id}`)
   }, [user, navigate])
 
   const handleLike = useCallback(async (work) => {
@@ -145,7 +145,7 @@ export default function GalleryPage() {
         )}
       </div>
 
-      <PublishCTA onPublish={() => user ? navigate('/puzzle') : navigate('/auth')} />
+      <PublishCTA onPublish={() => user ? navigate('/create') : navigate('/auth')} />
     </div>
   )
 }

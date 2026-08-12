@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from '../common/Router'
+import { useNavigate } from 'react-router-dom'
 import { fetchIsAdmin } from '../../lib/galleryApi'
 import { useAuth } from '../../lib/auth'
 

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/patternData'
 import { QINGHUA_CATEGORIES } from '../data/qinghuaPatterns'
 

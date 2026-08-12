@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { listPendingReviews, approveWork, rejectWork } from '../lib/galleryApi'
 import AdminOnlyRoute from '../components/gallery/AdminOnlyRoute'
