@@ -9,6 +9,11 @@ vi.mock('@tsparticles/react', () => ({
 
 vi.mock('../../../hooks/useReducedMotion')
 
+vi.mock('../../visual/DecorationLayer', () => ({
+  DecorationLayer: ({ type }: { type: string }) =>
+    type === 'none' ? null : <div data-testid={`mock-deco-${type}`} />,
+}))
+
 describe('SeriesSkin', () => {
   beforeEach(() => {
     vi.mocked(useReducedMotion).mockReturnValue(false)
@@ -62,5 +67,16 @@ describe('SeriesSkin', () => {
     // The bg-layer slot should exist for future shader use
     const bgLayer = container.querySelector('.series-bg-layer')
     expect(bgLayer).toBeInTheDocument()
+  })
+
+  it('renders decoration layer when theme has decoration', () => {
+    render(<SeriesSkin series="qinghua"><div>Content</div></SeriesSkin>)
+    // qinghua decoration is 'splash'
+    expect(screen.getByTestId('mock-deco-splash')).toBeInTheDocument()
+  })
+
+  it('does not render decoration layer in subtle intensity', () => {
+    render(<SeriesSkin series="qinghua" intensity="subtle"><div>Content</div></SeriesSkin>)
+    expect(screen.queryByTestId('mock-deco-splash')).not.toBeInTheDocument()
   })
 })

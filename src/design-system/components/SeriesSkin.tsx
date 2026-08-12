@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { SeriesIntensity } from '../../types/series-theme'
 import { getSeriesTheme } from '../series/themes'
 import { ParticleLayer } from '../visual/ParticleLayer'
+import { DecorationLayer } from '../visual/DecorationLayer'
 import './SeriesSkin.css'
 
 export interface SeriesSkinProps {
@@ -39,6 +40,9 @@ export default function SeriesSkin({
       )}
       {intensity === 'full' && theme.particle !== 'none' && (
         <ParticleLayer type={theme.particle} />
+      )}
+      {intensity === 'full' && theme.decoration !== 'none' && (
+        <DecorationLayer type={theme.decoration} />
       )}
       {children}
     </div>

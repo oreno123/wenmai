@@ -21,15 +21,18 @@
 /* Layering stack (z-index):
    0 — .series-bg-layer (background slot, currently empty — for future shader)
    1 — .ds-particle-layer (particles drift)
-   2 — children content (default)
-   Future: .ds-decoration-layer will need its own slot between 1 and 2 */
+   2 — .ds-decoration-layer (decorations: cloud/seal/bronze/vine/splash)
+   3 — children content (default) */
 .ds-series-skin .series-bg-layer {
   z-index: 0;
 }
 .ds-series-skin .ds-particle-layer {
   z-index: 1;
 }
-.ds-series-skin > *:not(.series-bg-layer):not(.ds-particle-layer) {
-  position: relative;
+.ds-series-skin .ds-decoration-layer {
   z-index: 2;
+}
+.ds-series-skin > *:not(.series-bg-layer):not(.ds-particle-layer):not(.ds-decoration-layer) {
+  position: relative;
+  z-index: 3;
 }
