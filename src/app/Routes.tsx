@@ -7,7 +7,7 @@ const SplashPage = lazy(() => import('../pages/SplashPage'))
 const AuthPage = lazy(() => import('../pages/AuthPage'))
 const Home = lazy(() => import('../pages/Home'))
 const Library = lazy(() => import('../pages/Library'))
-const PuzzlePage = lazy(() => import('../pages/PuzzlePage'))
+const CreatePage = lazy(() => import('../features/create/CreatePage'))
 const GachaPage = lazy(() => import('../pages/GachaPage'))
 const GalleryPage = lazy(() => import('../pages/GalleryPage'))
 const WorkDetailPage = lazy(() => import('../pages/WorkDetailPage'))
@@ -15,7 +15,6 @@ const PatternDetailPage = lazy(() => import('../pages/PatternDetailPage'))
 const PhotoMatchPage = lazy(() => import('../pages/PhotoMatchPage'))
 const AdminReviewPage = lazy(() => import('../pages/AdminReviewPage'))
 const CuratePage = lazy(() => import('../pages/CuratePage'))
-const Landing = lazy(() => import('../pages/Landing'))
 const SeriesDemoPage = lazy(() => import('../pages/demo/SeriesDemoPage'))
 
 function PageLoader() {
@@ -51,11 +50,10 @@ export default function AppRoutes({ children }: AppRoutesProps = {}) {
           {renderLegacyRedirects()}
           <Route path="/" element={<SplashPage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/landing" element={<Landing />} />
           <Route path="/home" element={<Home />} />
           <Route path="/library" element={<Library />} />
           <Route path="/pattern/:id" element={<PatternDetailPage />} />
-          <Route path="/create" element={<PuzzlePage />} />
+          <Route path="/create" element={<CreatePage />} />
           <Route path="/gacha" element={<GachaPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/work/:id" element={<WorkDetailPage />} />

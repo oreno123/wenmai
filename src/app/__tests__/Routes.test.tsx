@@ -18,7 +18,6 @@ vi.mock('../../pages/PatternDetailPage', () => ({ default: () => <div data-testi
 vi.mock('../../pages/PhotoMatchPage', () => ({ default: () => <div data-testid="photo">PhotoMatch</div> }))
 vi.mock('../../pages/AdminReviewPage', () => ({ default: () => <div data-testid="admin">Admin</div> }))
 vi.mock('../../pages/CuratePage', () => ({ default: () => <div data-testid="curate">Curate</div> }))
-vi.mock('../../pages/Landing', () => ({ default: () => <div data-testid="landing">Landing</div> }))
 vi.mock('../../pages/demo/SeriesDemoPage', () => ({ default: () => <div data-testid="demo">Demo</div> }))
 
 async function renderAt(path: string) {

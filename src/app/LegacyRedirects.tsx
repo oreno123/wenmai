@@ -8,6 +8,7 @@ export interface LegacyRedirect {
 
 export const LEGACY_REDIRECTS: LegacyRedirect[] = [
   { from: '/splash', to: '/' },
+  { from: '/landing', to: '/auth' },
   { from: '/puzzle', to: '/create?mode=free' },
   { from: '/composer', to: '/create?mode=guided' },
   { from: '/jigsaw', to: '/create?mode=guided' },

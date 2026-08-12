@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { LEGACY_REDIRECTS } from '../LegacyRedirects'
 
 describe('LEGACY_REDIRECTS', () => {
-  it('covers all 8 legacy paths', () => {
-    expect(LEGACY_REDIRECTS).toHaveLength(8)
+  it('covers all 9 legacy paths', () => {
+    expect(LEGACY_REDIRECTS).toHaveLength(9)
   })
 
   it('redirects all creation tools to /create with mode', () => {
@@ -27,5 +27,10 @@ describe('LEGACY_REDIRECTS', () => {
   it('redirects /splash to /', () => {
     const s = LEGACY_REDIRECTS.find((r) => r.from === '/splash')
     expect(s?.to).toBe('/')
+  })
+
+  it('redirects /landing to /auth (Landing merged into AuthPage in Plan 3)', () => {
+    const l = LEGACY_REDIRECTS.find((r) => r.from === '/landing')
+    expect(l?.to).toBe('/auth')
   })
 })
