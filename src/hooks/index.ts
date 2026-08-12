@@ -1,2 +1,6 @@
 export { useImagePreload } from './useImagePreload'
 export { useReducedMotion } from './useReducedMotion'
+export { useDrawPath, type DrawPathOptions } from './useDrawPath'
+export { useCloudFlow } from './useCloudFlow'
+export { useVineGrow } from './useVineGrow'
+export { useSealStamp, type SealStampOptions } from './useSealStamp'
