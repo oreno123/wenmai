@@ -20,13 +20,10 @@ export default function Card({
 }: CardProps) {
   const cls = ['ds-card', `card-variant-${variant}`, className]
     .filter(Boolean).join(' ')
-  const hasChrome = Boolean(header || footer)
   return (
     <div className={cls}>
       {header && <div className="ds-card-header">{header}</div>}
-      {hasChrome
-        ? <div className="ds-card-body">{children}</div>
-        : children}
+      <div className="ds-card-body">{children}</div>
       {footer && <div className="ds-card-footer">{footer}</div>}
     </div>
   )

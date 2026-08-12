@@ -9,8 +9,8 @@ describe('Card', () => {
   })
 
   it('applies variant class', () => {
-    render(<Card variant="elevated">Content</Card>)
-    expect(screen.getByText('Content').closest('div')).toHaveClass('ds-card', 'card-variant-elevated')
+    const { container } = render(<Card variant="elevated">Content</Card>)
+    expect(container.firstChild).toHaveClass('ds-card', 'card-variant-elevated')
   })
 
   it('renders header and footer when provided', () => {
