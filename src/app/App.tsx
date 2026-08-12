@@ -14,10 +14,7 @@ const GoldBackground = lazy(() => import('../components/common/GoldBackground'))
  * AppProvider so it can call useApp().
  */
 function CloudSync() {
-  // `useAuth` lives in a .js file (checkJs: false), where useState(null)
-  // narrows the inferred type to `null`. The runtime contract is really
-  // Supabase User | null, so we widen here.
-  const { user } = useAuth() as { user: { id: string } | null }
+  const { user } = useAuth()
   const { syncFromCloud, resetLocalData } = useApp()
 
   useEffect(() => {

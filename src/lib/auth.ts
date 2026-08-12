@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react'
+import type { User } from '@supabase/supabase-js'
 import { supabase, isSupabaseConfigured } from './supabase'
 
 /**
  * Subscribe to Supabase auth state. Returns { user, loading, configured }.
  * `user` is the Supabase user object (or null when logged out).
  */
-export function useAuth() {
-  const [user, setUser] = useState(null)
+export interface AuthState {
+  user: User | null
+  loading: boolean
+  configured: boolean
+}
+
+export function useAuth(): AuthState {
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -17,13 +24,13 @@ export function useAuth() {
 
     // Get initial session
     supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null)
+      setUser(data.session?.user ?? null)
       setLoading(false)
     })
 
     // Listen for changes (login/logout/token refresh)
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null)
+      setUser(session?.user ?? null)
     })
     return () => sub.subscription.unsubscribe()
   }, [])
@@ -31,11 +38,11 @@ export function useAuth() {
   return { user, loading, configured: isSupabaseConfigured }
 }
 
-export async function signInWithEmail(email, password) {
+export async function signInWithEmail(email: string, password: string) {
   return supabase.auth.signInWithPassword({ email, password })
 }
 
-export async function signUpWithEmail(email, password, username) {
+export async function signUpWithEmail(email: string, password: string, username: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
