@@ -5,7 +5,7 @@ import type { Variants } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import type { GameData } from '../store/gameStore'
-import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
+import { getAllSeries, getPatternImage } from '../store/patternData'
 import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
 
@@ -157,7 +157,6 @@ export default function Home() {
   const { data, deleteCreation } = useApp()
   const { user } = useAuth()
   const series = getAllSeries()
-  const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const creationsRef = useRef<HTMLDivElement>(null)
   const [deleteTarget, setDeleteTarget] = useState<Creation | null>(null)
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0]
@@ -379,7 +378,7 @@ export default function Home() {
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: 8,
             }}>
-              {STORY_CHAPTERS.map((ch, i) => (
+              {STORY_CHAPTERS.map((ch) => (
                 <motion.div key={ch.key} variants={fadeUp}
                   onClick={() => navigate(ch.path)}
                   style={{
@@ -736,7 +735,7 @@ export default function Home() {
             </motion.div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginTop: 12 }}>
-              {series.map((s, i) => {
+              {series.map((s) => {
                 const collected = s.patterns.filter(p => data.library.includes(p.id)).length
                 const total = s.patterns.length
                 const progress = total > 0 ? (collected / total) * 100 : 0

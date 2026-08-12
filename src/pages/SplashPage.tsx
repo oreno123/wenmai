@@ -5,14 +5,6 @@ import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 
-interface Uniforms {
-  u_resolution: { value: THREE.Vector3 }
-  u_time: { value: number }
-  u_noiseTexture: { value: THREE.Texture }
-  u_noiseSize: { value: THREE.Vector2 }
-  u_noiseStrength: { value: number }
-}
-
 export default function SplashPage() {
   const containerRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -42,7 +34,7 @@ export default function SplashPage() {
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
 
-    const uniforms: Uniforms = {
+    const uniforms = {
       u_resolution: { value: new THREE.Vector3(W, H, 1.0) },
       u_time: { value: 0.0 },
       u_noiseTexture: { value: new THREE.Texture() },
