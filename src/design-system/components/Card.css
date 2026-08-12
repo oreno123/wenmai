@@ -1,0 +1,24 @@
+.ds-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.card-variant-flat { background: var(--color-bg-card); }
+.card-variant-elevated {
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-card);
+}
+.card-variant-glass {
+  background: rgba(31, 31, 34, 0.6);
+  backdrop-filter: blur(8px);
+}
+.ds-card-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+.ds-card-body { padding: var(--space-4); }
+.ds-card-footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
