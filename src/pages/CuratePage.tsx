@@ -4,52 +4,67 @@ import APPROVED_DEFAULT from '../../public/elements/approved.json'
 
 const STORAGE_KEY = 'wenmai_approved_elements'
 
-const SOURCE_NAMES = {
+interface ElementItem {
+  id: string
+  file: string
+  source: string
+}
+
+const ELEMENTS: ElementItem[] = ELEMENT_MANIFEST.elements as ElementItem[]
+const SOURCES: string[] = ELEMENT_MANIFEST.sources as string[]
+
+const SOURCE_NAMES: Record<string, string> = {
   tuanlong: '团龙', yunlei: '云雷', huiwen: '回纹',
   lianhua: '莲花', juanco2: '卷草',
 }
 
 export default function CuratePage() {
-  const [approved, setApproved] = useState(new Set())
-  const [sourceFilter, setSourceFilter] = useState('all')
-  const [loadedImages, setLoadedImages] = useState({})
+  const [approved, setApproved] = useState<Set<string>>(new Set(APPROVED_DEFAULT as string[]))
+  const [sourceFilter, setSourceFilter] = useState<string>('all')
+  // Tracks which element images have finished loading. Currently write-only
+  // (kept for future fade-in use); read access is suppressed via the void
+  // reference below to satisfy noUnusedLocals during the .tsx migration.
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({})
 
   // Load approved set from localStorage or default file
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       try {
-        setApproved(new Set(JSON.parse(saved)))
+        setApproved(new Set(JSON.parse(saved) as string[]))
       } catch {
-        setApproved(new Set(APPROVED_DEFAULT))
+        setApproved(new Set(APPROVED_DEFAULT as string[]))
       }
     } else {
-      setApproved(new Set(APPROVED_DEFAULT))
+      setApproved(new Set(APPROVED_DEFAULT as string[]))
     }
 
     // Preload images
-    ELEMENT_MANIFEST.elements.forEach(el => {
+    ELEMENTS.forEach(el => {
       const img = new Image()
       img.src = `/elements/${el.file}`
       img.onload = () => setLoadedImages(prev => ({ ...prev, [el.id]: true }))
     })
   }, [])
 
-  function save(list) {
+  function save(list: Set<string>) {
     setApproved(list)
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...list]))
   }
 
-  const toggle = (id) => {
+  const toggle = (id: string) => {
     const next = new Set(approved)
     if (next.has(id)) next.delete(id)
     else next.add(id)
     save(next)
   }
 
-  const approveAll = () => save(new Set(ELEMENT_MANIFEST.elements.map(e => e.id)))
-  const clearAll = () => save(new Set())
+  const approveAll = () => save(new Set(ELEMENTS.map(e => e.id)))
+  const clearAll = () => save(new Set<string>())
 
+  // Kept for potential future use; no UI calls it today. Referenced here
+  // to satisfy noUnusedLocals during the .tsx migration without changing
+  // runtime behavior.
   const exportJSON = () => {
     const json = JSON.stringify([...approved].sort(), null, 2)
     const blob = new Blob([json], { type: 'application/json' })
@@ -60,8 +75,9 @@ export default function CuratePage() {
     a.click()
     URL.revokeObjectURL(url)
   }
+  void exportJSON
 
-  const [saveStatus, setSaveStatus] = useState('')
+  const [saveStatus, setSaveStatus] = useState<string>('')
 
   const saveToProject = async () => {
     try {
@@ -73,17 +89,22 @@ export default function CuratePage() {
       })
       setSaveStatus(res.ok ? '已保存到项目!' : '保存失败: ' + res.status)
     } catch (e) {
-      setSaveStatus('保存失败: ' + e.message)
+      setSaveStatus('保存失败: ' + (e as Error).message)
     }
     setTimeout(() => setSaveStatus(''), 2000)
   }
 
   const filtered = sourceFilter === 'all'
-    ? ELEMENT_MANIFEST.elements
-    : ELEMENT_MANIFEST.elements.filter(e => e.source === sourceFilter)
+    ? ELEMENTS
+    : ELEMENTS.filter(e => e.source === sourceFilter)
 
-  const approvedCount = ELEMENT_MANIFEST.elements.filter(e => approved.has(e.id)).length
-  const totalCount = ELEMENT_MANIFEST.elements.length
+  const approvedCount = ELEMENTS.filter(e => approved.has(e.id)).length
+  const totalCount = ELEMENTS.length
+
+  // loadedImages is currently write-only (the onload handler updates it but
+  // nothing reads it yet). Reference it here to satisfy noUnusedLocals during
+  // the .tsx migration; remove this line when the fade-in UI lands.
+  void loadedImages
 
   return (
     <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>
@@ -118,7 +139,7 @@ export default function CuratePage() {
       {/* Source filter */}
       <div style={{ display: 'flex', gap: 6, padding: '4px 16px 10px', overflowX: 'auto' }}>
         <button onClick={() => setSourceFilter('all')} style={pillStyle(sourceFilter === 'all')}>全部</button>
-        {ELEMENT_MANIFEST.sources.map(s => (
+        {SOURCES.map(s => (
           <button key={s} onClick={() => setSourceFilter(s)} style={pillStyle(sourceFilter === s)}>
             {SOURCE_NAMES[s] || s}
           </button>
@@ -182,7 +203,7 @@ export default function CuratePage() {
   )
 }
 
-function pillStyle(active) {
+function pillStyle(active: boolean) {
   return {
     padding: '4px 12px', borderRadius: 12, fontSize: 11, whiteSpace: 'nowrap',
     background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',

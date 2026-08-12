@@ -3,9 +3,32 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { PATTERN_LIBRARY, getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
 import { extractHashFromFileWithCrop, findTopMatches, buildLibraryHashes } from '../utils/imageComparison'
+import type { CropRect } from '../utils/imageComparison'
 import PatternImage from '../components/common/PatternImage'
 
-function similarityLabel(score) {
+// ── Types ─────────────────────────────────────────────
+type MatchState = 'idle' | 'crop' | 'loading' | 'results'
+
+interface ImgInfo {
+  naturalW: number
+  naturalH: number
+  displayW: number
+  displayH: number
+}
+
+interface PointXY {
+  x: number
+  y: number
+}
+
+interface MatchResult {
+  patternId: string
+  score: number
+  phashDist: number
+  dhashDist: number
+}
+
+function similarityLabel(score: number): { label: string; color: string } {
   if (score >= 0.85) return { label: '很像', color: '#F2D58A' }
   if (score >= 0.65) return { label: '相似', color: '#D4AF6A' }
   if (score >= 0.45) return { label: '略像', color: '#8a7a4a' }
@@ -14,23 +37,26 @@ function similarityLabel(score) {
 
 export default function PhotoMatchPage() {
   const navigate = useNavigate()
+  // useApp() is called for context subscription side-effects (re-render on
+  // library change) even though we don't read `data` here yet.
   const { data } = useApp()
-  const fileRef = useRef(null)
-  const imgRef = useRef(null)
+  void data
+  const fileRef = useRef<HTMLInputElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
 
   // 'idle' → 'crop' (let user draw box) → 'loading' → 'results'
-  const [matchState, setMatchState] = useState('idle')
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const [pendingFile, setPendingFile] = useState(null)
-  const [matches, setMatches] = useState([])
-  const [error, setError] = useState(null)
+  const [matchState, setMatchState] = useState<MatchState>('idle')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [matches, setMatches] = useState<MatchResult[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   // Crop rect in CSS pixels, relative to the displayed <img> element
-  const [cropRect, setCropRect] = useState(null) // { x, y, w, h }
-  const drawStartRef = useRef(null)
-  const [imgInfo, setImgInfo] = useState(null) // { naturalW, naturalH, displayW, displayH }
+  const [cropRect, setCropRect] = useState<CropRect | null>(null) // { x, y, w, h }
+  const drawStartRef = useRef<PointXY | null>(null)
+  const [imgInfo, setImgInfo] = useState<ImgInfo | null>(null) // { naturalW, naturalH, displayW, displayH }
 
-  const handleFile = useCallback((file) => {
+  const handleFile = useCallback((file: File) => {
     if (!file || !file.type.startsWith('image/')) return
     setError(null)
     setCropRect(null)
@@ -40,19 +66,19 @@ export default function PhotoMatchPage() {
     setMatchState('crop')
   }, [])
 
-  const handleFileInput = useCallback((e) => {
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) handleFile(file)
   }, [handleFile])
 
-  const handleDrop = useCallback((e) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     const file = e.dataTransfer.files?.[0]
     if (file) handleFile(file)
   }, [handleFile])
 
-  const handleImgLoad = useCallback((e) => {
-    const img = e.target
+  const handleImgLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget
     setImgInfo({
       naturalW: img.naturalWidth,
       naturalH: img.naturalHeight,
@@ -62,7 +88,7 @@ export default function PhotoMatchPage() {
   }, [])
 
   // Pointer events on the crop overlay
-  const pointFromEvent = useCallback((e) => {
+  const pointFromEvent = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const img = imgRef.current
     if (!img) return null
     const rect = img.getBoundingClientRect()
@@ -72,7 +98,7 @@ export default function PhotoMatchPage() {
     }
   }, [])
 
-  const onPointerDown = useCallback((e) => {
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture?.(e.pointerId)
     const p = pointFromEvent(e)
     if (!p) return
@@ -80,7 +106,7 @@ export default function PhotoMatchPage() {
     setCropRect({ x: p.x, y: p.y, w: 0, h: 0 })
   }, [pointFromEvent])
 
-  const onPointerMove = useCallback((e) => {
+  const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!drawStartRef.current) return
     const p = pointFromEvent(e)
     if (!p) return
@@ -97,11 +123,11 @@ export default function PhotoMatchPage() {
     drawStartRef.current = null
   }, [])
 
-  const runIdentify = useCallback(async (useCrop) => {
+  const runIdentify = useCallback(async (useCrop: boolean) => {
     if (!pendingFile || !imgInfo) return
     setMatchState('loading')
     try {
-      let crop = null
+      let crop: CropRect | null = null
       if (useCrop && cropRect && cropRect.w > 8 && cropRect.h > 8) {
         const sx = imgInfo.naturalW / imgInfo.displayW
         const sy = imgInfo.naturalH / imgInfo.displayH
@@ -118,7 +144,7 @@ export default function PhotoMatchPage() {
       const topMatches = findTopMatches(userHash, libHashes, 3)
       setMatches(topMatches)
       setMatchState('results')
-    } catch (e) {
+    } catch {
       setError('图片分析失败，请换一张试试')
       setMatchState('crop')
     }
@@ -205,7 +231,7 @@ export default function PhotoMatchPage() {
             <div style={{ position: 'relative', display: 'inline-block', lineHeight: 0 }}>
               <img
                 ref={imgRef}
-                src={previewUrl}
+                src={previewUrl ?? undefined}
                 alt="上传图片"
                 onLoad={handleImgLoad}
                 draggable={false}
@@ -312,7 +338,7 @@ export default function PhotoMatchPage() {
             borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
           }}>
             <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
-            <img src={previewUrl} alt="上传图片" style={{
+            <img src={previewUrl ?? undefined} alt="上传图片" style={{
               maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
             }} />
           </div>

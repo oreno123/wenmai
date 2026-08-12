@@ -3,34 +3,61 @@ import { useNavigate } from 'react-router-dom'
 import {
   generatePuzzle, drawPiece, findSnap, hitTestPiece, generateThumbnail,
 } from '../../../engine/jigsawEngine'
+import type { Puzzle, Piece } from '../../../engine/jigsawEngine'
 import { PATTERN_LIBRARY, getPatternImage } from '../../../store/patternData'
+import type { Pattern } from '../../../store/patternData'
 import PatternImage from '../../../components/common/PatternImage'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
 const SCALE = DISPLAY_SIZE / CANVAS_SIZE
 
-const GRID_OPTIONS = [
+interface GridOption {
+  rows: number
+  cols: number
+  label: string
+}
+
+const GRID_OPTIONS: GridOption[] = [
   { rows: 3, cols: 3, label: '3×3' },
   { rows: 4, cols: 4, label: '4×4' },
   { rows: 3, cols: 4, label: '3×4' },
 ]
 
+type JigsawPhase = 'setup' | 'playing' | 'complete'
+
+interface JigsawPlacement {
+  x: number
+  y: number
+  snapped: boolean
+}
+
+interface JigsawDrag {
+  id: string
+  offsetX: number
+  offsetY: number
+  moved?: boolean
+}
+
+interface TrayDrag {
+  piece: Piece
+}
+
 export default function Jigsaw() {
-  const canvasRef = useRef(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const navigate = useNavigate()
-  const offscreenRef = useRef(null) // scaled source image
-  const [phase, setPhase] = useState('setup') // setup | playing | complete
+  const offscreenRef = useRef<HTMLCanvasElement | null>(null) // scaled source image
+  const [phase, setPhase] = useState<JigsawPhase>('setup') // setup | playing | complete
   const [gridIdx, setGridIdx] = useState(0)
-  const [selectedPattern, setSelectedPattern] = useState(null)
-  const [sourceImg, setSourceImg] = useState(null)
-  const [puzzle, setPuzzle] = useState(null)
-  const [placements, setPlacements] = useState({})
-  const [selectedId, setSelectedId] = useState(null)
-  const [dragging, setDragging] = useState(null)
-  const [dragFromTray, setDragFromTray] = useState(null)
-  const [thumbnails, setThumbnails] = useState({})
-  const [placedOnCanvas, setPlacedOnCanvas] = useState(new Set())
+  const [selectedPattern, setSelectedPattern] = useState<Pattern | null>(null)
+  const [sourceImg, setSourceImg] = useState<HTMLImageElement | null>(null)
+  const [puzzle, setPuzzle] = useState<Puzzle | null>(null)
+  const [placements, setPlacements] = useState<Record<string, JigsawPlacement>>({})
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [dragging, setDragging] = useState<JigsawDrag | null>(null)
+  const [dragFromTray, setDragFromTray] = useState<TrayDrag | null>(null)
+  const [thumbnails, setThumbnails] = useState<Record<string, string>>({})
+  const [placedOnCanvas, setPlacedOnCanvas] = useState<Set<string>>(new Set())
   const [showTray, setShowTray] = useState(true)
 
   const gridSize = GRID_OPTIONS[gridIdx]
@@ -48,6 +75,7 @@ export default function Jigsaw() {
       c.width = CANVAS_SIZE
       c.height = CANVAS_SIZE
       const ctx = c.getContext('2d')
+      if (!ctx) return
 
       // Fill background for transparent images (shanjing)
       if (selectedPattern.series === 'shanjing') {
@@ -76,12 +104,12 @@ export default function Jigsaw() {
     img.src = imgSrc
   }, [selectedPattern, gridSize])
 
-  function initPuzzle(img) {
+  function initPuzzle(img: HTMLImageElement) {
     const p = generatePuzzle(CANVAS_SIZE, CANVAS_SIZE, gridSize.rows, gridSize.cols, Date.now())
     setPuzzle(p)
 
     // Scatter pieces
-    const init = {}
+    const init: Record<string, JigsawPlacement> = {}
     for (const piece of p.pieces) {
       init[piece.id] = {
         x: 60 + Math.random() * (CANVAS_SIZE - piece.cellW - 120),
@@ -95,7 +123,7 @@ export default function Jigsaw() {
     setPhase('playing')
 
     // Thumbnails
-    const thumbs = {}
+    const thumbs: Record<string, string> = {}
     for (const piece of p.pieces) {
       thumbs[piece.id] = generateThumbnail(piece, img)
     }
@@ -108,6 +136,7 @@ export default function Jigsaw() {
     const canvas = canvasRef.current
     if (!canvas || !puzzle || !sourceImg) return
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     ctx.fillStyle = '#0A0A0B'
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
@@ -148,19 +177,19 @@ export default function Jigsaw() {
 
   // ── Canvas coordinates ───────────────────────────────
 
-  function canvasCoords(e) {
-    const rect = canvasRef.current.getBoundingClientRect()
+  function canvasCoords(e: React.PointerEvent<HTMLCanvasElement>): { x: number; y: number } {
+    const rect = canvasRef.current!.getBoundingClientRect()
     return { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
   }
 
   // ── Canvas pointer events ────────────────────────────
 
-  const handleCanvasPointerDown = useCallback((e) => {
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = canvasCoords(e)
     // Hit test (reverse order)
-    let hitId = null
-    for (let i = puzzle.pieces.length - 1; i >= 0; i--) {
-      const piece = puzzle.pieces[i]
+    let hitId: string | null = null
+    for (let i = puzzle!.pieces.length - 1; i >= 0; i--) {
+      const piece = puzzle!.pieces[i]
       if (!placedOnCanvas.has(piece.id)) continue
       const pl = placements[piece.id]
       if (hitTestPiece(piece, pl.x, pl.y, pos.x, pos.y)) {
@@ -183,7 +212,7 @@ export default function Jigsaw() {
     }
   }, [puzzle, placements, placedOnCanvas])
 
-  const handleCanvasPointerMove = useCallback((e) => {
+  const handleCanvasPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!dragging) return
     const pos = canvasCoords(e)
 
@@ -202,7 +231,7 @@ export default function Jigsaw() {
   const handleCanvasPointerUp = useCallback(() => {
     if (dragging && puzzle) {
       const piece = puzzle.pieces.find(p => p.id === dragging.id)
-      const pl = placements[piece.id]
+      const pl = piece ? placements[piece.id] : undefined
 
       if (piece && pl) {
         const snap = findSnap(piece, pl.x, pl.y, placements, puzzle.pieces, 50)
@@ -219,14 +248,14 @@ export default function Jigsaw() {
 
   // ── Tray drag to canvas ──────────────────────────────
 
-  const handleTrayPointerDown = useCallback((e, piece) => {
+  const handleTrayPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>, piece: Piece) => {
     e.preventDefault()
     setDragFromTray({ piece })
   }, [])
 
   useEffect(() => {
     if (!dragFromTray) return
-    const onMove = (e) => {
+    const onMove = (e: PointerEvent) => {
       const canvas = canvasRef.current
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()

@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useApp } from '../../../store/AppState'
 import { getPatternById, getPatternImage, getRarityLabel } from '../../../store/patternData'
+import type { Pattern, Rarity } from '../../../store/patternData'
 import PatternImage from '../../../components/common/PatternImage'
 import ReliefScene from '../../../components/relief/ReliefScene'
 
-const RARITY_COLOR = {
+const RARITY_COLOR: Record<Rarity, string> = {
   ssr: '#C9A23C',
   rare: '#BC6B2F',
   common: '#666',
@@ -14,11 +15,11 @@ const RARITY_COLOR = {
 // so the selector reads as "all my clouds, then all my dragons, ..." instead
 // of "what I pulled most recently first".
 const SERIES_ORDER = ['cloud', 'taotie', 'dragon', 'scroll', 'floral', 'geometric', 'corner', 'tile', 'shanjing', 'qinghua']
-const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
+const RARITY_ORDER: Record<Rarity, number> = { ssr: 0, rare: 1, common: 2 }
 
 export default function Relief() {
   const { data } = useApp()
-  const [selectedPattern, setSelectedPattern] = useState(data.library[0] || null)
+  const [selectedPattern, setSelectedPattern] = useState<string | null>(data.library[0] || null)
 
   // Composition mode: when navigated from the puzzle "完成创作" preview,
   // sessionStorage carries the rasterized composition image. Render the
@@ -42,7 +43,7 @@ export default function Relief() {
   const myPatterns = useMemo(
     () => data.library
       .map(id => getPatternById(id))
-      .filter(Boolean)
+      .filter((p): p is Pattern => Boolean(p))
       .sort((a, b) => {
         const sa = SERIES_ORDER.indexOf(a.series)
         const sb = SERIES_ORDER.indexOf(b.series)

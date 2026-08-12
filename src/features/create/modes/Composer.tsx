@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../../../engine/componentLibrary'
+import type { Component } from '../../../engine/componentLibrary'
 import { useApp } from '../../../store/AppState'
 import ELEMENT_MANIFEST from '../../../../public/elements/manifest.json'
 import { createOutlinedBlock } from '../../../utils/blockOutline'
@@ -10,7 +11,13 @@ const SCALE = DISPLAY_SIZE / CANVAS_SIZE
 const CX = CANVAS_SIZE / 2
 const CY = CANVAS_SIZE / 2
 
-const SYMMETRY_MODES = [
+interface SymmetryMode {
+  id: number
+  label: string
+  desc: string
+}
+
+const SYMMETRY_MODES: SymmetryMode[] = [
   { id: 2, label: '二分', desc: '左右对称' },
   { id: 4, label: '四分', desc: '四方对称' },
   { id: 8, label: '八分', desc: '八角对称' },
@@ -18,32 +25,81 @@ const SYMMETRY_MODES = [
 
 const COLORS = ['#C9A84C', '#8B6914', '#F2D58A', '#FFFFFF', '#E8D5B7', '#5C3D1A']
 
-const PANEL_TABS = [
+type PanelTabId = 'math' | 'real'
+
+interface PanelTab {
+  id: PanelTabId
+  label: string
+}
+
+const PANEL_TABS: PanelTab[] = [
   { id: 'math', label: '几何组件' },
   { id: 'real', label: '纹样碎片' },
 ]
 
-const SOURCE_NAMES = {
+const SOURCE_NAMES: Record<string, string> = {
   tuanlong: '团龙', yunlei: '云雷', huiwen: '回纹',
   lianhua: '莲花', juanco2: '卷草',
 }
 
+// ── Types ─────────────────────────────────────────────
+interface ElementItem {
+  id: string
+  file: string
+  source: string
+}
+const ELEMENTS: ElementItem[] = ELEMENT_MANIFEST.elements as ElementItem[]
+const SOURCES: string[] = ELEMENT_MANIFEST.sources as string[]
+
+interface ComposerPlacement {
+  x: number
+  y: number
+  size: number
+  rotation: number
+  color?: string
+  elementId?: string
+  component?: Component
+  _temp?: boolean
+}
+
+interface ComposerDrag {
+  idx: number
+  offsetX: number
+  offsetY: number
+}
+
+interface CenterPiece {
+  component: Component
+  size: number
+  color?: string
+}
+
+interface PanelDragComponent {
+  component: Component
+}
+
+interface PanelDragElement {
+  element: ElementItem
+}
+
+type PanelDrag = PanelDragComponent | PanelDragElement
+
 export default function Composer() {
-  const canvasRef = useRef(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const { saveCreation } = useApp()
   const [saved, setSaved] = useState(false)
   const [folds, setFolds] = useState(4)
-  const [placements, setPlacements] = useState([])
+  const [placements, setPlacements] = useState<ComposerPlacement[]>([])
   const [selectedIdx, setSelectedIdx] = useState(-1)
-  const [dragging, setDragging] = useState(null)
-  const [dragFromPanel, setDragFromPanel] = useState(null)
+  const [dragging, setDragging] = useState<ComposerDrag | null>(null)
+  const [dragFromPanel, setDragFromPanel] = useState<PanelDrag | null>(null)
   const [strokeColor, setStrokeColor] = useState('#C9A84C')
-  const [filter, setFilter] = useState('all')
-  const [centerComp, setCenterComp] = useState(null)
-  const [panelTab, setPanelTab] = useState('math')
-  const [sourceFilter, setSourceFilter] = useState('all')
-  const [loadedImages, setLoadedImages] = useState({})
-  const [outlinedBlocks, setOutlinedBlocks] = useState({})
+  const [filter, setFilter] = useState<string>('all')
+  const [centerComp, setCenterComp] = useState<CenterPiece | null>(null)
+  const [panelTab, setPanelTab] = useState<PanelTabId>('math')
+  const [sourceFilter, setSourceFilter] = useState<string>('all')
+  const [loadedImages, setLoadedImages] = useState<Record<string, HTMLImageElement>>({})
+  const [outlinedBlocks, setOutlinedBlocks] = useState<Record<string, HTMLCanvasElement | HTMLImageElement>>({})
 
   const filtered = (filter === 'all'
     ? COMPONENT_LIBRARY
@@ -51,8 +107,8 @@ export default function Composer() {
   ).filter(c => c.type !== 'corner')
 
   const realElements = sourceFilter === 'all'
-    ? ELEMENT_MANIFEST.elements
-    : ELEMENT_MANIFEST.elements.filter(e => e.source === sourceFilter)
+    ? ELEMENTS
+    : ELEMENTS.filter(e => e.source === sourceFilter)
 
   const sliceAngle = (Math.PI * 2) / folds
 
@@ -72,7 +128,7 @@ export default function Composer() {
 
   // ── 绘制 ──────────────────────────────────────────
 
-  const drawElementOnCanvas = useCallback((ctx, elementId, x, y, size, rotation = 0) => {
+  const drawElementOnCanvas = useCallback((ctx: CanvasRenderingContext2D, elementId: string, x: number, y: number, size: number, rotation: number = 0) => {
     const block = outlinedBlocks[elementId] || loadedImages[elementId]
     if (!block) return
     ctx.save()
@@ -86,6 +142,7 @@ export default function Composer() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     ctx.fillStyle = '#0A0A0B'
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
@@ -171,12 +228,12 @@ export default function Composer() {
 
   // ── 坐标转换 ──────────────────────────────────────
 
-  function canvasCoords(e) {
-    const rect = canvasRef.current.getBoundingClientRect()
+  function canvasCoords(e: React.PointerEvent<HTMLCanvasElement>): { x: number; y: number } {
+    const rect = canvasRef.current!.getBoundingClientRect()
     return { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
   }
 
-  function inEditSlice(x, y) {
+  function inEditSlice(x: number, y: number): boolean {
     const dx = x - CX, dy = y - CY
     const dist = Math.sqrt(dx * dx + dy * dy)
     if (dist < 15 || dist > CANVAS_SIZE * 0.45) return false
@@ -187,19 +244,19 @@ export default function Composer() {
 
   // ── 面板拖入 ──────────────────────────────────────
 
-  const handlePanelPointerDown = useCallback((e, component) => {
+  const handlePanelPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>, component: Component) => {
     e.preventDefault()
     setDragFromPanel({ component })
   }, [])
 
-  const handleElementPointerDown = useCallback((e, element) => {
+  const handleElementPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>, element: ElementItem) => {
     e.preventDefault()
     setDragFromPanel({ element })
   }, [])
 
   // ── 画布指针事件 ──────────────────────────────────
 
-  const handleCanvasPointerDown = useCallback((e) => {
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = canvasCoords(e)
 
     if (centerComp) {
@@ -229,7 +286,7 @@ export default function Composer() {
     }
   }, [placements, centerComp])
 
-  const handleCanvasPointerMove = useCallback((e) => {
+  const handleCanvasPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!dragging) return
     const pos = canvasCoords(e)
     const newX = pos.x - dragging.offsetX
@@ -251,7 +308,7 @@ export default function Composer() {
   // 全局拖拽（从面板拖入画布）
   useEffect(() => {
     if (!dragFromPanel) return
-    const onMove = (e) => {
+    const onMove = (e: PointerEvent) => {
       const canvas = canvasRef.current
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
@@ -260,7 +317,7 @@ export default function Composer() {
       if (isOver) {
         const pos = { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
 
-        if (dragFromPanel.component) {
+        if ('component' in dragFromPanel) {
           const comp = dragFromPanel.component
           const defaultSize = comp.type === 'center' ? CANVAS_SIZE * 0.28 : CANVAS_SIZE * 0.15
 
@@ -280,7 +337,7 @@ export default function Composer() {
               return [...withoutTemp, { component: comp, x: px, y: py, size: defaultSize, rotation: 0, color: strokeColor, _temp: true }]
             })
           }
-        } else if (dragFromPanel.element) {
+        } else if ('element' in dragFromPanel) {
           const el = dragFromPanel.element
           const defaultSize = CANVAS_SIZE * 0.15
           let px = pos.x, py = pos.y
@@ -299,7 +356,10 @@ export default function Composer() {
       }
     }
     const onUp = () => {
-      setPlacements(prev => prev.map(p => { const { _temp, ...rest } = p; return rest }))
+      setPlacements(prev => prev.map(p => {
+        const { _temp: _omit, ...rest } = p
+        return rest
+      }))
       setDragFromPanel(null)
     }
 
@@ -320,7 +380,7 @@ export default function Composer() {
     setSelectedIdx(-1)
   }, [selectedIdx])
 
-  const rotateSelected = useCallback((deg) => {
+  const rotateSelected = useCallback((deg: number) => {
     if (selectedIdx < 0) return
     setPlacements(prev => {
       const next = [...prev]
@@ -329,9 +389,9 @@ export default function Composer() {
     })
   }, [selectedIdx])
 
-  const scaleSelected = useCallback((delta) => {
+  const scaleSelected = useCallback((delta: number) => {
     if (selectedIdx === -2) {
-      setCenterComp(prev => ({ ...prev, size: Math.max(40, prev.size + delta) }))
+      setCenterComp(prev => ({ ...prev!, size: Math.max(40, prev!.size + delta) }))
       return
     }
     if (selectedIdx < 0) return
@@ -569,7 +629,7 @@ export default function Composer() {
   )
 }
 
-function pillStyle(active) {
+function pillStyle(active: boolean): React.CSSProperties {
   return {
     padding: '4px 12px', borderRadius: 12, fontSize: 12, whiteSpace: 'nowrap',
     background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
@@ -579,7 +639,7 @@ function pillStyle(active) {
   }
 }
 
-const btnStyle = {
+const btnStyle: React.CSSProperties = {
   padding: '5px 14px', borderRadius: 8, fontSize: 13,
   background: 'rgba(255,255,255,0.04)',
   color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',

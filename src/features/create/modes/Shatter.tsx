@@ -4,7 +4,26 @@ import ShatterScene from '../../../showcase/ShatterScene'
 import useHandGesture from '../../../showcase/useHandGesture'
 import { BG_COLOR } from '../../../showcase/constants'
 
-const HAND_CONNECTIONS = [
+// ── Types ─────────────────────────────────────────────
+// useHandGesture.js is untyped; landmarks come from MediaPipe and
+// sessionStorage JSON is free-form. We type them loosely here so the
+// showcase shell stays logic-neutral during the .tsx migration.
+interface Landmark {
+  x: number
+  y: number
+  z: number
+}
+
+interface HandGestureState {
+  isOpen: boolean
+  isFist: boolean
+  isReady: boolean
+  error: string | null
+  allLandmarks: Landmark[][]
+  videoEl: HTMLVideoElement | null
+}
+
+const HAND_CONNECTIONS: ReadonlyArray<readonly [number, number]> = [
   [0,1],[1,2],[2,3],[3,4],
   [0,5],[5,6],[6,7],[7,8],
   [0,9],[9,10],[10,11],[11,12],
@@ -13,8 +32,8 @@ const HAND_CONNECTIONS = [
   [5,9],[9,13],[13,17],
 ]
 
-function HandOverlay({ videoEl, allLandmarks }) {
-  const canvasRef = useRef(null)
+function HandOverlay({ videoEl, allLandmarks }: { videoEl: HTMLVideoElement | null; allLandmarks: Landmark[][] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -22,6 +41,7 @@ function HandOverlay({ videoEl, allLandmarks }) {
     if (!canvas || !video) return
 
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
 
@@ -61,7 +81,7 @@ function HandOverlay({ videoEl, allLandmarks }) {
   }, [videoEl, allLandmarks])
 
   useEffect(() => {
-    let raf
+    let raf = 0
     const loop = () => { draw(); raf = requestAnimationFrame(loop) }
     loop()
     return () => cancelAnimationFrame(raf)
@@ -85,7 +105,7 @@ function HandOverlay({ videoEl, allLandmarks }) {
   )
 }
 
-function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
+function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }: { isOpen: boolean; isFist: boolean; isReady: boolean; error: string | null; hasImage: boolean }) {
   return (
     <div style={{
       position: 'absolute', bottom: 24, left: 0, right: 0,
@@ -108,9 +128,11 @@ function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
 }
 
 export default function Shatter() {
-  const { isOpen, isFist, isReady, error, allLandmarks, videoEl } = useHandGesture()
-  const [userImage, setUserImage] = useState(null)
-  const [placements, setPlacements] = useState(null)
+  const { isOpen, isFist, isReady, error, allLandmarks, videoEl } = useHandGesture() as HandGestureState
+  const [userImage, setUserImage] = useState<string | null>(null)
+  // placements come from sessionStorage JSON; shape is owned by the puzzle
+  // page. Keep loose here to stay logic-neutral.
+  const [placements, setPlacements] = useState<unknown[] | null>(null)
 
   useEffect(() => {
     const placementData = sessionStorage.getItem('showcase_placements')

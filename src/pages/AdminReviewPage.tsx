@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
+import type { CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { listPendingReviews, approveWork, rejectWork } from '../lib/galleryApi'
 import AdminOnlyRoute from '../components/gallery/AdminOnlyRoute'
+import type { GalleryWork } from '../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // AdminReviewPage — /admin 审核队列
@@ -20,11 +22,11 @@ export default function AdminReviewPage() {
 function AdminContent() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [pending, setPending] = useState([])
+  const [pending, setPending] = useState<GalleryWork[]>([])
   const [loading, setLoading] = useState(true)
-  const [rejectingId, setRejectingId] = useState(null)
-  const [rejectReason, setRejectReason] = useState('')
-  const [toast, setToast] = useState(null)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [rejectReason, setRejectReason] = useState<string>('')
+  const [toast, setToast] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -32,15 +34,17 @@ function AdminContent() {
     if (error) {
       setToast(`加载失败：${error.message}`)
     } else {
-      setPending(data)
+      setPending((data as unknown as GalleryWork[]) ?? [])
     }
     setLoading(false)
   }, [])
 
   useEffect(() => { reload() }, [reload])
 
-  const handleApprove = async (workId) => {
-    const { error } = await approveWork(workId, user.id)
+  const handleApprove = async (workId: string) => {
+    // AdminOnlyRoute guarantees a logged-in admin; non-null assertion keeps
+    // the original behavior without a runtime check.
+    const { error } = await approveWork(workId, user!.id)
     if (error) {
       setToast(`通过失败：${error.message}`)
       return
@@ -49,7 +53,7 @@ function AdminContent() {
     setPending(prev => prev.filter(w => w.id !== workId))
   }
 
-  const startReject = (workId) => {
+  const startReject = (workId: string) => {
     setRejectingId(workId)
     setRejectReason('')
   }
@@ -64,7 +68,7 @@ function AdminContent() {
       setToast('驳回必填理由')
       return
     }
-    const { error } = await rejectWork(rejectingId, user.id, rejectReason)
+    const { error } = await rejectWork(rejectingId, user!.id, rejectReason)
     if (error) {
       setToast(`驳回失败：${error.message}`)
       return
@@ -180,7 +184,7 @@ function AdminContent() {
 
 // ── 样式 ──────────────────────────────────────────────────
 
-const pageStyle = {
+const pageStyle: CSSProperties = {
   minHeight: '100vh',
   background: '#0A0806',
   color: '#F2EBDB',
@@ -190,7 +194,7 @@ const pageStyle = {
   paddingBottom: 80,
 }
 
-const headerStyle = {
+const headerStyle: CSSProperties = {
   maxWidth: 1100,
   margin: '0 auto',
   padding: '40px 48px 32px',
@@ -199,7 +203,7 @@ const headerStyle = {
   alignItems: 'flex-start',
 }
 
-const backBtnStyle = {
+const backBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
@@ -210,7 +214,7 @@ const backBtnStyle = {
   letterSpacing: '0.1em',
 }
 
-const sealStyle = {
+const sealStyle: CSSProperties = {
   display: 'inline-block',
   background: '#C41E3A',
   color: '#F2EBDB',
@@ -222,7 +226,7 @@ const sealStyle = {
   marginBottom: 12,
 }
 
-const h1Style = {
+const h1Style: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 36,
   fontWeight: 500,
@@ -231,13 +235,13 @@ const h1Style = {
   letterSpacing: '0.05em',
 }
 
-const subStyle = {
+const subStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   color: '#6B5C45',
 }
 
-const emptyStyle = {
+const emptyStyle: CSSProperties = {
   maxWidth: 1100,
   margin: '0 auto',
   padding: 80,
@@ -247,7 +251,7 @@ const emptyStyle = {
   lineHeight: 2,
 }
 
-const listStyle = {
+const listStyle: CSSProperties = {
   maxWidth: 1100,
   margin: '0 auto',
   padding: '0 48px',
@@ -256,7 +260,7 @@ const listStyle = {
   gap: 20,
 }
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '160px 1fr',
   gap: 24,
@@ -265,20 +269,20 @@ const cardStyle = {
   border: '1px solid rgba(212,175,55,0.18)',
 }
 
-const coverWrapStyle = {
+const coverWrapStyle: CSSProperties = {
   width: 160,
   height: 160,
   background: 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
   overflow: 'hidden',
 }
 
-const coverStyle = {
+const coverStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
 }
 
-const coverFallbackStyle = {
+const coverFallbackStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'flex',
@@ -289,12 +293,12 @@ const coverFallbackStyle = {
   color: '#8B6F1F',
 }
 
-const bodyStyle = {
+const bodyStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
 }
 
-const titleStyle = {
+const titleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 22,
   fontWeight: 500,
@@ -303,7 +307,7 @@ const titleStyle = {
   marginBottom: 8,
 }
 
-const metaStyle = {
+const metaStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 8,
@@ -314,15 +318,15 @@ const metaStyle = {
   marginBottom: 16,
 }
 
-const dotStyle = { color: '#6B5C45' }
+const dotStyle: CSSProperties = { color: '#6B5C45' }
 
-const actionsStyle = {
+const actionsStyle: CSSProperties = {
   display: 'flex',
   gap: 12,
   marginTop: 'auto',
 }
 
-const approveBtnStyle = {
+const approveBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
@@ -334,7 +338,7 @@ const approveBtnStyle = {
   fontWeight: 500,
 }
 
-const rejectBtnStyle = {
+const rejectBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
@@ -345,7 +349,7 @@ const rejectBtnStyle = {
   letterSpacing: '0.2em',
 }
 
-const detailBtnStyle = {
+const detailBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
@@ -357,11 +361,11 @@ const detailBtnStyle = {
   marginLeft: 'auto',
 }
 
-const rejectFormStyle = {
+const rejectFormStyle: CSSProperties = {
   marginTop: 'auto',
 }
 
-const textareaStyle = {
+const textareaStyle: CSSProperties = {
   width: '100%',
   background: 'rgba(10,8,6,0.5)',
   border: '1px solid rgba(196,30,58,0.4)',
@@ -374,12 +378,12 @@ const textareaStyle = {
   marginBottom: 12,
 }
 
-const rejectActionsStyle = {
+const rejectActionsStyle: CSSProperties = {
   display: 'flex',
   gap: 12,
 }
 
-const cancelBtnStyle = {
+const cancelBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
@@ -390,7 +394,7 @@ const cancelBtnStyle = {
   letterSpacing: '0.2em',
 }
 
-const confirmRejectBtnStyle = {
+const confirmRejectBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: '#C41E3A',
@@ -402,7 +406,7 @@ const confirmRejectBtnStyle = {
   fontWeight: 500,
 }
 
-const toastStyle = {
+const toastStyle: CSSProperties = {
   position: 'fixed',
   bottom: 100,
   left: '50%',
