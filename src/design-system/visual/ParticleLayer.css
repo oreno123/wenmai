@@ -1,0 +1,9 @@
+.ds-particle-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.ds-particle-layer canvas {
+  display: block;
+}
