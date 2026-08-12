@@ -2,13 +2,13 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../store/AppState'
 import { getRandomPattern, getRarityLabel, getPatternImage, getTenPullPatterns, getSeriesInfo } from '../store/patternData'
+import type { Pattern } from '../store/patternData'
 import { PULL_COST, TEN_PULL_COST } from '../constants'
 import { generateShareCard } from '../utils/shareCard'
-import { shareImage } from '../utils/shareOrDownload'
 import PatternImage from '../components/common/PatternImage'
 
 /* 太极 + 能量环 SVG */
-function YinYangSymbol({ size = 120, bloom = false }) {
+function YinYangSymbol({ size = 120, bloom = false }: { size?: number; bloom?: boolean }) {
   return (
     <div style={{
       width: size, height: size, position: 'relative',
@@ -43,22 +43,28 @@ function YinYangSymbol({ size = 120, bloom = false }) {
   )
 }
 
+interface SharePreview {
+  url: string
+  pattern: Pattern
+  filename: string
+}
+
 export default function GachaPage() {
   const { data, doPull, doTenPull, addToLibrary, incrementPity, resetPity } = useApp()
-  const [state, setState] = useState('idle')
-  const [result, setResult] = useState(null)
-  const [tenResults, setTenResults] = useState(null)
+  const [state, setState] = useState<'idle' | 'pulling' | 'revealed'>('idle')
+  const [result, setResult] = useState<Pattern | null>(null)
+  const [tenResults, setTenResults] = useState<Pattern[] | null>(null)
   const [showBurst, setShowBurst] = useState(false)
   const [sharing, setSharing] = useState(false)
 
-  const [sharePreview, setSharePreview] = useState(null)
+  const [sharePreview, setSharePreview] = useState<SharePreview | null>(null)
 
-  const handleShare = useCallback(async (pattern) => {
+  const handleShare = useCallback(async (pattern: Pattern) => {
     if (sharing) return
     setSharing(true)
     try {
       const series = getSeriesInfo(pattern.series)
-      const blob = await generateShareCard(pattern, series)
+      const blob = await generateShareCard(pattern, series) as Blob | null
       if (!blob) {
         console.error('Share card generation returned null blob')
         return
@@ -92,7 +98,7 @@ export default function GachaPage() {
         handleDownloadShare()
       }
     } catch (e) {
-      if (e?.name !== 'AbortError') handleDownloadShare()
+      if ((e as { name?: string })?.name !== 'AbortError') handleDownloadShare()
     }
   }, [sharePreview, handleDownloadShare])
 
@@ -328,10 +334,6 @@ export default function GachaPage() {
 
             {/* 金色粒子 */}
             {Array.from({ length: 12 }).map((_, i) => {
-              const angle = (i * 30) * Math.PI / 180
-              const dist = 70 + (i % 3) * 25
-              const tx = Math.cos(angle) * dist
-              const ty = Math.sin(angle) * dist
               return (
                 <div key={i} style={{
                   position: 'absolute',
@@ -367,8 +369,6 @@ export default function GachaPage() {
           </div>
           {/* 环绕粒子 */}
           {Array.from({ length: 20 }).map((_, i) => {
-            const angle = (i * 18) * Math.PI / 180
-            const dist = 90 + (i % 3) * 20
             return (
               <div key={i} style={{
                 position: 'absolute',
