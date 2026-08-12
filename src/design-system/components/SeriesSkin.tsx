@@ -1,9 +1,13 @@
+import { lazy, Suspense } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import type { SeriesIntensity } from '../../types/series-theme'
 import { getSeriesTheme } from '../series/themes'
 import { ParticleLayer } from '../visual/ParticleLayer'
 import { DecorationLayer } from '../visual/DecorationLayer'
 import './SeriesSkin.css'
+
+// Lazy-loaded so Three.js + shader only ship when a cloud-themed series renders.
+const CloudShader = lazy(() => import('../../shaders/CloudShaderComponent'))
 
 export interface SeriesSkinProps {
   series: string
@@ -43,6 +47,11 @@ export default function SeriesSkin({
       )}
       {intensity === 'full' && theme.decoration !== 'none' && (
         <DecorationLayer type={theme.decoration} />
+      )}
+      {intensity === 'full' && theme.shader === 'cloud' && (
+        <Suspense fallback={null}>
+          <CloudShader />
+        </Suspense>
       )}
       {children}
     </div>
