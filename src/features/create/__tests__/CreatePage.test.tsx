@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, useSearchParams } from 'react-router-dom'
 import CreatePage from '../CreatePage'
+import { normalizeSub } from '../SubModeTabs'
 
 vi.mock('../../../pages/PuzzlePage', () => ({
   __esModule: true,
@@ -11,7 +12,13 @@ vi.mock('../modes/GuidedMode', () => ({
   __esModule: true,
   default: () => {
     const [sp] = useSearchParams()
-    const sub = sp.get('sub') ?? 'symmetry'
+    const sub = normalizeSub(
+      [
+        { sub: 'symmetry' },
+        { sub: 'jigsaw' },
+      ],
+      sp.get('sub'),
+    )
     return (
       <div data-testid={`guided-${sub}`}>
         GuidedMode ({sub})
@@ -23,7 +30,13 @@ vi.mock('../modes/PreviewMode', () => ({
   __esModule: true,
   default: () => {
     const [sp] = useSearchParams()
-    const sub = sp.get('sub') ?? 'relief'
+    const sub = normalizeSub(
+      [
+        { sub: 'relief' },
+        { sub: 'shatter' },
+      ],
+      sp.get('sub'),
+    )
     return (
       <div data-testid={`preview-${sub}`}>
         PreviewMode ({sub})
@@ -98,5 +111,15 @@ describe('CreatePage sub-modes', () => {
   it('preview mode switches to shatter when sub=shatter', async () => {
     const { findByTestId } = renderAt('/create?mode=preview&sub=shatter')
     expect(await findByTestId('preview-shatter')).toBeTruthy()
+  })
+
+  it('guided mode falls back to symmetry when sub is unknown', async () => {
+    const { findByTestId } = renderAt('/create?mode=guided&sub=garbage')
+    expect(await findByTestId('guided-symmetry')).toBeTruthy()
+  })
+
+  it('preview mode falls back to relief when sub is unknown', async () => {
+    const { findByTestId } = renderAt('/create?mode=preview&sub=garbage')
+    expect(await findByTestId('preview-relief')).toBeTruthy()
   })
 })

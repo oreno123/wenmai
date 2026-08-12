@@ -5,10 +5,14 @@ export interface SubModeTabsProps {
   options: { sub: string; cn: string }[]
 }
 
+export function normalizeSub(options: { sub: string }[], raw: string | null): string {
+  return options.some((o) => o.sub === raw) ? (raw as string) : options[0].sub
+}
+
 export default function SubModeTabs({ mode, options }: SubModeTabsProps) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const current = searchParams.get('sub') ?? options[0].sub
+  const current = normalizeSub(options, searchParams.get('sub'))
 
   return (
     <div

@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import SubModeTabs from '../SubModeTabs'
+import SubModeTabs, { normalizeSub } from '../SubModeTabs'
 
 const Composer = lazy(() => import('./Composer'))
 const Jigsaw = lazy(() => import('./Jigsaw'))
@@ -12,7 +12,7 @@ const OPTIONS = [
 
 export default function GuidedMode() {
   const [searchParams] = useSearchParams()
-  const sub = searchParams.get('sub') ?? 'symmetry'
+  const sub = normalizeSub(OPTIONS, searchParams.get('sub'))
 
   return (
     <div>

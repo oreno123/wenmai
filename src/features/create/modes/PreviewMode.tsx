@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import SubModeTabs from '../SubModeTabs'
+import SubModeTabs, { normalizeSub } from '../SubModeTabs'
 
 const Relief = lazy(() => import('./Relief'))
 const Shatter = lazy(() => import('./Shatter'))
@@ -12,7 +12,7 @@ const OPTIONS = [
 
 export default function PreviewMode() {
   const [searchParams] = useSearchParams()
-  const sub = searchParams.get('sub') ?? 'relief'
+  const sub = normalizeSub(OPTIONS, searchParams.get('sub'))
 
   return (
     <div>
