@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage, getAllSeries, getAiPatterns, getAiPurpose } from '../store/patternData'
+import type { Pattern } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
 import {
   extractContour,
@@ -11,11 +12,13 @@ import {
   getSuggestedPositions,
 } from '../engine/shapeInteraction'
 import { TEMPLATES, getTemplateById } from '../data/templates'
+import type { CompositionTemplate } from '../data/templates'
 import { SNAP_THRESHOLD, SNAP_STRENGTH } from '../constants'
 import PreviewScaleModal from '../components/PreviewScaleModal'
 import PublishModal from '../components/gallery/PublishModal'
 import { useAuth } from '../lib/auth'
 import { getWork } from '../lib/galleryApi'
+import type { PuzzlePlacement, ShapeData, OutlineBlock } from '../types/creation'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -23,39 +26,43 @@ const SCALE = DISPLAY_SIZE / CANVAS_SIZE
 const MASK_DIM = 32
 
 export default function PuzzlePage() {
-  const canvasRef = useRef(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
   const { data, saveCreation } = useApp()
-  const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation, scale }
-  const [selectedIdx, setSelectedIdx] = useState(-1)
-  const [dragging, setDragging] = useState(null)
-  const [dragFromTray, setDragFromTray] = useState(null)
-  const [loadedImages, setLoadedImages] = useState({})
-  const [outlinedBlocks, setOutlinedBlocks] = useState({})
-  const [outlinedUrls, setOutlinedUrls] = useState({})
-  const shapeCache = useRef({}) // patternId -> { mask: Uint8Array(64*64), boundingRadius }
-  const [seriesFilter, setSeriesFilter] = useState('all')
-  const [aiPurposeFilter, setAiPurposeFilter] = useState('all') // 二级筛选：all/corner/filler/border/standalone/tile/hero
-  const [showTray, setShowTray] = useState(true)
-  const [showPreview, setShowPreview] = useState(false)
-  const [completedImage, setCompletedImage] = useState(null)
-  const [showExportModal, setShowExportModal] = useState(false)
-  const [exportSize, setExportSize] = useState(2048)
-  const [showTemplateModal, setShowTemplateModal] = useState(false)
-  const [activeTemplateId, setActiveTemplateId] = useState(null)
-  const [saved, setSaved] = useState(false)
+  const [placements, setPlacements] = useState<PuzzlePlacement[]>([]) // { id, x, y, size, rotation, scale }
+  const [selectedIdx, setSelectedIdx] = useState<number>(-1)
+  const [dragging, setDragging] = useState<{ idx: number; offsetX: number; offsetY: number } | null>(null)
+  const [dragFromTray, setDragFromTray] = useState<{ element: Pattern } | null>(null)
+  const [loadedImages, setLoadedImages] = useState<Record<string, HTMLImageElement | HTMLCanvasElement>>({})
+  const [outlinedBlocks, setOutlinedBlocks] = useState<Record<string, OutlineBlock>>({})
+  const [outlinedUrls, setOutlinedUrls] = useState<Record<string, string>>({})
+  const shapeCache = useRef<Record<string, ShapeData>>({}) // patternId -> { mask: Uint8Array(64*64), boundingRadius }
+  const [seriesFilter, setSeriesFilter] = useState<string>('all')
+  const [aiPurposeFilter, setAiPurposeFilter] = useState<string>('all') // 二级筛选：all/corner/filler/border/standalone/tile/hero
+  const [showTray, setShowTray] = useState<boolean>(true)
+  const [showPreview, setShowPreview] = useState<boolean>(false)
+  const [completedImage, setCompletedImage] = useState<string | null>(null)
+  const [showExportModal, setShowExportModal] = useState<boolean>(false)
+  const [exportSize, setExportSize] = useState<number>(2048)
+  const [showTemplateModal, setShowTemplateModal] = useState<boolean>(false)
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null)
+  const [saved, setSaved] = useState<boolean>(false)
 
   // ── Gallery integration ───────────────────────────────
-  const [forkSource, setForkSource] = useState(null)        // { id, title, author }
-  const [showPublish, setShowPublish] = useState(false)
-  const [publishCoverBlob, setPublishCoverBlob] = useState(null)
-  const [extraPatterns, setExtraPatterns] = useState([])    // fork 引入的 pattern（绕过 library 过滤）
+  // NOTE: `author` shape is loosely typed because supabase's generated
+  // join type reports it as an array, but the runtime returns a single
+  // object (or null) for `!works_author_id_fkey`. We read `.username` off
+  // it directly; treat as unknown and narrow at the use site.
+  const [forkSource, setForkSource] = useState<{ id: string; title: string; author: unknown } | null>(null)        // { id, title, author }
+  const [showPublish, setShowPublish] = useState<boolean>(false)
+  const [publishCoverBlob, setPublishCoverBlob] = useState<Blob | null>(null)
+  const [extraPatterns, setExtraPatterns] = useState<Pattern[]>([])    // fork 引入的 pattern（绕过 library 过滤）
 
   // 用户已收集的纹样（library + fork 引入的 extras），不含 AI 元素
   const libPatterns = useMemo(() => {
-    const lib = data.library.map(id => getPatternById(id)).filter(Boolean)
+    const lib = data.library.map(id => getPatternById(id)).filter((p): p is Pattern => Boolean(p))
     const extras = extraPatterns.filter(p => !lib.find(x => x.id === p.id))
     return [...lib, ...extras]
   }, [data.library, extraPatterns])
@@ -92,18 +99,18 @@ export default function PuzzlePage() {
       if (Array.isArray(src.placements) && src.placements.length > 0) {
         // placements 的 id 字段就是 patternId（PuzzlePage 设计如此），
         // 保留原值让 renderScene 能查到 outlinedBlocks / loadedImages / shapeCache
-        const usedPatternIds = [...new Set(src.placements.map(p => p.id).filter(Boolean))]
+        const usedPatternIds = [...new Set(src.placements.map((p: PuzzlePlacement) => p.id).filter(Boolean))]
         // 把这些 pattern 注入 extraPatterns，让 image preload 流程能跑到（绕过 library 过滤）
         const extras = usedPatternIds
           .map(pid => getPatternById(pid))
-          .filter(Boolean)
+          .filter((p): p is Pattern => Boolean(p))
         if (extras.length > 0) {
           setExtraPatterns(prev => {
             const existing = new Set(prev.map(p => p.id))
             return [...prev, ...extras.filter(p => !existing.has(p.id))]
           })
         }
-        setPlacements(src.placements)
+        setPlacements(src.placements as PuzzlePlacement[])
       }
     })
     return () => { cancelled = true }
@@ -121,7 +128,7 @@ export default function PuzzlePage() {
         // top-left quadrant so we get a single corner; the four suggested
         // positions rotate this slice to fill all four corners symmetrically.
         const pat = getPatternById(p.id)
-        let processSrc = img
+        let processSrc: HTMLImageElement | HTMLCanvasElement = img
         if (pat?.type === '角花') {
           processSrc = sliceTopLeftQuadrant(img)
         }
@@ -135,7 +142,7 @@ export default function PuzzlePage() {
           const pat = getPatternById(p.id)
           const flexible = pat ? isFlexiblePattern(pat.type) : false
           shapeCache.current[p.id] = { ...shape, contour, flexible }
-        } catch (e) {
+        } catch {
           // Shape extraction can fail on degenerate images; fall back to no
           // collision data (block will be pass-through for collision tests)
         }
@@ -153,13 +160,13 @@ export default function PuzzlePage() {
 
   // Background prerendered once — paper color + noise texture + frame.
   // Redrawing 200 random fillRects every frame was a hot path during drag.
-  const bgCanvasRef = useRef(null)
+  const bgCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const getBackground = useCallback(() => {
     if (bgCanvasRef.current) return bgCanvasRef.current
     const c = document.createElement('canvas')
     c.width = CANVAS_SIZE
     c.height = CANVAS_SIZE
-    const cx = c.getContext('2d')
+    const cx = c.getContext('2d')!
     // 宣纸色 base — slightly cooler than the previous warm cream, reads
     // as paper rather than as parchment. Two-stop radial adds a faint
     // vignette so the center reads as the "page" and the corners recede.
@@ -189,7 +196,7 @@ export default function PuzzlePage() {
   // Shared scene renderer. Drawing happens in CANVAS_SIZE (1024) logical
   // space; the caller is responsible for any ctx.scale before calling.
   // Used by both on-screen redraw and high-DPI export.
-  const renderScene = useCallback((ctx, { drawSelection = false, drawGhosts = false } = {}) => {
+  const renderScene = useCallback((ctx: CanvasRenderingContext2D, { drawSelection = false, drawGhosts = false }: { drawSelection?: boolean; drawGhosts?: boolean } = {}) => {
     // Prerendered background (paper + texture + frame)
     ctx.drawImage(getBackground(), 0, 0)
 
@@ -285,6 +292,7 @@ export default function PuzzlePage() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
     renderScene(ctx, { drawSelection: true, drawGhosts: true })
   }, [renderScene])
 
@@ -292,14 +300,14 @@ export default function PuzzlePage() {
 
   // ── Canvas coordinates ───────────────────────────────
 
-  function canvasCoords(e) {
-    const rect = canvasRef.current.getBoundingClientRect()
+  function canvasCoords(e: React.PointerEvent<HTMLCanvasElement>) {
+    const rect = canvasRef.current!.getBoundingClientRect()
     return { x: (e.clientX - rect.left) / SCALE, y: (e.clientY - rect.top) / SCALE }
   }
 
   // ── Hit test (uses cached mask, no per-click getImageData) ────
 
-  function hitTestPixel(pos, p) {
+  function hitTestPixel(pos: { x: number; y: number }, p: PuzzlePlacement) {
     // Prefer the cached shape mask — no canvas readback, no warning.
     const shape = shapeCache.current[p.id]
     if (shape?.mask) {
@@ -325,7 +333,7 @@ export default function PuzzlePage() {
 
   // ── Canvas pointer events ────────────────────────────
 
-  const handleCanvasPointerDown = useCallback((e) => {
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = canvasCoords(e)
     let hitIdx = -1
     for (let i = placements.length - 1; i >= 0; i--) {
@@ -354,17 +362,17 @@ export default function PuzzlePage() {
     }
   }, [placements])
 
-  // RAF throttle: collapse multiple pointermove events per frame into one
+  // RAF throttle: collapses multiple pointermove events per frame into one
   // state update. Without this, high-frequency move events (120Hz on some
   // pointers) each trigger a full React re-render + canvas redraw.
-  const rafIdRef = useRef(null)
-  const pendingEvtRef = useRef(null)
+  const rafIdRef = useRef<number | null>(null)
+  const pendingEvtRef = useRef<React.PointerEvent<HTMLCanvasElement> | null>(null)
 
   useEffect(() => () => {
     if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current)
   }, [])
 
-  const handleCanvasPointerMove = useCallback((e) => {
+  const handleCanvasPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!dragging) return
     pendingEvtRef.current = e
     if (rafIdRef.current !== null) return
@@ -384,8 +392,8 @@ export default function PuzzlePage() {
 
         // B: edge snapping — attract to nearby static contours
         if (movingShape?.contour && movingShape.contour.length > 0) {
-          const statics = []
-          const fixeds = []
+          const statics: Array<{ contour: { x: number; y: number }[]; place: PuzzlePlacement; boundingRadius: number; idx: number }> = []
+          const fixeds: Array<{ place: PuzzlePlacement; boundingRadius: number }> = []
           for (let i = 0; i < next.length; i++) {
             if (i === drag.idx) continue
             const s = shapeCache.current[next[i].id]
@@ -466,14 +474,14 @@ export default function PuzzlePage() {
 
   // ── Tray drag to canvas ──────────────────────────────
 
-  const handleTrayPointerDown = useCallback((e, element) => {
+  const handleTrayPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>, element: Pattern) => {
     e.preventDefault()
     setDragFromTray({ element })
   }, [])
 
   useEffect(() => {
     if (!dragFromTray) return
-    const onMove = (e) => {
+    const onMove = (e: PointerEvent) => {
       const canvas = canvasRef.current
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
@@ -492,7 +500,7 @@ export default function PuzzlePage() {
       const baseSize = el.type === '角花' ? 140 : 280
       setPlacements(prev => {
         const withoutTemp = prev.filter(p => !p._temp)
-        const target = { id: el.id, x: pos.x, y: pos.y, size: baseSize, rotation: 0, scaleX: 1, scaleY: 1 }
+        const target: PuzzlePlacement = { id: el.id, x: pos.x, y: pos.y, size: baseSize, rotation: 0, scaleX: 1, scaleY: 1 }
         // Run the same collision+slide logic as canvas drag so the
         // incoming block respects existing placements instead of dropping
         // on top of them. draggingIdx points at the slot we're filling.
@@ -517,9 +525,9 @@ export default function PuzzlePage() {
         // 角花 → fan out into 4 symmetric corners
         if (isCorner) {
           const suggestions = getSuggestedPositions('角花', CANVAS_SIZE)
-          const newOnes = []
+          const newOnes: PuzzlePlacement[] = []
           for (const s of suggestions) {
-            const placement = {
+            const placement: PuzzlePlacement = {
               id: tempBlock.id,
               x: s.x,
               y: s.y,
@@ -575,16 +583,16 @@ export default function PuzzlePage() {
     setSelectedIdx(-1)
   }, [selectedIdx])
 
-  const rotateSelected = useCallback((deg) => {
+  const rotateSelected = useCallback((deg: number) => {
     if (selectedIdx < 0) return
     setPlacements(prev => {
       const next = [...prev]
-      next[selectedIdx] = { ...next[selectedIdx], rotation: (next[selectedIdx].rotation + deg) % 360 }
+      next[selectedIdx] = { ...next[selectedIdx], rotation: ((next[selectedIdx].rotation || 0) + deg) % 360 }
       return next
     })
   }, [selectedIdx])
 
-  const scaleSelected = useCallback((delta) => {
+  const scaleSelected = useCallback((delta: number) => {
     if (selectedIdx < 0) return
     setPlacements(prev => {
       const next = [...prev]
@@ -601,14 +609,14 @@ export default function PuzzlePage() {
     return 1024
   }, [placements.length])
 
-  const exportPNG = useCallback((size) => {
+  const exportPNG = useCallback((size: number) => {
     // Render to an offscreen canvas at the requested size, scaling the
     // logical 1024 scene up. Background bitmap gets stretched (slightly
     // soft texture) which is fine for print.
     const exportCanvas = document.createElement('canvas')
     exportCanvas.width = size
     exportCanvas.height = size
-    const ctx = exportCanvas.getContext('2d')
+    const ctx = exportCanvas.getContext('2d')!
     const scaleFactor = size / CANVAS_SIZE
     ctx.scale(scaleFactor, scaleFactor)
     renderScene(ctx, { drawSelection: false, drawGhosts: false })
@@ -643,12 +651,12 @@ export default function PuzzlePage() {
     const out = document.createElement('canvas')
     out.width = 1536
     out.height = 1536
-    const ctx = out.getContext('2d')
+    const ctx = out.getContext('2d')!
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
     // 直接 drawImage 把 1024 canvas 放大到 1536（背景纹理会被放大但视觉可接受）
     ctx.drawImage(src, 0, 0, 1536, 1536)
-    return new Promise(resolve => {
+    return new Promise<Blob | null>(resolve => {
       out.toBlob(resolve, 'image/webp', 0.92)
     })
   }, [])
@@ -671,18 +679,18 @@ export default function PuzzlePage() {
   // Apply a composition template: clear placements, materialize template
   // slots as placements, auto-fill from the user's library by type, mark
   // unmatched slots as empty placeholders.
-  const applyTemplate = useCallback((template) => {
+  const applyTemplate = useCallback((template: CompositionTemplate) => {
     // Group library patterns by type so multiple slots of the same type
     // pull distinct elements when available (e.g. 4 corner slots get 4
     // different 角花 if the user owns that many).
-    const patternsByType = new Map()
+    const patternsByType = new Map<string, Pattern[]>()
     for (const p of myPatterns) {
       if (!patternsByType.has(p.type)) patternsByType.set(p.type, [])
-      patternsByType.get(p.type).push(p)
+      patternsByType.get(p.type)!.push(p)
     }
-    const cursorByType = new Map()
+    const cursorByType = new Map<string, number>()
 
-    const newPlacements = template.slots.map(slot => {
+    const newPlacements: PuzzlePlacement[] = template.slots.map(slot => {
       const x = slot.x * CANVAS_SIZE
       const y = slot.y * CANVAS_SIZE
       const list = patternsByType.get(slot.typeConstraint) || []
@@ -1010,7 +1018,7 @@ export default function PuzzlePage() {
         userId={user?.id}
         placements={placements}
         coverBlob={publishCoverBlob}
-        forkedFrom={forkSource?.id || null}
+        forkedFrom={(forkSource?.id || null) as unknown as null | undefined}
         defaultTemplate={forkSource ? '复用' : '自由创作'}
         onPublished={() => {
           setShowPublish(false)
@@ -1026,7 +1034,7 @@ export default function PuzzlePage() {
           fontFamily: 'Noto Serif SC, serif', fontSize: 11, letterSpacing: '0.15em',
           boxShadow: '0 4px 16px rgba(196,30,58,0.4)', zIndex: 90,
         }}>
-          复 用 自 「{forkSource.title}」 · by {forkSource.author?.username || '匿名'}
+          复 用 自 「{forkSource.title}」 · by {(forkSource.author as { username?: string } | null | undefined)?.username || '匿名'}
         </div>
       )}
 
@@ -1054,13 +1062,22 @@ export default function PuzzlePage() {
 }
 
 // ── Export size options ─────────────────────────────────
-const EXPORT_SIZES = [
+const EXPORT_SIZES: Array<{ size: number; label: string; useCase: string }> = [
   { size: 1024, label: '标准', useCase: '屏幕分享 · 朋友圈/微信 · ~500KB' },
   { size: 2048, label: '高清', useCase: '小卡片/贴纸/手机壁纸 · ~2MB' },
   { size: 3072, label: '印刷', useCase: '明信片/马克杯/海报 · ~5MB · 300 DPI' },
 ]
 
-function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelect, onCancel, onConfirm }) {
+interface ExportSizeModalProps {
+  currentSize: number
+  recommendedSize: number
+  placementCount: number
+  onSelect: (size: number) => void
+  onCancel: () => void
+  onConfirm: () => void
+}
+
+function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelect, onCancel, onConfirm }: ExportSizeModalProps) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100,
@@ -1166,14 +1183,21 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
   )
 }
 
-function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
+interface TemplatePickerModalProps {
+  activeId: string | null
+  library: Pattern[]
+  onSelect: (template: CompositionTemplate) => void
+  onCancel: () => void
+}
+
+function TemplatePickerModal({ activeId, library, onSelect, onCancel }: TemplatePickerModalProps) {
   // For each template, count how many slots the user's library can fill
-  const coverage = (template) => {
-    const have = new Map()
+  const coverage = (template: CompositionTemplate) => {
+    const have = new Map<string, number>()
     for (const p of library) {
       have.set(p.type, (have.get(p.type) || 0) + 1)
     }
-    const need = new Map()
+    const need = new Map<string, number>()
     for (const s of template.slots) {
       need.set(s.typeConstraint, (need.get(s.typeConstraint) || 0) + 1)
     }
@@ -1274,7 +1298,7 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
   )
 }
 
-function pillStyle(active, accent) {
+function pillStyle(active: boolean, accent?: string): React.CSSProperties {
   const c = accent || '#F2D58A'
   return {
     padding: '5px 14px', borderRadius: 14, fontSize: 12, whiteSpace: 'nowrap',
@@ -1291,13 +1315,6 @@ function pillStyle(active, accent) {
   }
 }
 
-const btnStyle = {
-  padding: '5px 14px', borderRadius: 8, fontSize: 13,
-  background: 'rgba(255,255,255,0.04)',
-  color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
-  cursor: 'pointer', fontFamily: 'inherit',
-}
-
 // ── Shape-level collision helpers ─────────────────────
 // Mask is 64x64, mask[i] = 1 if pattern occupies that cell.
 // Placement in world space: x,y = center, size = side length, rotation in deg.
@@ -1308,24 +1325,24 @@ const btnStyle = {
 // this piece to fill all four canvas corners symmetrically.
 // Returns a 1/2 × 1/2 canvas (not original size) so the resulting mask
 // and outline tightly bound the single corner — no dead space.
-function sliceTopLeftQuadrant(img) {
+function sliceTopLeftQuadrant(img: HTMLImageElement): HTMLCanvasElement {
   const w = img.width, h = img.height
   const cw = Math.floor(w / 2), ch = Math.floor(h / 2)
   const c = document.createElement('canvas')
   c.width = cw
   c.height = ch
-  const cx = c.getContext('2d')
+  const cx = c.getContext('2d')!
   cx.drawImage(img, 0, 0, cw, ch, 0, 0, cw, ch)
   return c
 }
 
-function placementMaskRadius(shape, place) {
+function placementMaskRadius(shape: ShapeData | undefined, place: PuzzlePlacement): number {
   if (!shape) return place.size * 0.5 // fallback: full square bbox
   const scaleMax = Math.max(place.scaleX || 1, place.scaleY || 1)
   return shape.boundingRadius * place.size * 0.5 * scaleMax
 }
 
-function masksCollide(shapeA, placeA, shapeB, placeB) {
+function masksCollide(shapeA: ShapeData | undefined, placeA: PuzzlePlacement, shapeB: ShapeData | undefined, placeB: PuzzlePlacement): boolean {
   if (!shapeA || !shapeB) return false // skip if either has no shape data
   // Bounding circle pre-filter
   const rA = placementMaskRadius(shapeA, placeA)
@@ -1375,9 +1392,9 @@ function masksCollide(shapeA, placeA, shapeB, placeB) {
 // any other placement (excluding draggingIdx). Tries full move first;
 // if blocked, tries X-only slide so the block can glide horizontally
 // along another block's edge instead of getting stuck.
-function resolveMove(moved, placements, draggingIdx, shapeCacheRef) {
-  const shapeOf = (p) => shapeCacheRef.current[p.id]
-  const collidesAt = (test) => {
+function resolveMove(moved: PuzzlePlacement, placements: PuzzlePlacement[], draggingIdx: number, shapeCacheRef: React.MutableRefObject<Record<string, ShapeData>>): PuzzlePlacement {
+  const shapeOf = (p: PuzzlePlacement) => shapeCacheRef.current[p.id]
+  const collidesAt = (test: PuzzlePlacement) => {
     for (let i = 0; i < placements.length; i++) {
       if (i === draggingIdx) continue
       if (masksCollide(shapeOf(test), test, shapeOf(placements[i]), placements[i])) return true
@@ -1390,7 +1407,7 @@ function resolveMove(moved, placements, draggingIdx, shapeCacheRef) {
   return placements[draggingIdx] // cannot move
 }
 
-const ghostBtnStyle = {
+const ghostBtnStyle: React.CSSProperties = {
   padding: '6px 14px', borderRadius: 9, fontSize: 12,
   background: 'rgba(255,255,255,0.02)',
   color: '#A09682',
@@ -1401,7 +1418,7 @@ const ghostBtnStyle = {
   transition: 'all 0.2s',
 }
 
-const navBtnStyle = {
+const navBtnStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: 5,
   padding: '4px 10px', borderRadius: 12,
   background: 'rgba(255,255,255,0.02)',
@@ -1412,7 +1429,7 @@ const navBtnStyle = {
   transition: 'all 0.2s',
 }
 
-const iconBtnStyle = {
+const iconBtnStyle: React.CSSProperties = {
   width: 34, height: 34, borderRadius: 9,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'linear-gradient(145deg, #1F1D17, #14120D)',
