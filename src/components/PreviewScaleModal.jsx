@@ -88,7 +88,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
         }
       } catch {}
     }
-    navigate('/editor')
+    navigate('/create?mode=preview&sub=relief')
   }, [imageUrl, placements, navigate])
 
   const goToShowcase = useCallback(() => {
@@ -140,12 +140,12 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
           ctx.restore()
           sessionStorage.setItem('showcase_image', canvas.toDataURL('image/png'))
         } catch {}
-        navigate('/showcase')
+        navigate('/create?mode=preview&sub=shatter')
       }
-      img.onerror = () => navigate('/showcase')
+      img.onerror = () => navigate('/create?mode=preview&sub=shatter')
       img.src = imageUrl
     } catch {
-      navigate('/showcase')
+      navigate('/create?mode=preview&sub=shatter')
     }
   }, [imageUrl, placements, scale, rotation, navigate])
 

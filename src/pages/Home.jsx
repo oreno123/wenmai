@@ -570,7 +570,7 @@ export default function Home() {
                         sessionStorage.setItem('showcase_image', c.image)
                         sessionStorage.removeItem('showcase_placements')
                       }
-                      navigate('/showcase')
+                      navigate('/create?mode=preview&sub=shatter')
                     } catch {}
                   }} style={{
                     position: 'relative',
