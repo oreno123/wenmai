@@ -22,6 +22,7 @@ export const SERIES_THEMES: Record<string, SeriesTheme> = {
     decoration: 'seal',
     cardBorder: 'ink-line',
     textGlow: true,
+    shader: 'fluid',
   },
   dragon: {
     id: 'dragon',
@@ -33,6 +34,7 @@ export const SERIES_THEMES: Record<string, SeriesTheme> = {
     decoration: 'seal',
     cardBorder: 'gold-line',
     textGlow: true,
+    silkCanvas: true,
   },
   taotie: {
     id: 'taotie',
@@ -66,6 +68,7 @@ export const SERIES_THEMES: Record<string, SeriesTheme> = {
     decoration: 'cloud',
     cardBorder: 'soft',
     textGlow: false,
+    shader: 'cloud',
   },
   floral: {
     id: 'floral',
