@@ -51,4 +51,16 @@ describe('SeriesSkin', () => {
     render(<SeriesSkin series="geometric"><div>Content</div></SeriesSkin>)
     expect(screen.queryByTestId('mock-particles')).not.toBeInTheDocument()
   })
+
+  it('does not render particle layer in subtle intensity', () => {
+    render(<SeriesSkin series="qinghua" intensity="subtle"><div>Content</div></SeriesSkin>)
+    expect(screen.queryByTestId('mock-particles')).not.toBeInTheDocument()
+  })
+
+  it('renders series-bg-layer slot when intensity is full', () => {
+    const { container } = render(<SeriesSkin series="qinghua"><div>Content</div></SeriesSkin>)
+    // The bg-layer slot should exist for future shader use
+    const bgLayer = container.querySelector('.series-bg-layer')
+    expect(bgLayer).toBeInTheDocument()
+  })
 })
