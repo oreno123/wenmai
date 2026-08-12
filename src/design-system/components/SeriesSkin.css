@@ -1,0 +1,20 @@
+.ds-series-skin {
+  position: relative;
+  background: var(--color-bg-base);
+  color: var(--series-text);
+}
+.ds-series-skin.intensity-full {
+  background: var(--series-bg);
+}
+.ds-series-skin.intensity-subtle {
+  background: var(--series-bg);
+  opacity: 0.5;
+}
+.ds-series-skin.intensity-minimal {
+  /* CSS variables only — background controlled by parent */
+}
+.series-bg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
