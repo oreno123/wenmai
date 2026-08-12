@@ -37,7 +37,7 @@ export interface GalleryWork {
   placements: unknown  // 来自 supabase 的 JSON 字符串；页面不深度解析
   template?: string | null
   series?: string | null
-  author: { id: string; username: string } | null
+  author: { user_id: string; username: string } | null
   forked_from?: string | null
   source?: GalleryWork | null  // fork 详情页用的源作品
   likes_count: number
