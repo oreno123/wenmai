@@ -16,6 +16,7 @@ export interface SeriesSkinProps {
   intensity?: SeriesIntensity
   children: ReactNode
   className?: string
+  style?: CSSProperties
 }
 
 export default function SeriesSkin({
@@ -23,6 +24,7 @@ export default function SeriesSkin({
   intensity = 'full',
   children,
   className = '',
+  style,
 }: SeriesSkinProps) {
   const theme = getSeriesTheme(series)
   const wrapperStyle = {
@@ -40,7 +42,7 @@ export default function SeriesSkin({
   ].filter(Boolean).join(' ')
 
   return (
-    <div className={cls} style={wrapperStyle}>
+    <div className={cls} style={{ ...wrapperStyle, ...style }}>
       {intensity === 'full' && (
         <div className="series-bg-layer" aria-hidden />
       )}
