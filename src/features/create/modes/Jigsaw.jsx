@@ -2,9 +2,9 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   generatePuzzle, drawPiece, findSnap, hitTestPiece, generateThumbnail,
-} from '../engine/jigsawEngine'
-import { PATTERN_LIBRARY, getPatternImage } from '../store/patternData'
-import PatternImage from '../components/common/PatternImage'
+} from '../../../engine/jigsawEngine'
+import { PATTERN_LIBRARY, getPatternImage } from '../../../store/patternData'
+import PatternImage from '../../../components/common/PatternImage'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -16,7 +16,7 @@ const GRID_OPTIONS = [
   { rows: 3, cols: 4, label: '3×4' },
 ]
 
-export default function JigsawPage() {
+export default function Jigsaw() {
   const canvasRef = useRef(null)
   const navigate = useNavigate()
   const offscreenRef = useRef(null) // scaled source image

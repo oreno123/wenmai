@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
-import { useApp } from '../store/AppState'
-import { getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
-import PatternImage from '../components/common/PatternImage'
-import ReliefScene from '../components/relief/ReliefScene'
+import { useApp } from '../../../store/AppState'
+import { getPatternById, getPatternImage, getRarityLabel } from '../../../store/patternData'
+import PatternImage from '../../../components/common/PatternImage'
+import ReliefScene from '../../../components/relief/ReliefScene'
 
 const RARITY_COLOR = {
   ssr: '#C9A23C',
@@ -16,7 +16,7 @@ const RARITY_COLOR = {
 const SERIES_ORDER = ['cloud', 'taotie', 'dragon', 'scroll', 'floral', 'geometric', 'corner', 'tile', 'shanjing', 'qinghua']
 const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
 
-export default function Editor() {
+export default function Relief() {
   const { data } = useApp()
   const [selectedPattern, setSelectedPattern] = useState(data.library[0] || null)
 

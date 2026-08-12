@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useSearchParams } from 'react-router-dom'
 import CreatePage from '../CreatePage'
 
 vi.mock('../../../pages/PuzzlePage', () => ({
@@ -9,11 +9,27 @@ vi.mock('../../../pages/PuzzlePage', () => ({
 }))
 vi.mock('../modes/GuidedMode', () => ({
   __esModule: true,
-  default: () => <div data-testid="guided-mode">GuidedMode</div>,
+  default: () => {
+    const [sp] = useSearchParams()
+    const sub = sp.get('sub') ?? 'symmetry'
+    return (
+      <div data-testid={`guided-${sub}`}>
+        GuidedMode ({sub})
+      </div>
+    )
+  },
 }))
 vi.mock('../modes/PreviewMode', () => ({
   __esModule: true,
-  default: () => <div data-testid="preview-mode">PreviewMode</div>,
+  default: () => {
+    const [sp] = useSearchParams()
+    const sub = sp.get('sub') ?? 'relief'
+    return (
+      <div data-testid={`preview-${sub}`}>
+        PreviewMode ({sub})
+      </div>
+    )
+  },
 }))
 
 function renderAt(path: string) {
@@ -39,19 +55,19 @@ describe('CreatePage', () => {
 
   it('renders GuidedMode when mode=guided', async () => {
     const { findByTestId } = renderAt('/create?mode=guided')
-    expect(await findByTestId('guided-mode')).toBeTruthy()
+    expect(await findByTestId('guided-symmetry')).toBeTruthy()
   })
 
   it('renders PreviewMode when mode=preview', async () => {
     const { findByTestId } = renderAt('/create?mode=preview')
-    expect(await findByTestId('preview-mode')).toBeTruthy()
+    expect(await findByTestId('preview-relief')).toBeTruthy()
   })
 
   it('falls back to FreeMode when mode is unknown', async () => {
     const { findByTestId, queryByTestId } = renderAt('/create?mode=garbage')
     expect(await findByTestId('free-mode')).toBeTruthy()
-    expect(queryByTestId('guided-mode')).toBeNull()
-    expect(queryByTestId('preview-mode')).toBeNull()
+    expect(queryByTestId('guided-symmetry')).toBeNull()
+    expect(queryByTestId('preview-relief')).toBeNull()
   })
 
   it('renders 3 mode tabs', () => {
@@ -60,5 +76,27 @@ describe('CreatePage', () => {
       ['自', '引', '预'].some((t) => b.textContent?.includes(t)),
     )
     expect(tabs.length).toBeGreaterThanOrEqual(3)
+  })
+})
+
+describe('CreatePage sub-modes', () => {
+  it('guided mode defaults to symmetry when no sub', async () => {
+    const { findByTestId } = renderAt('/create?mode=guided')
+    expect(await findByTestId('guided-symmetry')).toBeTruthy()
+  })
+
+  it('guided mode switches to jigsaw when sub=jigsaw', async () => {
+    const { findByTestId } = renderAt('/create?mode=guided&sub=jigsaw')
+    expect(await findByTestId('guided-jigsaw')).toBeTruthy()
+  })
+
+  it('preview mode defaults to relief when no sub', async () => {
+    const { findByTestId } = renderAt('/create?mode=preview')
+    expect(await findByTestId('preview-relief')).toBeTruthy()
+  })
+
+  it('preview mode switches to shatter when sub=shatter', async () => {
+    const { findByTestId } = renderAt('/create?mode=preview&sub=shatter')
+    expect(await findByTestId('preview-shatter')).toBeTruthy()
   })
 })

@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../engine/componentLibrary'
-import { useApp } from '../store/AppState'
-import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
-import { createOutlinedBlock } from '../utils/blockOutline'
+import { COMPONENT_LIBRARY, drawComponentOnCanvas, getComponentSVG } from '../../../engine/componentLibrary'
+import { useApp } from '../../../store/AppState'
+import ELEMENT_MANIFEST from '../../../../public/elements/manifest.json'
+import { createOutlinedBlock } from '../../../utils/blockOutline'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380

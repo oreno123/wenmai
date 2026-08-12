@@ -1,8 +1,8 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import ShatterScene from '../showcase/ShatterScene'
-import useHandGesture from '../showcase/useHandGesture'
-import { BG_COLOR } from '../showcase/constants'
+import ShatterScene from '../../../showcase/ShatterScene'
+import useHandGesture from '../../../showcase/useHandGesture'
+import { BG_COLOR } from '../../../showcase/constants'
 
 const HAND_CONNECTIONS = [
   [0,1],[1,2],[2,3],[3,4],
@@ -107,7 +107,7 @@ function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
   )
 }
 
-export default function Showcase() {
+export default function Shatter() {
   const { isOpen, isFist, isReady, error, allLandmarks, videoEl } = useHandGesture()
   const [userImage, setUserImage] = useState(null)
   const [placements, setPlacements] = useState(null)
