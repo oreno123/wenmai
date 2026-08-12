@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { renderLegacyRedirects } from './LegacyRedirects'
 
 const SplashPage = lazy(() => import('../pages/SplashPage'))
 const AuthPage = lazy(() => import('../pages/AuthPage'))
@@ -47,6 +48,7 @@ export default function AppRoutes({ children }: AppRoutesProps = {}) {
       {children}
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {renderLegacyRedirects()}
           <Route path="/" element={<SplashPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/landing" element={<Landing />} />

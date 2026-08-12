@@ -88,4 +88,14 @@ describe('AppRoutes', () => {
     await renderAt('/this-does-not-exist')
     expect(await screen.findByTestId('splash')).toBeTruthy()
   })
+
+  it('redirects /puzzle to /create (legacy)', () => {
+    renderAt('/puzzle')
+    expect(screen.findByTestId('create')).toBeTruthy()
+  })
+
+  it('redirects /qinghua to /library (legacy)', () => {
+    renderAt('/qinghua')
+    expect(screen.findByTestId('library')).toBeTruthy()
+  })
 })
