@@ -1,19 +1,36 @@
 import { useRef, useState, useEffect } from 'react'
+import type { MouseEvent } from 'react'
 import { motion } from 'framer-motion'
+import type { Variants } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppState'
+import type { GameData } from '../store/gameStore'
 import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
 import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
 
-const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
-const fadeUp = {
+type Creation = GameData['creations'][number]
+type FeatureName = 'camera' | 'compose' | 'puzzle' | 'cube' | 'hand' | 'gallery'
+
+const stagger: Variants = { animate: { transition: { staggerChildren: 0.1 } } }
+const fadeUp: Variants = {
   initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 }
 
+interface StoryChapter {
+  key: string
+  num: string
+  cn: string
+  en: string
+  desc: string
+  cta: string
+  path: string
+  deco: React.ReactNode
+}
+
 // ── 故事旅程 4 章节 ──
-const STORY_CHAPTERS = [
+const STORY_CHAPTERS: StoryChapter[] = [
   {
     key: 'see', num: '壹', cn: '看 见', en: 'SEE',
     desc: '千年纹样触手可及',
@@ -62,7 +79,7 @@ const STORY_CHAPTERS = [
 ]
 
 /* 云雷纹简化 SVG */
-function CloudPattern({ size = 44, opacity = 0.85 }) {
+function CloudPattern({ size = 44, opacity = 0.85 }: { size?: number; opacity?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" style={{ opacity }}>
       <circle cx="24" cy="24" r="18" stroke="#D4AF6A" strokeWidth="0.8" />
@@ -78,8 +95,16 @@ function CloudPattern({ size = 44, opacity = 0.85 }) {
 }
 
 /* 五入口图标 — 线条 SVG，统一风格 */
-function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
-  const icons = {
+function FeatureIcon({
+  name,
+  size = 22,
+  color = '#F2D58A',
+}: {
+  name: FeatureName
+  size?: number
+  color?: string
+}) {
+  const icons: Record<FeatureName, React.ReactNode> = {
     camera: (
       <>
         <path d="M3 7h3l2-3h8l2 3h3v12H3V7z" />
@@ -133,8 +158,8 @@ export default function Home() {
   const { user } = useAuth()
   const series = getAllSeries()
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
-  const creationsRef = useRef(null)
-  const [deleteTarget, setDeleteTarget] = useState(null)
+  const creationsRef = useRef<HTMLDivElement>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Creation | null>(null)
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0]
 
   const scrollToCreations = () => {
@@ -178,11 +203,11 @@ export default function Home() {
                 letterSpacing: '0.08em',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => {
                 e.currentTarget.style.background = 'rgba(212,175,106,0.15)'
                 e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => {
                 e.currentTarget.style.background = 'rgba(212,175,106,0.08)'
                 e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
               }}
@@ -367,12 +392,12 @@ export default function Home() {
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                   }}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
                     e.currentTarget.style.transform = 'translateY(-3px)'
                     e.currentTarget.style.borderColor = 'rgba(212,175,106,0.55)'
                     e.currentTarget.style.boxShadow = '0 10px 24px rgba(0,0,0,0.45), 0 0 18px rgba(212,175,106,0.15)'
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                     e.currentTarget.style.transform = 'translateY(0)'
                     e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
                     e.currentTarget.style.boxShadow = 'none'
@@ -453,11 +478,11 @@ export default function Home() {
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
                 e.currentTarget.style.background = 'rgba(188,31,40,0.12)'
                 e.currentTarget.style.borderColor = 'rgba(188,31,40,0.5)'
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                 e.currentTarget.style.background = 'rgba(188,31,40,0.06)'
                 e.currentTarget.style.borderColor = 'rgba(188,31,40,0.28)'
               }}
@@ -485,12 +510,12 @@ export default function Home() {
           <motion.div variants={stagger} initial="initial" animate="animate"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 14 }}
           >
-            {[
+            {([
               { icon: 'camera', label: '找相似', path: '/photo-match' },
               { icon: 'puzzle', label: '经典拼图', path: '/create?mode=guided' },
               { icon: 'hand', label: '手势展示', path: '/create?mode=preview' },
               { icon: 'compose', label: '自由拼', path: '/create' },
-            ].map((item, i) => (
+            ] as { icon: FeatureName; label: string; path: string }[]).map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
                 <div style={{
@@ -501,11 +526,11 @@ export default function Home() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.25s ease',
                 }}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
                     e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                     e.currentTarget.style.transform = 'translateY(0)'
                     e.currentTarget.style.borderColor = 'rgba(212,175,106,0.15)'
                   }}
@@ -580,11 +605,11 @@ export default function Home() {
                     cursor: 'pointer',
                     transition: 'transform 0.2s, border-color 0.2s',
                   }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
                       e.currentTarget.style.transform = 'scale(1.03)'
                       e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                       e.currentTarget.style.transform = 'scale(1)'
                       e.currentTarget.style.borderColor = 'rgba(212,175,106,0.18)'
                     }}
@@ -593,7 +618,7 @@ export default function Home() {
                     {/* Delete button — top-right × ; stops propagation so the
                         card's "open in Showcase" click doesn't fire */}
                     <button
-                      onClick={(e) => {
+                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation()
                         setDeleteTarget(c)
                       }}
@@ -613,8 +638,8 @@ export default function Home() {
                         opacity: 0.7,
                         transition: 'opacity 0.2s',
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
+                      onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.opacity = '1' }}
+                      onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.opacity = '0.7' }}
                     >×</button>
                   </div>
                 ))}
@@ -636,7 +661,7 @@ export default function Home() {
               >
                 <motion.div
                   initial={{ scale: 0.9, y: 12 }} animate={{ scale: 1, y: 0 }}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
                   style={{
                     width: '100%', maxWidth: 280,
                     padding: '22px 22px 18px',
@@ -743,8 +768,13 @@ export default function Home() {
   )
 }
 
-function SeriesCarousel({ series, navigate }) {
-  const ref = useRef(null)
+interface SeriesCarouselProps {
+  series: import('../store/patternData').SeriesWithPatterns
+  navigate: (path: string) => void
+}
+
+function SeriesCarousel({ series, navigate }: SeriesCarouselProps) {
+  const ref = useRef<HTMLDivElement>(null)
   const [paused, setPaused] = useState(false)
 
   // Auto-scroll loop — duplicates the items enough times to fill ≥2 screens
@@ -752,7 +782,7 @@ function SeriesCarousel({ series, navigate }) {
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    let raf
+    let raf: number | undefined
     const speed = 0.4
     const tick = () => {
       if (!paused) {
@@ -763,7 +793,7 @@ function SeriesCarousel({ series, navigate }) {
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => { if (raf !== undefined) cancelAnimationFrame(raf) }
   }, [paused])
 
   if (!series.patterns.length) return null
@@ -817,11 +847,11 @@ function SeriesCarousel({ series, navigate }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'transform 0.2s, border-color 0.2s',
               }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
                   e.currentTarget.style.borderColor = series.color + '55'
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                   e.currentTarget.style.transform = 'translateY(0)'
                   e.currentTarget.style.borderColor = series.color + '22'
                 }}
