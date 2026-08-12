@@ -18,3 +18,7 @@
   inset: 0;
   pointer-events: none;
 }
+.ds-series-skin > *:not(.ds-particle-layer) {
+  position: relative;
+  z-index: 1;
+}

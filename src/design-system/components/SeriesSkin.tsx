@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { SeriesIntensity } from '../../types/series-theme'
 import { getSeriesTheme } from '../series/themes'
+import { ParticleLayer } from '../visual/ParticleLayer'
 import './SeriesSkin.css'
 
 export interface SeriesSkinProps {
@@ -35,6 +36,9 @@ export default function SeriesSkin({
     <div className={cls} style={wrapperStyle}>
       {intensity === 'full' && (
         <div className="series-bg-layer" aria-hidden />
+      )}
+      {intensity === 'full' && theme.particle !== 'none' && (
+        <ParticleLayer type={theme.particle} />
       )}
       {children}
     </div>
