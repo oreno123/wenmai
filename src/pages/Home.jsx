@@ -487,9 +487,9 @@ export default function Home() {
           >
             {[
               { icon: 'camera', label: '找相似', path: '/photo-match' },
-              { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
-              { icon: 'hand', label: '手势展示', path: '/showcase' },
-              { icon: 'compose', label: '自由拼', path: '/puzzle' },
+              { icon: 'puzzle', label: '经典拼图', path: '/create?mode=guided' },
+              { icon: 'hand', label: '手势展示', path: '/create?mode=preview' },
+              { icon: 'compose', label: '自由拼', path: '/create' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
