@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap');
 @import "tailwindcss";
+@import "./design-system/tokens/colors.css";
+@import "./design-system/tokens/typography.css";
+@import "./design-system/tokens/spacing.css";
+@import "./design-system/tokens/shadows.css";
 @import "./styles/gacha-animations.css";
 
 @theme {

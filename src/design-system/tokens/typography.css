@@ -1,0 +1,24 @@
+/* src/design-system/tokens/typography.css */
+:root {
+  --font-serif: 'Noto Serif SC', 'STSong', Georgia, serif;
+  --font-display: 'Noto Serif SC', 'STSong', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-seal: 'Ma Shan Zheng', 'STKaiti', cursive;
+
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+  --text-display: 56px;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-loose: 1.8;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em;
+  --tracking-wider: 0.2em;
+}

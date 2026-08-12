@@ -1,0 +1,24 @@
+/* src/design-system/tokens/colors.css */
+:root {
+  /* 基座 */
+  --color-bg-base: #0F0F10;
+  --color-bg-elevated: #1A1A1C;
+  --color-bg-card: #1F1F22;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* 文字 */
+  --color-text-primary: #F5F1E8;
+  --color-text-secondary: #8A8A8A;
+  --color-text-dim: #4A4A4A;
+
+  /* 强调（由 SeriesSkin 注入） */
+  --color-accent: #D4AF6A;
+  --color-accent-soft: rgba(212, 175, 106, 0.2);
+  --color-accent-text: #F5E7B8;
+
+  /* 状态 */
+  --color-success: #98FB98;
+  --color-warning: #FFD700;
+  --color-danger: #C41E3A;
+}
