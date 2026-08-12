@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { AppProviders } from './providers'
 import AppRoutes from './Routes'
 import BottomNav from './BottomNav'
+import { SeriesSkinLayer } from './SeriesSkinLayer'
 import { useApp } from '../store/AppState'
 import { useAuth } from '../lib/auth'
 import { setSyncUser } from '../store/gameStore'
@@ -43,7 +44,9 @@ function Layout() {
       <Suspense fallback={null}>
         <GoldBackground />
       </Suspense>
-      <AppRoutes />
+      <SeriesSkinLayer>
+        <AppRoutes />
+      </SeriesSkinLayer>
       {showNav && <BottomNav />}
     </>
   )

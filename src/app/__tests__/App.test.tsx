@@ -44,6 +44,17 @@ vi.mock('../../components/common/GoldBackground', () => ({
   default: () => <div data-testid="gold-bg" />,
 }))
 
+// App now wraps routes in SeriesSkinLayer, which pulls in the design-system
+// barrel (re-exports visual/* including LottieAsset → lottie-react →
+// lottie-web). lottie-web touches the canvas API at module eval time and
+// crashes under jsdom. Stub the animation deps before App imports them.
+vi.mock('lottie-react', () => ({
+  default: () => <div data-testid="mock-lottie" />,
+}))
+vi.mock('@tsparticles/react', () => ({
+  default: () => <div data-testid="mock-particles" />,
+}))
+
 describe('App', () => {
   it('renders SplashPage at / without BottomNav', async () => {
     window.history.pushState({}, '', '/')
