@@ -96,4 +96,62 @@ describe('SeriesSkinLayer', () => {
     const skin = container.querySelector('.ds-series-skin')
     expect(skin?.classList.contains('series-dragon')).toBe(true)
   })
+
+  it('falls through to neutral for unmapped paths and still mounts skin', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/unmapped']}>
+        <Routes>
+          <Route
+            path="/unmapped"
+            element={
+              <SeriesSkinLayer>
+                <div>unmapped</div>
+              </SeriesSkinLayer>
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    )
+    const skin = container.querySelector('.ds-series-skin')
+    expect(skin?.classList.contains('series-neutral')).toBe(true)
+  })
+
+  it('does NOT match prefix without slash boundary (/libraryfoo falls through to neutral)', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/libraryfoo']}>
+        <Routes>
+          <Route
+            path="/libraryfoo"
+            element={
+              <SeriesSkinLayer>
+                <div>libfoo</div>
+              </SeriesSkinLayer>
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    )
+    // /libraryfoo should NOT match /library — falls through to default 'neutral'
+    const skin = container.querySelector('.ds-series-skin')
+    expect(skin).not.toBeNull()
+    expect(skin?.classList.contains('series-neutral')).toBe(true)
+  })
+
+  it('skips skin for /admin paths', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/admin/review']}>
+        <Routes>
+          <Route
+            path="/admin/review"
+            element={
+              <SeriesSkinLayer>
+                <div>admin</div>
+              </SeriesSkinLayer>
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    )
+    expect(container.querySelector('.ds-series-skin')).toBeNull()
+  })
 })

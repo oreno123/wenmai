@@ -6,7 +6,6 @@ export const SERIES_ROUTE_MAP: Record<string, SeriesId> = {
   '/create': 'neutral',
   '/gallery': 'neutral',
   '/work': 'neutral',
-  '/auth': 'neutral',
   '/photo-match': 'neutral',
   '/gacha': 'dragon',
 }
@@ -24,7 +23,7 @@ export function resolveSeriesForPath(pathname: string): SeriesId {
   if (shouldSkipSkin(pathname)) return 'neutral'
   const sortedKeys = Object.keys(SERIES_ROUTE_MAP).sort((a, b) => b.length - a.length)
   for (const key of sortedKeys) {
-    if (pathname === key || pathname.startsWith(key + '/') || pathname.startsWith(key)) {
+    if (pathname === key || pathname.startsWith(key + '/')) {
       return SERIES_ROUTE_MAP[key]
     }
   }
