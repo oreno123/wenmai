@@ -6,8 +6,9 @@ import { ParticleLayer } from '../visual/ParticleLayer'
 import { DecorationLayer } from '../visual/DecorationLayer'
 import './SeriesSkin.css'
 
-// Lazy-loaded so Three.js + shader only ship when a cloud-themed series renders.
+// Lazy-loaded so Three.js + shader only ship when a shader-themed series renders.
 const CloudShader = lazy(() => import('../../shaders/CloudShaderComponent'))
+const FluidShader = lazy(() => import('../../shaders/FluidShaderComponent'))
 
 export interface SeriesSkinProps {
   series: string
@@ -51,6 +52,11 @@ export default function SeriesSkin({
       {intensity === 'full' && theme.shader === 'cloud' && (
         <Suspense fallback={null}>
           <CloudShader />
+        </Suspense>
+      )}
+      {intensity === 'full' && theme.shader === 'fluid' && (
+        <Suspense fallback={null}>
+          <FluidShader />
         </Suspense>
       )}
       {children}
