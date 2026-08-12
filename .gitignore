@@ -26,3 +26,6 @@ dist-ssr
 # Python
 __pycache__/
 *.pyc
+
+# Claude Code local settings (per-user, not for repo)
+.claude/settings.local.json
