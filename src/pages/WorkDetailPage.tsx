@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
+import type { CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { getWork, listForksOf, toggleLike, hasLiked } from '../lib/galleryApi'
+import type { GalleryWork } from '../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // WorkDetailPage — /work/:id
@@ -10,13 +12,13 @@ import { getWork, listForksOf, toggleLike, hasLiked } from '../lib/galleryApi'
 
 export default function WorkDetailPage() {
   const navigate = useNavigate()
-  const { id: workId } = useParams()
+  const { id: workId } = useParams<{ id: string }>()
   const { user } = useAuth()
 
-  const [work, setWork] = useState(null)
-  const [forks, setForks] = useState([])
+  const [work, setWork] = useState<GalleryWork | null>(null)
+  const [forks, setForks] = useState<GalleryWork[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [liked, setLiked] = useState(false)
   const [likeDelta, setLikeDelta] = useState(0)
 
@@ -28,9 +30,9 @@ export default function WorkDetailPage() {
         setError(error?.message || '作品不存在')
         setWork(null)
       } else {
-        setWork(data)
+        setWork(data as unknown as GalleryWork)
         // 拉 fork 列表
-        listForksOf(workId).then(({ data: forks }) => setForks(forks || []))
+        listForksOf(workId).then(({ data: forks }) => setForks((forks as unknown as GalleryWork[]) || []))
         // 拉是否已点赞
         if (user) hasLiked(workId, user.id).then(setLiked)
       }
@@ -174,7 +176,8 @@ export default function WorkDetailPage() {
 
 // ── 子组件 ────────────────────────────────────────────────
 
-function StatCell({ num, label }) {
+interface StatCellProps { num: number; label: string }
+function StatCell({ num, label }: StatCellProps) {
   return (
     <div style={statCellStyle}>
       <div style={statNumStyle}>{(num || 0).toLocaleString()}</div>
@@ -185,7 +188,7 @@ function StatCell({ num, label }) {
 
 // ── 样式 ──────────────────────────────────────────────────
 
-const pageStyle = {
+const pageStyle: CSSProperties = {
   minHeight: '100vh',
   background: '#0A0806',
   color: '#F2EBDB',
@@ -194,13 +197,13 @@ const pageStyle = {
   paddingTop: 80,
 }
 
-const backBarStyle = {
+const backBarStyle: CSSProperties = {
   maxWidth: 1400,
   margin: '0 auto',
   padding: '0 48px 24px',
 }
 
-const backBtnStyle = {
+const backBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
@@ -211,7 +214,7 @@ const backBtnStyle = {
   letterSpacing: '0.1em',
 }
 
-const containerStyle = {
+const containerStyle: CSSProperties = {
   maxWidth: 1400,
   margin: '0 auto',
   padding: '0 48px 80px',
@@ -220,13 +223,13 @@ const containerStyle = {
   gap: 64,
 }
 
-const leftColStyle = {
+const leftColStyle: CSSProperties = {
   position: 'sticky',
   top: 100,
   alignSelf: 'start',
 }
 
-const coverWrapStyle = {
+const coverWrapStyle: CSSProperties = {
   position: 'relative',
   width: '100%',
   aspectRatio: '1/1',
@@ -235,13 +238,13 @@ const coverWrapStyle = {
   boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
 }
 
-const coverImgStyle = {
+const coverImgStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
 }
 
-const coverFallbackStyle = {
+const coverFallbackStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'flex',
@@ -252,7 +255,7 @@ const coverFallbackStyle = {
   color: '#8B6F1F',
 }
 
-const rarityTagStyle = {
+const rarityTagStyle: CSSProperties = {
   position: 'absolute',
   top: 14, left: 14,
   fontFamily: "'Noto Serif SC', serif",
@@ -264,7 +267,7 @@ const rarityTagStyle = {
   letterSpacing: '0.15em',
 }
 
-const seriesTagStyle = {
+const seriesTagStyle: CSSProperties = {
   position: 'absolute',
   top: 14, right: 14,
   fontFamily: "'Noto Serif SC', serif",
@@ -275,13 +278,13 @@ const seriesTagStyle = {
   letterSpacing: '0.15em',
 }
 
-const actionsStyle = {
+const actionsStyle: CSSProperties = {
   display: 'flex',
   gap: 12,
   marginTop: 24,
 }
 
-const reuseBtnStyle = {
+const reuseBtnStyle: CSSProperties = {
   flex: 2,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
@@ -295,7 +298,7 @@ const reuseBtnStyle = {
   transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
 }
 
-const likeBtnStyle = (liked) => ({
+const likeBtnStyle = (liked: boolean): CSSProperties => ({
   flex: 1,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
@@ -308,12 +311,12 @@ const likeBtnStyle = (liked) => ({
   fontWeight: 400,
 })
 
-const rightColStyle = {
+const rightColStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
 }
 
-const titleStyle = {
+const titleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 'clamp(32px, 4vw, 48px)',
   fontWeight: 500,
@@ -324,7 +327,7 @@ const titleStyle = {
   marginTop: 0,
 }
 
-const metaStyle = {
+const metaStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 12,
@@ -334,10 +337,10 @@ const metaStyle = {
   color: '#A89580',
 }
 
-const metaItemStyle = {}
-const metaDotStyle = { color: '#6B5C45' }
+const metaItemStyle: CSSProperties = {}
+const metaDotStyle: CSSProperties = { color: '#6B5C45' }
 
-const authorCardStyle = {
+const authorCardStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 16,
@@ -347,7 +350,7 @@ const authorCardStyle = {
   marginBottom: 32,
 }
 
-const avatarStyle = {
+const avatarStyle: CSSProperties = {
   width: 48,
   height: 48,
   borderRadius: '50%',
@@ -361,7 +364,7 @@ const avatarStyle = {
   fontWeight: 500,
 }
 
-const authorNameStyle = {
+const authorNameStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 18,
   color: '#F2EBDB',
@@ -369,14 +372,14 @@ const authorNameStyle = {
   letterSpacing: '0.05em',
 }
 
-const authorMetaStyle = {
+const authorMetaStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
   color: '#6B5C45',
   marginTop: 4,
 }
 
-const statsRowStyle = {
+const statsRowStyle: CSSProperties = {
   display: 'flex',
   gap: 0,
   borderTop: '1px solid rgba(212,175,55,0.18)',
@@ -384,15 +387,17 @@ const statsRowStyle = {
   marginBottom: 32,
 }
 
+// 原 .jsx 中含 `':last-child'` 伪类键，CSSProperties 不允许，但运行时无害。
+// 用 cast 把这个特殊键保留，避免破坏既有视觉。
 const statCellStyle = {
   flex: 1,
   padding: '20px 0',
   textAlign: 'center',
   borderRight: '1px solid rgba(212,175,55,0.18)',
   ':last-child': { borderRight: 'none' },
-}
+} as CSSProperties
 
-const statNumStyle = {
+const statNumStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontSize: 32,
   fontWeight: 300,
@@ -400,7 +405,7 @@ const statNumStyle = {
   lineHeight: 1,
 }
 
-const statLabelStyle = {
+const statLabelStyle: CSSProperties = {
   fontFamily: "'Outfit', sans-serif",
   fontSize: 10,
   letterSpacing: '0.22em',
@@ -409,11 +414,11 @@ const statLabelStyle = {
   marginTop: 8,
 }
 
-const forkSourceStyle = {
+const forkSourceStyle: CSSProperties = {
   marginBottom: 32,
 }
 
-const forkSourceLabelStyle = {
+const forkSourceLabelStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 11,
   letterSpacing: '0.3em',
@@ -421,7 +426,7 @@ const forkSourceLabelStyle = {
   marginBottom: 12,
 }
 
-const forkSourceCardStyle = {
+const forkSourceCardStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 16,
@@ -432,7 +437,7 @@ const forkSourceCardStyle = {
   transition: 'all 0.3s',
 }
 
-const forkSourceTitleStyle = {
+const forkSourceTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 17,
   color: '#F2EBDB',
@@ -440,7 +445,7 @@ const forkSourceTitleStyle = {
   letterSpacing: '0.05em',
 }
 
-const forkSourceAuthorStyle = {
+const forkSourceAuthorStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 13,
@@ -448,19 +453,19 @@ const forkSourceAuthorStyle = {
   marginTop: 4,
 }
 
-const arrowStyle = {
+const arrowStyle: CSSProperties = {
   fontSize: 20,
   color: '#D4AF37',
 }
 
-const rejectStyle = {
+const rejectStyle: CSSProperties = {
   padding: 24,
   background: 'rgba(196,30,58,0.1)',
   border: '1px solid rgba(196,30,58,0.4)',
   marginBottom: 32,
 }
 
-const rejectLabelStyle = {
+const rejectLabelStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   fontWeight: 500,
@@ -469,7 +474,7 @@ const rejectLabelStyle = {
   marginBottom: 12,
 }
 
-const rejectReasonStyle = {
+const rejectReasonStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 15,
   color: '#F2EBDB',
@@ -477,17 +482,17 @@ const rejectReasonStyle = {
   marginBottom: 8,
 }
 
-const rejectHintStyle = {
+const rejectHintStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
   color: '#6B5C45',
 }
 
-const forkListStyle = {
+const forkListStyle: CSSProperties = {
   marginTop: 32,
 }
 
-const forkListTitleStyle = {
+const forkListTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   color: '#A89580',
@@ -497,25 +502,25 @@ const forkListTitleStyle = {
   borderBottom: '1px solid rgba(212,175,55,0.18)',
 }
 
-const forkGridStyle = {
+const forkGridStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   gap: 16,
 }
 
-const forkItemStyle = {
+const forkItemStyle: CSSProperties = {
   cursor: 'pointer',
   transition: 'all 0.3s',
 }
 
-const forkItemImgStyle = {
+const forkItemImgStyle: CSSProperties = {
   width: '100%',
   aspectRatio: '1/1',
   objectFit: 'cover',
   marginBottom: 8,
 }
 
-const forkItemFallbackStyle = {
+const forkItemFallbackStyle: CSSProperties = {
   width: '100%',
   aspectRatio: '1/1',
   display: 'flex',
@@ -528,14 +533,14 @@ const forkItemFallbackStyle = {
   marginBottom: 8,
 }
 
-const forkItemTitleStyle = {
+const forkItemTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   color: '#F2EBDB',
   fontWeight: 500,
 }
 
-const forkItemAuthorStyle = {
+const forkItemAuthorStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 11,
@@ -543,7 +548,7 @@ const forkItemAuthorStyle = {
   marginTop: 2,
 }
 
-const centerMsgStyle = {
+const centerMsgStyle: CSSProperties = {
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',

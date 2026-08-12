@@ -1,21 +1,28 @@
 import { useEffect, useState, useCallback } from 'react'
+import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { listWorks, toggleLike, hasLiked } from '../lib/galleryApi'
 import WorkCard from '../components/gallery/WorkCard'
+import type { GalleryWork, GallerySortKey } from '../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // GalleryPage — /gallery 广场首页
 // 瀑布流 + sticky 筛选 + 编辑精选横幅 + 发布 CTA
 // ──────────────────────────────────────────────────────────
 
-const SORT_OPTIONS = [
+type FilterKey = string | null
+
+interface SortOption { key: GallerySortKey; label: string }
+interface FilterOption { key: FilterKey; label: string }
+
+const SORT_OPTIONS: SortOption[] = [
   { key: 'newest', label: '最新' },
   { key: 'hottest', label: '最热' },
   { key: 'curated', label: '编辑精选' },
 ]
 
-const SERIES_OPTIONS = [
+const SERIES_OPTIONS: FilterOption[] = [
   { key: null, label: '全部' },
   { key: '青花瓷', label: '青花瓷' },
   { key: '山海经', label: '山海经' },
@@ -23,7 +30,7 @@ const SERIES_OPTIONS = [
   { key: '唐草', label: '唐草' },
 ]
 
-const TEMPLATE_OPTIONS = [
+const TEMPLATE_OPTIONS: FilterOption[] = [
   { key: null, label: '全部模板' },
   { key: '团龙献瑞', label: '团龙献瑞' },
   { key: '莲池清韵', label: '莲池清韵' },
@@ -36,14 +43,14 @@ const TEMPLATE_OPTIONS = [
 export default function GalleryPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [sort, setSort] = useState('newest')
-  const [series, setSeries] = useState(null)
-  const [template, setTemplate] = useState(null)
-  const [works, setWorks] = useState([])
+  const [sort, setSort] = useState<GallerySortKey>('newest')
+  const [series, setSeries] = useState<FilterKey>(null)
+  const [template, setTemplate] = useState<FilterKey>(null)
+  const [works, setWorks] = useState<GalleryWork[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [likedIds, setLikedIds] = useState(new Set())
-  const [curated, setCurated] = useState(null)
+  const [error, setError] = useState<string | null>(null)
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
+  const [curated, setCurated] = useState<GalleryWork | null>(null)
 
   // 拉作品列表
   const reload = useCallback(async () => {
@@ -54,7 +61,7 @@ export default function GalleryPage() {
       setError(error.message)
       setWorks([])
     } else {
-      setWorks(data)
+      setWorks((data as unknown as GalleryWork[]) || [])
     }
     setLoading(false)
   }, [sort, series, template])
@@ -64,7 +71,8 @@ export default function GalleryPage() {
   // 拉编辑精选（独立查询：reuse_count + likes_count 最高的 1 件）
   useEffect(() => {
     listWorks({ sort: 'curated', limit: 1 }).then(({ data }) => {
-      setCurated(data?.[0] || null)
+      const arr = (data as unknown as GalleryWork[]) || []
+      setCurated(arr[0] || null)
     })
   }, [])
 
@@ -72,13 +80,13 @@ export default function GalleryPage() {
   useEffect(() => {
     if (!user || works.length === 0) return
     Promise.all(works.map(w => hasLiked(w.id, user.id))).then(results => {
-      const liked = new Set()
+      const liked = new Set<string>()
       results.forEach((ok, i) => { if (ok) liked.add(works[i].id) })
       setLikedIds(liked)
     })
   }, [user, works])
 
-  const handleReuse = useCallback((work) => {
+  const handleReuse = useCallback((work: GalleryWork) => {
     if (!user) {
       navigate('/auth')
       return
@@ -86,7 +94,7 @@ export default function GalleryPage() {
     navigate(`/create?fork=${work.id}`)
   }, [user, navigate])
 
-  const handleLike = useCallback(async (work) => {
+  const handleLike = useCallback(async (work: GalleryWork) => {
     if (!user) {
       navigate('/auth')
       return
@@ -154,7 +162,8 @@ export default function GalleryPage() {
 // 子组件
 // ──────────────────────────────────────────────────────────
 
-function GalleryHero({ worksCount }) {
+interface GalleryHeroProps { worksCount: number }
+function GalleryHero({ worksCount }: GalleryHeroProps) {
   return (
     <section style={heroStyle}>
       <div style={sealTagStyle}>广 场</div>
@@ -172,7 +181,8 @@ function GalleryHero({ worksCount }) {
   )
 }
 
-function MetaCell({ num, label }) {
+interface MetaCellProps { num: number; label: string }
+function MetaCell({ num, label }: MetaCellProps) {
   return (
     <div style={metaCellStyle}>
       <div style={numStyle}>{(num || 0).toLocaleString()}</div>
@@ -181,7 +191,15 @@ function MetaCell({ num, label }) {
   )
 }
 
-function FilterBar({ sort, setSort, series, setSeries, template, setTemplate }) {
+interface FilterBarProps {
+  sort: GallerySortKey
+  setSort: (v: GallerySortKey) => void
+  series: FilterKey
+  setSeries: (v: FilterKey) => void
+  template: FilterKey
+  setTemplate: (v: FilterKey) => void
+}
+function FilterBar({ sort, setSort, series, setSeries, template, setTemplate }: FilterBarProps) {
   return (
     <div style={filterBarStyle}>
       <FilterGroup label="Sort" options={SORT_OPTIONS} value={sort} onChange={setSort} />
@@ -193,7 +211,13 @@ function FilterBar({ sort, setSort, series, setSeries, template, setTemplate }) 
   )
 }
 
-function FilterGroup({ label, options, value, onChange }) {
+interface FilterGroupProps<V extends FilterKey | GallerySortKey> {
+  label: string
+  options: { key: V; label: string }[]
+  value: V
+  onChange: (v: V) => void
+}
+function FilterGroup<V extends FilterKey | GallerySortKey>({ label, options, value, onChange }: FilterGroupProps<V>) {
   return (
     <div style={filterGroupStyle}>
       <span style={filterLabelStyle}>{label}</span>
@@ -210,7 +234,12 @@ function FilterGroup({ label, options, value, onChange }) {
   )
 }
 
-function CuratedBanner({ work, onReuse, onClick }) {
+interface CuratedBannerProps {
+  work: GalleryWork
+  onReuse: () => void
+  onClick: () => void
+}
+function CuratedBanner({ work, onReuse, onClick }: CuratedBannerProps) {
   return (
     <div style={curatedWrapStyle}>
       <div style={curatedCardStyle} onClick={onClick}>
@@ -230,7 +259,7 @@ function CuratedBanner({ work, onReuse, onClick }) {
         </div>
         <button
           style={curatedActionStyle}
-          onClick={(e) => { e.stopPropagation(); onReuse() }}
+          onClick={(e: ReactMouseEvent) => { e.stopPropagation(); onReuse() }}
         >
           复 用 这 件
         </button>
@@ -239,7 +268,11 @@ function CuratedBanner({ work, onReuse, onClick }) {
   )
 }
 
-function CuratedStat({ label, value }) {
+interface CuratedStatProps {
+  label: string
+  value: number | string | null | undefined
+}
+function CuratedStat({ label, value }: CuratedStatProps) {
   return (
     <div>
       {label}
@@ -248,7 +281,8 @@ function CuratedStat({ label, value }) {
   )
 }
 
-function PublishCTA({ onPublish }) {
+interface PublishCTAProps { onPublish: () => void }
+function PublishCTA({ onPublish }: PublishCTAProps) {
   return (
     <div style={ctaWrapStyle}>
       <div style={ctaCardStyle}>
@@ -271,7 +305,7 @@ function PublishCTA({ onPublish }) {
 // 样式
 // ──────────────────────────────────────────────────────────
 
-const pageStyle = {
+const pageStyle: CSSProperties = {
   minHeight: '100vh',
   background: '#0A0806',
   color: '#F2EBDB',
@@ -280,14 +314,14 @@ const pageStyle = {
   paddingTop: 0,
 }
 
-const heroStyle = {
+const heroStyle: CSSProperties = {
   position: 'relative',
   padding: '160px 64px 60px',
   textAlign: 'center',
   borderBottom: '1px solid rgba(212,175,55,0.18)',
 }
 
-const sealTagStyle = {
+const sealTagStyle: CSSProperties = {
   display: 'inline-block',
   background: '#C41E3A',
   color: '#F2EBDB',
@@ -299,7 +333,7 @@ const sealTagStyle = {
   marginBottom: 24,
 }
 
-const h1Style = {
+const h1Style: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 'clamp(40px, 5.5vw, 68px)',
   fontWeight: 500,
@@ -310,14 +344,14 @@ const h1Style = {
   margin: '0 0 24px',
 }
 
-const emStyle = {
+const emStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   color: '#D4AF37',
   fontWeight: 400,
 }
 
-const ledeStyle = {
+const ledeStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 300,
   fontSize: 17,
@@ -327,7 +361,7 @@ const ledeStyle = {
   lineHeight: 1.95,
 }
 
-const metaRowStyle = {
+const metaRowStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   gap: 48,
@@ -339,9 +373,9 @@ const metaRowStyle = {
   marginRight: 'auto',
 }
 
-const metaCellStyle = { textAlign: 'center' }
+const metaCellStyle: CSSProperties = { textAlign: 'center' }
 
-const numStyle = {
+const numStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontSize: 32,
   fontWeight: 300,
@@ -349,7 +383,7 @@ const numStyle = {
   lineHeight: 1,
 }
 
-const labelStyle = {
+const labelStyle: CSSProperties = {
   fontFamily: "'Outfit', sans-serif",
   fontSize: 10,
   letterSpacing: '0.22em',
@@ -358,7 +392,7 @@ const labelStyle = {
   marginTop: 6,
 }
 
-const filterBarStyle = {
+const filterBarStyle: CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 50,
@@ -374,14 +408,14 @@ const filterBarStyle = {
   flexWrap: 'wrap',
 }
 
-const filterGroupStyle = {
+const filterGroupStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10,
   flexWrap: 'wrap',
 }
 
-const filterLabelStyle = {
+const filterLabelStyle: CSSProperties = {
   fontFamily: "'Outfit', sans-serif",
   fontSize: 10,
   letterSpacing: '0.24em',
@@ -390,7 +424,7 @@ const filterLabelStyle = {
   marginRight: 4,
 }
 
-const chipStyle = {
+const chipStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   padding: '7px 16px',
@@ -402,27 +436,27 @@ const chipStyle = {
   letterSpacing: '0.1em',
 }
 
-const chipActiveStyle = {
+const chipActiveStyle: CSSProperties = {
   ...chipStyle,
   borderColor: '#D4AF37',
   color: '#D4AF37',
   background: 'rgba(212,175,55,0.08)',
 }
 
-const dividerStyle = {
+const dividerStyle: CSSProperties = {
   width: 1,
   height: 18,
   background: 'rgba(212,175,55,0.18)',
   margin: '0 8px',
 }
 
-const curatedWrapStyle = {
+const curatedWrapStyle: CSSProperties = {
   maxWidth: 1400,
   margin: '48px auto 0',
   padding: '0 48px',
 }
 
-const curatedCardStyle = {
+const curatedCardStyle: CSSProperties = {
   position: 'relative',
   background: 'linear-gradient(135deg, rgba(31,24,18,0.95) 0%, rgba(45,34,24,0.9) 100%)',
   border: '1px solid #5C4A1A',
@@ -431,7 +465,7 @@ const curatedCardStyle = {
   cursor: 'pointer',
 }
 
-const curatedTagStyle = {
+const curatedTagStyle: CSSProperties = {
   display: 'inline-block',
   background: '#C41E3A',
   color: '#F2EBDB',
@@ -443,7 +477,7 @@ const curatedTagStyle = {
   marginBottom: 18,
 }
 
-const curatedTitleStyle = {
+const curatedTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 32,
   fontWeight: 500,
@@ -453,7 +487,7 @@ const curatedTitleStyle = {
   lineHeight: 1.3,
 }
 
-const curatedDescStyle = {
+const curatedDescStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 15,
   color: '#A89580',
@@ -462,7 +496,7 @@ const curatedDescStyle = {
   fontWeight: 300,
 }
 
-const curatedMetaStyle = {
+const curatedMetaStyle: CSSProperties = {
   display: 'flex',
   gap: 24,
   paddingTop: 18,
@@ -474,7 +508,7 @@ const curatedMetaStyle = {
   color: '#6B5C45',
 }
 
-const curatedStrongStyle = {
+const curatedStrongStyle: CSSProperties = {
   color: '#D4AF37',
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
@@ -486,7 +520,7 @@ const curatedStrongStyle = {
   marginTop: 4,
 }
 
-const curatedActionStyle = {
+const curatedActionStyle: CSSProperties = {
   marginTop: 24,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
@@ -499,31 +533,31 @@ const curatedActionStyle = {
   fontWeight: 500,
 }
 
-const gridWrapStyle = {
+const gridWrapStyle: CSSProperties = {
   maxWidth: 1400,
   margin: '0 auto',
   padding: '48px 48px 80px',
 }
 
-const gridStyle = {
+const gridStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   gap: 24,
 }
 
-const loadingStyle = {
+const loadingStyle: CSSProperties = {
   padding: 80,
   textAlign: 'center',
   color: '#6B5C45',
   fontFamily: "'Noto Serif SC', serif",
 }
 
-const errorStyle = {
+const errorStyle: CSSProperties = {
   ...loadingStyle,
   color: '#C41E3A',
 }
 
-const emptyStyle = {
+const emptyStyle: CSSProperties = {
   padding: 80,
   textAlign: 'center',
   color: '#6B5C45',
@@ -531,13 +565,13 @@ const emptyStyle = {
   lineHeight: 2,
 }
 
-const ctaWrapStyle = {
+const ctaWrapStyle: CSSProperties = {
   maxWidth: 1400,
   margin: '0 auto 80px',
   padding: '0 48px',
 }
 
-const ctaCardStyle = {
+const ctaCardStyle: CSSProperties = {
   background: 'linear-gradient(135deg, rgba(196,30,58,0.08) 0%, rgba(212,175,55,0.04) 100%)',
   border: '1px solid #5C4A1A',
   padding: '56px 48px',
@@ -546,7 +580,7 @@ const ctaCardStyle = {
   overflow: 'hidden',
 }
 
-const ctaSealStyle = {
+const ctaSealStyle: CSSProperties = {
   display: 'inline-block',
   background: '#C41E3A',
   color: '#F2EBDB',
@@ -558,7 +592,7 @@ const ctaSealStyle = {
   marginBottom: 24,
 }
 
-const ctaTitleStyle = {
+const ctaTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 38,
   fontWeight: 500,
@@ -568,7 +602,7 @@ const ctaTitleStyle = {
   lineHeight: 1.3,
 }
 
-const ctaDescStyle = {
+const ctaDescStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
   color: '#A89580',
@@ -577,7 +611,7 @@ const ctaDescStyle = {
   lineHeight: 1.95,
 }
 
-const ctaBtnStyle = {
+const ctaBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
   background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
