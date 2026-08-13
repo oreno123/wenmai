@@ -102,9 +102,12 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }: Pre
     // Apply global scale + rotation to placements, persist for Showcase.
     // Each placement keeps its element id so Showcase can render the original
     // element texture (not the rasterized composite).
-    // `rad` is hoisted out of the `if` so the image-onload closure below
-    // has a defined value to rotate by even when placements is empty
-    // (preserves original behavior of rotating by 0 in that edge case).
+    // Hoist `rad` to the outer scope so the image-onload closure below can
+    // reference it. The original .jsx block-scoped `rad` inside the
+    // `if (placements && placements.length > 0)` branch, but the closure
+    // lived outside that block, so `showcase_image` never populated (the
+    // ReferenceError was silently swallowed). This hoist fixes that bug
+    // alongside the TS migration.
     const rad = rotation * Math.PI / 180
     if (placements && placements.length > 0) {
       const cos = Math.cos(rad)

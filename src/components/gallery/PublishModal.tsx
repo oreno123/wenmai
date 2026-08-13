@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { CSSProperties } from 'react'
-import { publishWork, uploadWorkCover } from '../../lib/galleryApi'
+import { publishWork } from '../../lib/galleryApi'
 
 // ──────────────────────────────────────────────────────────
 // PublishModal — 发布作品到广场
@@ -9,12 +9,6 @@ import { publishWork, uploadWorkCover } from '../../lib/galleryApi'
 
 const SERIES_OPTIONS = ['青花瓷', '山海经', '青铜器', '唐草', '团龙']
 const TEMPLATE_OPTIONS = ['团龙献瑞', '莲池清韵', '双龙戏珠', '青铜威仪', '青花缠枝', '山海异兽', '自由创作']
-
-// uploadWorkCover is re-exported by galleryApi and was imported by the
-// pre-migration JSX even though this file doesn't call it directly.
-// Keep the import alive to preserve the original dependency surface
-// (no behavior change); reference it once to satisfy noUnusedLocals.
-void uploadWorkCover
 
 interface PublishModalProps {
   open: boolean
