@@ -1,18 +1,26 @@
 /**
  * Generate branded share card image using Canvas
  */
-import { getPatternImage } from '../store/patternData'
+import { getPatternImage, type Pattern, type SeriesInfo } from '../store/patternData'
 
 const W = 750
 const H = 1334
 
-export async function generateShareCard(pattern, seriesInfo) {
+interface ShareCardSeriesInfo {
+  name?: string
+}
+
+export async function generateShareCard(
+  pattern: Pattern,
+  seriesInfo?: SeriesInfo | ShareCardSeriesInfo,
+): Promise<Blob | null> {
   await document.fonts.ready
 
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
   const ctx = canvas.getContext('2d')
+  if (!ctx) return null
 
   // Background gradient
   const bg = ctx.createLinearGradient(0, 0, 0, H)
@@ -80,8 +88,8 @@ export async function generateShareCard(pattern, seriesInfo) {
   ctx.fillText(pattern.name, W / 2, nameY)
 
   // Rarity badge
-  const rarityColors = { ssr: '#F2D58A', rare: '#D4AF6A', common: '#8A8A8A' }
-  const rarityLabels = { ssr: '传说', rare: '稀有', common: '普通' }
+  const rarityColors: Record<string, string> = { ssr: '#F2D58A', rare: '#D4AF6A', common: '#8A8A8A' }
+  const rarityLabels: Record<string, string> = { ssr: '传说', rare: '稀有', common: '普通' }
   const rarityText = rarityLabels[pattern.rarity] || '普通'
   ctx.font = '600 22px "Noto Serif SC", serif'
   const rarityW = ctx.measureText(rarityText).width + 32
@@ -130,7 +138,7 @@ export async function generateShareCard(pattern, seriesInfo) {
   return new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
 }
 
-function loadImage(src) {
+function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -140,7 +148,14 @@ function loadImage(src) {
   })
 }
 
-function roundRect(ctx, x, y, w, h, r) {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
   ctx.beginPath()
   ctx.moveTo(x + r, y)
   ctx.lineTo(x + w - r, y)
