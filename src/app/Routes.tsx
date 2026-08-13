@@ -1,5 +1,4 @@
 import { lazy, Suspense } from 'react'
-import type { ReactNode } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { renderLegacyRedirects } from './LegacyRedirects'
 
@@ -36,16 +35,9 @@ function PageLoader() {
   )
 }
 
-export interface AppRoutesProps {
-  /** Optional children rendered above routes — used by App.tsx for GoldBackground etc. */
-  children?: ReactNode
-}
-
-export default function AppRoutes({ children }: AppRoutesProps = {}) {
+export default function AppRoutes() {
   return (
-    <>
-      {children}
-      <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<PageLoader />}>
         <Routes>
           {renderLegacyRedirects()}
           <Route path="/" element={<SplashPage />} />
@@ -63,7 +55,6 @@ export default function AppRoutes({ children }: AppRoutesProps = {}) {
           <Route path="/demo/series/:id" element={<SeriesDemoPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Suspense>
-    </>
+    </Suspense>
   )
 }

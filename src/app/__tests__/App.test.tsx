@@ -39,11 +39,6 @@ vi.mock('../../store/gameStore', () => ({
   setSyncUser: vi.fn(),
 }))
 
-// Stub GoldBackground to a plain div (Three.js doesn't run in jsdom).
-vi.mock('../../components/common/GoldBackground', () => ({
-  default: () => <div data-testid="gold-bg" />,
-}))
-
 // App now wraps routes in SeriesSkinLayer, which pulls in the design-system
 // barrel (re-exports visual/* including LottieAsset → lottie-react →
 // lottie-web). lottie-web touches the canvas API at module eval time and
