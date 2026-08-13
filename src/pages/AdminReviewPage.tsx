@@ -68,7 +68,7 @@ function AdminContent() {
       setToast('驳回必填理由')
       return
     }
-    const { error } = await rejectWork(rejectingId, user!.id, rejectReason)
+    const { error } = await rejectWork(rejectingId!, user!.id, rejectReason)
     if (error) {
       setToast(`驳回失败：${error.message}`)
       return

@@ -1,11 +1,14 @@
 import { useState, useCallback } from 'react'
 import { useApp } from '../../store/AppState'
 import { getRandomPattern, getRarityLabel } from '../../store/patternData'
+import type { Pattern } from '../../store/patternData'
+
+type PullState = 'idle' | 'pulling' | 'revealed'
 
 export default function GachaPull() {
   const { data, doPull, addToLibrary } = useApp()
-  const [state, setState] = useState('idle') // idle | pulling | revealed
-  const [result, setResult] = useState(null)
+  const [state, setState] = useState<PullState>('idle')
+  const [result, setResult] = useState<Pattern | null>(null)
 
   const cost = data.freePulls > 0 ? 0 : 10
 

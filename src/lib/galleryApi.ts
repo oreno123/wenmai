@@ -1,23 +1,39 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import type { GalleryWork, ListWorksParams } from '../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // galleryApi — Supabase 查询封装
 // 所有广场相关读写都走这里
+//
+// NOTE on typing: supabase returns rows in snake_case with nested
+// `author:profiles!works_author_id_fkey(...)` shape. That runtime shape
+// is typed as `GalleryWork` in src/types/gallery.ts. We cast at the
+// boundary so consumers get a stable type without forcing supabase
+// generics through every query.
 // ──────────────────────────────────────────────────────────
 
 const STORAGE_BUCKET = 'works'
+
+// Local input shape for publishWork. `placements` is the JSON string
+// PuzzlePage builds; we send it to supabase opaque-ly.
+export interface PublishWorkInput {
+  authorId: string
+  title: string
+  template: string | null
+  placements: unknown
+  series: string | null
+  forkedFrom?: string | null
+  coverBlob?: Blob | null
+}
 
 // ── 读取 ──────────────────────────────────────────────────
 
 /**
  * 列出已审核通过的作品
- * @param {Object} opts
- *   - sort: 'newest' | 'hottest' | 'curated'
- *   - series: '青花瓷' | '山海经' | '青铜器' | '唐草' | null
- *   - template: 模板 id 或 null
- *   - limit, offset
  */
-export async function listWorks(opts = {}) {
+export async function listWorks(
+  opts: ListWorksParams = {},
+): Promise<{ data: GalleryWork[]; error: Error | null }> {
   if (!isSupabaseConfigured) return { data: [], error: null }
   const { sort = 'newest', series = null, template = null, limit = 24, offset = 0 } = opts
 
@@ -43,7 +59,7 @@ export async function listWorks(opts = {}) {
 
   q = q.range(offset, offset + limit - 1)
   const { data, error } = await q
-  return { data: data || [], error }
+  return { data: (data as unknown as GalleryWork[]) || [], error: error as Error | null }
 }
 
 /**
@@ -51,7 +67,9 @@ export async function listWorks(opts = {}) {
  * 注意：Supabase 不允许在一条 select 里 self-join works 表，
  * 所以 forked_from 的源作品要单独查一次
  */
-export async function getWork(id) {
+export async function getWork(
+  id: string,
+): Promise<{ data: GalleryWork | null; error: Error | null }> {
   if (!isSupabaseConfigured) return { data: null, error: new Error('not configured') }
   const { data, error } = await supabase
     .from('works')
@@ -63,22 +81,26 @@ export async function getWork(id) {
     `)
     .eq('id', id)
     .maybeSingle()
-  if (error || !data) return { data, error }
-  if (!data.forked_from) return { data: { ...data, source: null }, error: null }
+  if (error || !data) return { data: data as unknown as GalleryWork | null, error: error as Error | null }
+  const d = data as unknown as GalleryWork
+  if (!d.forked_from) return { data: { ...d, source: null }, error: null }
 
   // 单独查源作品
   const { data: source } = await supabase
     .from('works')
     .select('id, title, status, author:profiles!works_author_id_fkey(user_id, username)')
-    .eq('id', data.forked_from)
+    .eq('id', d.forked_from)
     .maybeSingle()
-  return { data: { ...data, source }, error: null }
+  return { data: { ...d, source: source as unknown as GalleryWork }, error: null }
 }
 
 /**
  * 这件作品被哪些作品复用了
  */
-export async function listForksOf(workId, limit = 6) {
+export async function listForksOf(
+  workId: string,
+  limit: number = 6,
+): Promise<{ data: GalleryWork[]; error: Error | null }> {
   if (!isSupabaseConfigured) return { data: [], error: null }
   const { data, error } = await supabase
     .from('works')
@@ -87,13 +109,13 @@ export async function listForksOf(workId, limit = 6) {
     .eq('status', 'approved')
     .order('likes_count', { ascending: false })
     .limit(limit)
-  return { data: data || [], error }
+  return { data: (data as unknown as GalleryWork[]) || [], error: error as Error | null }
 }
 
 /**
  * 当前用户是否已点赞
  */
-export async function hasLiked(workId, userId) {
+export async function hasLiked(workId: string, userId: string): Promise<boolean> {
   if (!isSupabaseConfigured || !userId) return false
   const { data } = await supabase
     .from('likes')
@@ -108,11 +130,12 @@ export async function hasLiked(workId, userId) {
 
 /**
  * 上传作品封面到 Storage，返回 public URL
- * @param {Blob|File} blob — 1536×1536 WebP 推荐
- * @param {string} userId
- * @param {string} workId
  */
-export async function uploadWorkCover(blob, userId, workId) {
+export async function uploadWorkCover(
+  blob: Blob,
+  userId: string,
+  workId: string,
+): Promise<string> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured')
   const ext = blob.type === 'image/png' ? 'png' : 'webp'
   const path = `${userId}/${workId}.${ext}`
@@ -126,11 +149,10 @@ export async function uploadWorkCover(blob, userId, workId) {
 
 /**
  * 发布作品（status=pending 等审）
- * @param {Object} input
- *   - authorId, title, template, placements, series, forkedFrom
- *   - coverBlob: Blob|File（封面图）
  */
-export async function publishWork(input) {
+export async function publishWork(
+  input: PublishWorkInput,
+): Promise<{ data: { id: string; cover_path: string | null } | null; error: Error | null }> {
   if (!isSupabaseConfigured) return { data: null, error: new Error('not configured') }
   const { authorId, title, template, placements, series, forkedFrom = null, coverBlob } = input
 
@@ -148,25 +170,30 @@ export async function publishWork(input) {
     })
     .select('id')
     .single()
-  if (insErr) return { data: null, error: insErr }
+  if (insErr) return { data: null, error: insErr as Error }
 
-  let coverUrl = null
+  const workId = (work as { id: string }).id
+  let coverUrl: string | null = null
   if (coverBlob) {
     try {
-      coverUrl = await uploadWorkCover(coverBlob, authorId, work.id)
-      await supabase.from('works').update({ cover_path: coverUrl }).eq('id', work.id)
+      coverUrl = await uploadWorkCover(coverBlob, authorId, workId)
+      await supabase.from('works').update({ cover_path: coverUrl }).eq('id', workId)
     } catch (e) {
-      console.warn('[gallery] cover upload failed:', e.message)
+      const err = e as { message?: string }
+      console.warn('[gallery] cover upload failed:', err?.message)
     }
   }
 
-  return { data: { id: work.id, cover_path: coverUrl }, error: null }
+  return { data: { id: workId, cover_path: coverUrl }, error: null }
 }
 
 /**
  * 点赞 / 取消点赞
  */
-export async function toggleLike(workId, userId) {
+export async function toggleLike(
+  workId: string,
+  userId: string,
+): Promise<{ liked: boolean; error: Error | null }> {
   if (!isSupabaseConfigured) return { liked: false, error: new Error('not configured') }
   const { data: existing } = await supabase
     .from('likes')
@@ -181,12 +208,12 @@ export async function toggleLike(workId, userId) {
       .delete()
       .eq('work_id', workId)
       .eq('user_id', userId)
-    return { liked: false, error }
+    return { liked: false, error: error as Error | null }
   }
   const { error } = await supabase
     .from('likes')
     .insert({ work_id: workId, user_id: userId })
-  return { liked: true, error }
+  return { liked: true, error: error as Error | null }
 }
 
 // ── 管理员 ────────────────────────────────────────────────
@@ -194,7 +221,7 @@ export async function toggleLike(workId, userId) {
 /**
  * 拉取待审核队列（仅 is_admin）
  */
-export async function listPendingReviews() {
+export async function listPendingReviews(): Promise<{ data: GalleryWork[]; error: Error | null }> {
   if (!isSupabaseConfigured) return { data: [], error: null }
   const { data, error } = await supabase
     .from('works')
@@ -204,13 +231,16 @@ export async function listPendingReviews() {
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
-  return { data: data || [], error }
+  return { data: (data as unknown as GalleryWork[]) || [], error: error as Error | null }
 }
 
 /**
  * 通过审核
  */
-export async function approveWork(workId, adminId) {
+export async function approveWork(
+  workId: string,
+  adminId: string,
+): Promise<{ error: Error | null }> {
   const { error } = await supabase
     .from('works')
     .update({
@@ -220,13 +250,17 @@ export async function approveWork(workId, adminId) {
       rejected_reason: null,
     })
     .eq('id', workId)
-  return { error }
+  return { error: error as Error | null }
 }
 
 /**
  * 驳回（必填理由）
  */
-export async function rejectWork(workId, adminId, reason) {
+export async function rejectWork(
+  workId: string,
+  adminId: string,
+  reason: string,
+): Promise<{ error: Error | null }> {
   if (!reason || !reason.trim()) {
     return { error: new Error('驳回必填理由') }
   }
@@ -239,18 +273,18 @@ export async function rejectWork(workId, adminId, reason) {
       rejected_reason: reason.trim(),
     })
     .eq('id', workId)
-  return { error }
+  return { error: error as Error | null }
 }
 
 /**
  * 当前用户是否管理员
  */
-export async function fetchIsAdmin(userId) {
+export async function fetchIsAdmin(userId: string): Promise<boolean> {
   if (!isSupabaseConfigured || !userId) return false
   const { data } = await supabase
     .from('profiles')
     .select('is_admin')
     .eq('user_id', userId)
     .maybeSingle()
-  return Boolean(data?.is_admin)
+  return Boolean((data as { is_admin?: boolean } | null)?.is_admin)
 }

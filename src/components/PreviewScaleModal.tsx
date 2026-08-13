@@ -2,24 +2,31 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../store/AppState'
+import type { PuzzlePlacement } from '../types/creation'
 
 const MIN_SCALE = 0.3
 const MAX_SCALE = 3.0
 const FRAME_SIZE = 320
 
-export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
+interface PreviewScaleModalProps {
+  imageUrl: string
+  placements: PuzzlePlacement[]
+  onClose: () => void
+}
+
+export default function PreviewScaleModal({ imageUrl, placements, onClose }: PreviewScaleModalProps) {
   const navigate = useNavigate()
   const { saveCreation } = useApp()
-  const frameRef = useRef(null)
-  const [scale, setScale] = useState(1.0)
-  const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const [rotation, setRotation] = useState(0)
-  const [dragging, setDragging] = useState(null)
-  const [showRotation, setShowRotation] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const frameRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState<number>(1.0)
+  const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [rotation, setRotation] = useState<number>(0)
+  const [dragging, setDragging] = useState<{ x: number; y: number } | null>(null)
+  const [showRotation, setShowRotation] = useState<boolean>(false)
+  const [saved, setSaved] = useState<boolean>(false)
 
-  const clampScale = useCallback((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s)), [])
-  const clampOffset = useCallback((ox, oy, s) => {
+  const clampScale = useCallback((s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s)), [])
+  const clampOffset = useCallback((ox: number, oy: number, s: number) => {
     const frame = frameRef.current
     const size = frame ? frame.offsetWidth : FRAME_SIZE
     const limit = size * s * 0.5
@@ -33,7 +40,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
   useEffect(() => {
     const frame = frameRef.current
     if (!frame) return
-    const onWheel = (e) => {
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault()
       // Wheel = zoom
       const delta = e.deltaY > 0 ? -0.08 : 0.08
@@ -43,13 +50,13 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
     return () => frame.removeEventListener('wheel', onWheel)
   }, [clampScale, clampOffset, scale])
 
-  const handlePointerDown = useCallback((e) => {
-    if (e.target.closest('.controls-area')) return
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.controls-area')) return
     e.preventDefault()
     setDragging({ x: e.clientX - offset.x, y: e.clientY - offset.y })
   }, [offset])
 
-  const handlePointerMove = useCallback((e) => {
+  const handlePointerMove = useCallback((e: PointerEvent) => {
     if (!dragging) return
     const ox = e.clientX - dragging.x
     const oy = e.clientY - dragging.y
@@ -95,8 +102,11 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
     // Apply global scale + rotation to placements, persist for Showcase.
     // Each placement keeps its element id so Showcase can render the original
     // element texture (not the rasterized composite).
+    // `rad` is hoisted out of the `if` so the image-onload closure below
+    // has a defined value to rotate by even when placements is empty
+    // (preserves original behavior of rotating by 0 in that edge case).
+    const rad = rotation * Math.PI / 180
     if (placements && placements.length > 0) {
-      const rad = rotation * Math.PI / 180
       const cos = Math.cos(rad)
       const sin = Math.sin(rad)
       const transformed = placements.map(p => {
@@ -130,6 +140,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
           canvas.width = size
           canvas.height = size
           const ctx = canvas.getContext('2d')
+          if (!ctx) return
           ctx.fillStyle = '#F5F0E6'
           ctx.fillRect(0, 0, size, size)
           ctx.save()

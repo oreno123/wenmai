@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchIsAdmin } from '../../lib/galleryApi'
 import { useAuth } from '../../lib/auth'
@@ -7,11 +8,15 @@ import { useAuth } from '../../lib/auth'
 // AdminOnlyRoute — 包裹组件，仅 is_admin=true 可访问
 // ──────────────────────────────────────────────────────────
 
-export default function AdminOnlyRoute({ children }) {
+interface AdminOnlyRouteProps {
+  children: ReactNode
+}
+
+export default function AdminOnlyRoute({ children }: AdminOnlyRouteProps) {
   const navigate = useNavigate()
   const { user, loading: authLoading } = useAuth()
-  const [checking, setChecking] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [checking, setChecking] = useState<boolean>(true)
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
 
   useEffect(() => {
     if (authLoading) return

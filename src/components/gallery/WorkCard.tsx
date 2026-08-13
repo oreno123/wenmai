@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import type { CSSProperties, MouseEvent } from 'react'
+import type { GalleryWork } from '../../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // WorkCard — 广场瀑布流卡片
 // 复用 gallery-page mock 视觉，改为 React + 真实 cover_path
 // ──────────────────────────────────────────────────────────
 
-const SERIES_LABEL = {
+const SERIES_LABEL: Record<string, string> = {
   '青花瓷': '青花',
   '山海经': '山海',
   '青铜器': '青铜',
@@ -13,12 +15,12 @@ const SERIES_LABEL = {
   '团龙': '团龙',
 }
 
-function getInitial(name) {
+function getInitial(name: string | undefined | null): string {
   if (!name) return '?'
   return name.charAt(0).toUpperCase()
 }
 
-function timeAgo(iso) {
+function timeAgo(iso: string | undefined | null): string {
   if (!iso) return ''
   const diff = Date.now() - new Date(iso).getTime()
   const day = 86400000
@@ -29,9 +31,18 @@ function timeAgo(iso) {
   return `${Math.floor(diff / day / 30)} 月前`
 }
 
-export default function WorkCard({ work, author, liked, onReuse, onLike, onClick }) {
-  const [imgError, setImgError] = useState(false)
-  const seriesLabel = SERIES_LABEL[work.series] || work.series || ''
+interface WorkCardProps {
+  work: GalleryWork
+  author?: { user_id: string; username: string } | null
+  liked: boolean
+  onReuse?: () => void
+  onLike?: () => void
+  onClick?: () => void
+}
+
+export default function WorkCard({ work, author, liked, onReuse, onLike, onClick }: WorkCardProps) {
+  const [imgError, setImgError] = useState<boolean>(false)
+  const seriesLabel = SERIES_LABEL[work.series || ''] || work.series || ''
   const isFork = Boolean(work.forked_from)
 
   return (
@@ -92,7 +103,14 @@ export default function WorkCard({ work, author, liked, onReuse, onLike, onClick
 
 // ── 子组件 ────────────────────────────────────────────────
 
-function Stat({ icon, value, active, onClick }) {
+interface StatProps {
+  icon: 'heart' | 'share'
+  value: number
+  active?: boolean
+  onClick?: (e: MouseEvent) => void
+}
+
+function Stat({ icon, value, active, onClick }: StatProps) {
   return (
     <span onClick={onClick} style={{ ...statStyle, cursor: onClick ? 'pointer' : 'default', color: active ? '#C41E3A' : undefined }}>
       {icon === 'heart' ? <HeartIcon active={active} /> : <ShareIcon />}
@@ -101,7 +119,9 @@ function Stat({ icon, value, active, onClick }) {
   )
 }
 
-function HeartIcon({ active }) {
+interface HeartIconProps { active?: boolean }
+
+function HeartIcon({ active }: HeartIconProps) {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24"
       fill={active ? '#C41E3A' : 'none'}
@@ -120,7 +140,9 @@ function ShareIcon() {
   )
 }
 
-function CoverFallback({ title }) {
+interface CoverFallbackProps { title?: string }
+
+function CoverFallback({ title }: CoverFallbackProps) {
   return (
     <div style={{
       position: 'absolute', inset: 0,
@@ -135,7 +157,7 @@ function CoverFallback({ title }) {
 
 // ── 样式 ──────────────────────────────────────────────────
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   position: 'relative',
   background: '#1A140E',
   border: '1px solid rgba(212,175,55,0.18)',
@@ -146,7 +168,7 @@ const cardStyle = {
   borderRadius: 2,
 }
 
-const coverStyle = (coverPath, imgError) => ({
+const coverStyle = (coverPath: string | null, imgError: boolean): CSSProperties => ({
   position: 'relative',
   width: '100%',
   aspectRatio: '4/5',
@@ -156,7 +178,7 @@ const coverStyle = (coverPath, imgError) => ({
   overflow: 'hidden',
 })
 
-const imgStyle = {
+const imgStyle: CSSProperties = {
   position: 'absolute',
   inset: 0,
   width: '100%',
@@ -165,7 +187,7 @@ const imgStyle = {
   transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
 }
 
-const rarityBadgeStyle = {
+const rarityBadgeStyle: CSSProperties = {
   position: 'absolute',
   top: 14, left: 14,
   fontFamily: "'Outfit', sans-serif",
@@ -178,7 +200,7 @@ const rarityBadgeStyle = {
   zIndex: 2,
 }
 
-const seriesBadgeStyle = {
+const seriesBadgeStyle: CSSProperties = {
   position: 'absolute',
   top: 14, right: 14,
   fontFamily: "'Noto Serif SC', serif",
@@ -190,7 +212,7 @@ const seriesBadgeStyle = {
   zIndex: 2,
 }
 
-const actionStyle = {
+const actionStyle: CSSProperties = {
   position: 'absolute',
   bottom: 14, right: 14,
   background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
@@ -208,12 +230,12 @@ const actionStyle = {
   zIndex: 3,
 }
 
-const bodyStyle = {
+const bodyStyle: CSSProperties = {
   padding: '18px 20px 20px',
   borderTop: '1px solid rgba(212,175,55,0.18)',
 }
 
-const titleRowStyle = {
+const titleRowStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'flex-start',
@@ -221,7 +243,7 @@ const titleRowStyle = {
   marginBottom: 8,
 }
 
-const titleStyle = {
+const titleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 17,
   fontWeight: 500,
@@ -230,7 +252,7 @@ const titleStyle = {
   lineHeight: 1.4,
 }
 
-const templateStyle = {
+const templateStyle: CSSProperties = {
   fontFamily: "'Outfit', sans-serif",
   fontSize: 10,
   letterSpacing: '0.18em',
@@ -239,14 +261,14 @@ const templateStyle = {
   marginTop: 4,
 }
 
-const authorRowStyle = {
+const authorRowStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10,
   marginBottom: 14,
 }
 
-const avatarStyle = {
+const avatarStyle: CSSProperties = {
   width: 28,
   height: 28,
   borderRadius: '50%',
@@ -261,7 +283,7 @@ const avatarStyle = {
   flexShrink: 0,
 }
 
-const authorNameStyle = {
+const authorNameStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   color: '#A89580',
@@ -270,14 +292,14 @@ const authorNameStyle = {
   gap: 6,
 }
 
-const eraStyle = {
+const eraStyle: CSSProperties = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 11,
   color: '#6B5C45',
 }
 
-const statsStyle = {
+const statsStyle: CSSProperties = {
   display: 'flex',
   gap: 18,
   paddingTop: 14,
@@ -288,13 +310,13 @@ const statsStyle = {
   alignItems: 'center',
 }
 
-const statStyle = {
+const statStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 6,
 }
 
-const reuseTagStyle = {
+const reuseTagStyle: CSSProperties = {
   marginLeft: 'auto',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 11,

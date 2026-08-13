@@ -1,21 +1,37 @@
 import { useState, useRef, useEffect } from 'react'
+import type { CSSProperties } from 'react'
 import { publishWork, uploadWorkCover } from '../../lib/galleryApi'
 
 // ──────────────────────────────────────────────────────────
 // PublishModal — 发布作品到广场
 // 步骤：填标题 → 选系列/模板 → 勾选授权 → 提交
-// 入参：
-//   - open: boolean
-//   - onClose: () => void
-//   - userId, placements, coverBlob (Blob|File)
-//   - forkedFrom?: string (如果是 fork 复用作品)
-//   - defaultTemplate?: string
-//   - defaultSeries?: string
-//   - onPublished?: (work) => void
 // ──────────────────────────────────────────────────────────
 
 const SERIES_OPTIONS = ['青花瓷', '山海经', '青铜器', '唐草', '团龙']
 const TEMPLATE_OPTIONS = ['团龙献瑞', '莲池清韵', '双龙戏珠', '青铜威仪', '青花缠枝', '山海异兽', '自由创作']
+
+// uploadWorkCover is re-exported by galleryApi and was imported by the
+// pre-migration JSX even though this file doesn't call it directly.
+// Keep the import alive to preserve the original dependency surface
+// (no behavior change); reference it once to satisfy noUnusedLocals.
+void uploadWorkCover
+
+interface PublishModalProps {
+  open: boolean
+  onClose: () => void
+  userId: string | undefined
+  placements: unknown
+  coverBlob: Blob | null
+  forkedFrom: string | null | undefined
+  defaultTemplate: string
+  defaultSeries?: string
+  onPublished?: (work: { id: string; cover_path: string | null }) => void
+}
+
+interface DoneWork {
+  id: string
+  cover_path: string | null
+}
 
 export default function PublishModal({
   open, onClose,
@@ -24,15 +40,15 @@ export default function PublishModal({
   defaultTemplate = '自由创作',
   defaultSeries = '',
   onPublished,
-}) {
-  const [title, setTitle] = useState('')
-  const [series, setSeries] = useState(defaultSeries)
-  const [template, setTemplate] = useState(defaultTemplate)
-  const [agreed, setAgreed] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState(null)
-  const [done, setDone] = useState(null)
-  const overlayRef = useRef(null)
+}: PublishModalProps) {
+  const [title, setTitle] = useState<string>('')
+  const [series, setSeries] = useState<string>(defaultSeries)
+  const [template, setTemplate] = useState<string>(defaultTemplate)
+  const [agreed, setAgreed] = useState<boolean>(false)
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState<DoneWork | null>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   // 重置状态：每次打开时
   useEffect(() => {
@@ -53,6 +69,7 @@ export default function PublishModal({
       document.body.style.overflow = 'hidden'
       return () => { document.body.style.overflow = prev }
     }
+    return undefined
   }, [open])
 
   if (!open) return null
@@ -82,7 +99,10 @@ export default function PublishModal({
       return
     }
     setDone(data)
-    onPublished?.(data)
+    // publishWork returns data alongside an error; if error is null we
+    // know data was populated. Cast to satisfy the callback signature
+    // without changing the runtime call shape from the original JSX.
+    onPublished?.(data as DoneWork)
   }
 
   return (
@@ -197,7 +217,15 @@ export default function PublishModal({
 
 // ── 完成视图 ──────────────────────────────────────────────
 
-function DoneView({ work, onClose }) {
+interface DoneViewProps {
+  work: DoneWork
+  onClose: () => void
+}
+
+function DoneView({ work, onClose }: DoneViewProps) {
+  void work  // work is part of the DoneView contract but the current
+            // view renders static confirmation text; keep the prop so
+            // future revisions can show the new work id/cover.
   return (
     <div style={doneStyle}>
       <div style={doneSealStyle}>已 提 交</div>
@@ -214,7 +242,7 @@ function DoneView({ work, onClose }) {
 
 // ── 样式 ──────────────────────────────────────────────────
 
-const overlayStyle = {
+const overlayStyle: CSSProperties = {
   position: 'fixed',
   inset: 0,
   background: 'rgba(10,8,6,0.88)',
@@ -227,7 +255,7 @@ const overlayStyle = {
   padding: 20,
 }
 
-const modalStyle = {
+const modalStyle: CSSProperties = {
   position: 'relative',
   background: 'linear-gradient(135deg, #14100A 0%, #1F1812 100%)',
   border: '1px solid rgba(212,175,55,0.4)',
@@ -241,7 +269,7 @@ const modalStyle = {
   boxShadow: '0 30px 80px rgba(0,0,0,0.7)',
 }
 
-const closeBtnStyle = {
+const closeBtnStyle: CSSProperties = {
   position: 'absolute',
   top: 16, right: 16,
   width: 32, height: 32,
@@ -253,13 +281,13 @@ const closeBtnStyle = {
   lineHeight: 1,
 }
 
-const headerStyle = {
+const headerStyle: CSSProperties = {
   textAlign: 'center',
   marginBottom: 32,
   paddingTop: 8,
 }
 
-const sealStyle = {
+const sealStyle: CSSProperties = {
   display: 'inline-block',
   background: '#C41E3A',
   color: '#F2EBDB',
@@ -271,7 +299,7 @@ const sealStyle = {
   marginBottom: 16,
 }
 
-const h2Style = {
+const h2Style: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 26,
   fontWeight: 500,
@@ -280,7 +308,7 @@ const h2Style = {
   letterSpacing: '0.05em',
 }
 
-const subTitleStyle = {
+const subTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   color: '#6B5C45',
@@ -288,19 +316,19 @@ const subTitleStyle = {
   fontWeight: 300,
 }
 
-const fieldStyle = {
+const fieldStyle: CSSProperties = {
   marginBottom: 20,
   flex: 1,
 }
 
-const fieldRowStyle = {
+const fieldRowStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   gap: 16,
   marginBottom: 20,
 }
 
-const labelStyle = {
+const labelStyle: CSSProperties = {
   display: 'block',
   fontFamily: "'Outfit', sans-serif",
   fontSize: 11,
@@ -310,7 +338,7 @@ const labelStyle = {
   marginBottom: 8,
 }
 
-const inputStyle = {
+const inputStyle: CSSProperties = {
   width: '100%',
   background: 'rgba(10,8,6,0.5)',
   border: '1px solid rgba(212,175,55,0.25)',
@@ -322,7 +350,7 @@ const inputStyle = {
   transition: 'border-color 0.3s',
 }
 
-const selectStyle = {
+const selectStyle: CSSProperties = {
   ...inputStyle,
   appearance: 'none',
   cursor: 'pointer',
@@ -332,7 +360,7 @@ const selectStyle = {
   paddingRight: 36,
 }
 
-const hintStyle = {
+const hintStyle: CSSProperties = {
   textAlign: 'right',
   fontSize: 11,
   color: '#6B5C45',
@@ -340,7 +368,7 @@ const hintStyle = {
   fontFamily: "'Outfit', sans-serif",
 }
 
-const forkNoteStyle = {
+const forkNoteStyle: CSSProperties = {
   padding: 16,
   background: 'rgba(196,30,58,0.08)',
   border: '1px solid rgba(196,30,58,0.3)',
@@ -351,7 +379,7 @@ const forkNoteStyle = {
   marginBottom: 20,
 }
 
-const agreeRowStyle = {
+const agreeRowStyle: CSSProperties = {
   display: 'flex',
   gap: 12,
   alignItems: 'flex-start',
@@ -362,7 +390,7 @@ const agreeRowStyle = {
   cursor: 'pointer',
 }
 
-const checkboxStyle = {
+const checkboxStyle: CSSProperties = {
   marginTop: 4,
   width: 16,
   height: 16,
@@ -370,7 +398,7 @@ const checkboxStyle = {
   cursor: 'pointer',
 }
 
-const agreeTextStyle = {
+const agreeTextStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   color: '#A89580',
@@ -378,7 +406,7 @@ const agreeTextStyle = {
   flex: 1,
 }
 
-const errorBoxStyle = {
+const errorBoxStyle: CSSProperties = {
   padding: 16,
   background: 'rgba(196,30,58,0.1)',
   border: '1px solid rgba(196,30,58,0.4)',
@@ -389,12 +417,12 @@ const errorBoxStyle = {
   textAlign: 'center',
 }
 
-const actionsStyle = {
+const actionsStyle: CSSProperties = {
   display: 'flex',
   gap: 12,
 }
 
-const cancelBtnStyle = {
+const cancelBtnStyle: CSSProperties = {
   flex: 1,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
@@ -406,7 +434,7 @@ const cancelBtnStyle = {
   letterSpacing: '0.2em',
 }
 
-const submitBtnStyle = (disabled) => ({
+const submitBtnStyle = (disabled: boolean): CSSProperties => ({
   flex: 2,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
@@ -423,12 +451,12 @@ const submitBtnStyle = (disabled) => ({
 
 // ── 完成视图样式 ─────────────────────────────────────────
 
-const doneStyle = {
+const doneStyle: CSSProperties = {
   textAlign: 'center',
   padding: '32px 0',
 }
 
-const doneSealStyle = {
+const doneSealStyle: CSSProperties = {
   display: 'inline-block',
   background: '#D4AF37',
   color: '#0A0806',
@@ -440,7 +468,7 @@ const doneSealStyle = {
   marginBottom: 24,
 }
 
-const doneTitleStyle = {
+const doneTitleStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 24,
   fontWeight: 500,
@@ -448,7 +476,7 @@ const doneTitleStyle = {
   marginBottom: 16,
 }
 
-const doneDescStyle = {
+const doneDescStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   color: '#A89580',
@@ -456,7 +484,7 @@ const doneDescStyle = {
   marginBottom: 32,
 }
 
-const doneBtnStyle = {
+const doneBtnStyle: CSSProperties = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',

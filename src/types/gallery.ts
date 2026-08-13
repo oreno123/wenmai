@@ -54,4 +54,5 @@ export interface ListWorksParams {
   series?: string | null
   template?: string | null
   limit?: number
+  offset?: number
 }
