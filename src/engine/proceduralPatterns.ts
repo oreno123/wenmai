@@ -24,9 +24,11 @@ interface Neighbor {
   dist: number;
 }
 
+type GeneratorParams = { size?: number } & Record<string, number | undefined>
+
 interface GeneratorConfig {
   name: string;
-  generate: (params: Record<string, number>) => SVGSVGElement;
+  generate: (params: GeneratorParams) => SVGSVGElement;
   params: Record<string, number>;
 }
 
@@ -111,7 +113,10 @@ function spiralHuiwenPath(startX: number, startY: number, size: number, turns: n
 /**
  * 回纹 — 方折螺旋
  */
-export function generateHuiwen(size: number = 512, unit: number = 40, turns: number = 4): SVGSVGElement {
+export function generateHuiwen(params: GeneratorParams): SVGSVGElement {
+  const size = params.size ?? 512
+  const unit = params.unit ?? 40
+  const turns = params.turns ?? 4
   const svg = createSVG(size)
 
   // 生成回纹方阵
@@ -167,7 +172,9 @@ function wanziPath(cx: number, cy: number, r: number): string {
 /**
  * 万字纹 — 卐 连续图案
  */
-export function generateWanzi(size: number = 512, unit: number = 80): SVGSVGElement {
+export function generateWanzi(params: GeneratorParams): SVGSVGElement {
+  const size = params.size ?? 512
+  const unit = params.unit ?? 80
   const svg = createSVG(size)
   const gap = unit * 1.5
   const cols = Math.ceil(size / gap) + 1
@@ -190,7 +197,9 @@ export function generateWanzi(size: number = 512, unit: number = 80): SVGSVGElem
 /**
  * 冰裂纹 — 随机几何冰裂网络（Voronoi 风格）
  */
-export function generateBinglie(size: number = 512, density: number = 40): SVGSVGElement {
+export function generateBinglie(params: GeneratorParams): SVGSVGElement {
+  const size = params.size ?? 512
+  const density = params.density ?? 40
   const svg = createSVG(size)
 
   // 生成随机点
@@ -244,7 +253,9 @@ export function generateBinglie(size: number = 512, density: number = 40): SVGSV
 /**
  * 雷纹 — 商周青铜器风格方折回旋
  */
-export function generateLeiwen(size: number = 512, turns: number = 8): SVGSVGElement {
+export function generateLeiwen(params: GeneratorParams): SVGSVGElement {
+  const size = params.size ?? 512
+  const turns = params.turns ?? 8
   const svg = createSVG(size)
   const margin = size * 0.1
   const inner = size - margin * 2
@@ -283,7 +294,9 @@ export function generateLeiwen(size: number = 512, turns: number = 8): SVGSVGEle
 /**
  * 绳纹 — 交织绳索纹样
  */
-export function generateShengwen(size: number = 512, strands: number = 2): SVGSVGElement {
+export function generateShengwen(params: GeneratorParams): SVGSVGElement {
+  const size = params.size ?? 512
+  const strands = params.strands ?? 2
   const svg = createSVG(size)
   const amplitude = size * 0.15
   const frequency = 3

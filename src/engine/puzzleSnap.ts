@@ -1,4 +1,4 @@
-import { SNAP_THRESHOLD as SNAP_DIST, SNAP_STRENGTH_VAL } from '../constants'
+import { SNAP_THRESHOLD as SNAP_DIST, SNAP_STRENGTH } from '../constants'
 
 // ── Types ─────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ export interface StaticPlacementEntry {
 // ── Constants ─────────────────────────────────────────
 
 const SNAP_THRESHOLD = SNAP_DIST   // from constants
-const SNAP_STRENGTH_VAL_VAL = SNAP_STRENGTH_VAL
+const SNAP_STRENGTH_VAL_VAL = SNAP_STRENGTH
 
 // ── Functions ─────────────────────────────────────────
 
@@ -118,8 +118,8 @@ export function findContourSnap(
           bestDist = dist
           const factor = 1 - Math.min(dist / SNAP_THRESHOLD, 1)
           bestOffset = {
-            dx: -dx * SNAP_STRENGTH_VAL * factor,
-            dy: -dy * SNAP_STRENGTH_VAL * factor,
+            dx: -dx * SNAP_STRENGTH * factor,
+            dy: -dy * SNAP_STRENGTH * factor,
           }
           bestTarget = si
         }
