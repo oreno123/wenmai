@@ -50,9 +50,6 @@ export class HandSwipeDetector {
   // Scale detection
   private prevTwoHandDistance: number | null = null
 
-  // Swipe directions accumulator (assigned across state transitions)
-  private swipeDirections: unknown[] = []
-
   // Callbacks cleanup
   private onVisibilityChange: (() => void) | null = null
 
@@ -190,7 +187,6 @@ export class HandSwipeDetector {
       if (now - this.noHandSince >= NO_HAND_TIMEOUT_MS) {
         this.transitionTo('IDLE')
         this.noHandSince = 0
-        this.swipeDirections = []
         this.prevTwoHandDistance = null
         this.callbacks.onHandsUpdate([])
       }
@@ -226,7 +222,6 @@ export class HandSwipeDetector {
     if (numHands >= 2 && this.state !== 'SCALING') {
       const dist = this.twoHandDistance(hands[0].palmCenter, hands[1].palmCenter)
       this.prevTwoHandDistance = dist
-      this.swipeDirections = []
       this.transitionTo('SCALING')
     } else if (numHands >= 2 && this.state === 'SCALING') {
       const dist = this.twoHandDistance(hands[0].palmCenter, hands[1].palmCenter)
@@ -245,7 +240,6 @@ export class HandSwipeDetector {
     // Back to single hand — exit scaling
     if (numHands < 2 && this.state === 'SCALING') {
       this.prevTwoHandDistance = null
-      this.swipeDirections = []
       this.transitionTo('TRACKING')
     }
 
