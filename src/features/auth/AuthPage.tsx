@@ -2,9 +2,9 @@ import { useState, useCallback, useEffect } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { signInWithEmail, signUpWithEmail, signOut } from '../lib/auth'
-import { useAuth } from '../lib/auth'
-import FluidShaderBackground from '../components/common/FluidShaderBackground'
+import { signInWithEmail, signUpWithEmail, signOut } from '../../lib/auth'
+import { useAuth } from '../../lib/auth'
+import FluidShaderBackground from '../../components/common/FluidShaderBackground'
 
 /* 云雷纹装饰圆 — brand crest */
 function CrestMark({ size = 48, opacity = 0.9 }: { size?: number; opacity?: number }) {

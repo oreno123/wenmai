@@ -6,18 +6,18 @@ import AppRoutes from '../Routes'
 // Stub all lazy-loaded pages. Each must `default` export a component.
 // Note: vi.mock paths resolve relative to the test file
 // (src/app/__tests/), so we use ../../pages/... to reach src/pages/.
-vi.mock('../../pages/SplashPage', () => ({ default: () => <div data-testid="splash">Splash</div> }))
-vi.mock('../../pages/AuthPage', () => ({ default: () => <div data-testid="auth">Auth</div> }))
-vi.mock('../../pages/Home', () => ({ default: () => <div data-testid="home">Home</div> }))
-vi.mock('../../pages/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
+vi.mock('../../features/splash/SplashPage', () => ({ default: () => <div data-testid="splash">Splash</div> }))
+vi.mock('../../features/auth/AuthPage', () => ({ default: () => <div data-testid="auth">Auth</div> }))
+vi.mock('../../features/home/Home', () => ({ default: () => <div data-testid="home">Home</div> }))
+vi.mock('../../features/library/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
 vi.mock('../../features/create/modes/FreeMode', () => ({ default: () => <div data-testid="create">Create</div> }))
 vi.mock('../../features/gacha/GachaPage', () => ({ default: () => <div data-testid="gacha">Gacha</div> }))
 vi.mock('../../features/gallery/GalleryPage', () => ({ default: () => <div data-testid="gallery">Gallery</div> }))
 vi.mock('../../features/gallery/WorkDetailPage', () => ({ default: () => <div data-testid="work">Work</div> }))
-vi.mock('../../pages/PatternDetailPage', () => ({ default: () => <div data-testid="pattern">Pattern</div> }))
-vi.mock('../../pages/PhotoMatchPage', () => ({ default: () => <div data-testid="photo">PhotoMatch</div> }))
+vi.mock('../../features/library/PatternDetailPage', () => ({ default: () => <div data-testid="pattern">Pattern</div> }))
+vi.mock('../../features/photo-match/PhotoMatchPage', () => ({ default: () => <div data-testid="photo">PhotoMatch</div> }))
 vi.mock('../../features/gallery/AdminReviewPage', () => ({ default: () => <div data-testid="admin">Admin</div> }))
-vi.mock('../../pages/CuratePage', () => ({ default: () => <div data-testid="curate">Curate</div> }))
+vi.mock('../../features/tools/CuratePage', () => ({ default: () => <div data-testid="curate">Curate</div> }))
 vi.mock('../../pages/demo/SeriesDemoPage', () => ({ default: () => <div data-testid="demo">Demo</div> }))
 
 async function renderAt(path: string) {

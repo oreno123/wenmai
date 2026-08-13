@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import * as THREE from 'three'
-import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
+import { vertexShader, fragmentShader } from '../../shaders/cloudTrain'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../../lib/auth'
 
 export default function SplashPage() {
   const containerRef = useRef<HTMLDivElement>(null)

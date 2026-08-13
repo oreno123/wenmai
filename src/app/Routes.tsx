@@ -3,18 +3,18 @@ import type { ReactNode } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { renderLegacyRedirects } from './LegacyRedirects'
 
-const SplashPage = lazy(() => import('../pages/SplashPage'))
-const AuthPage = lazy(() => import('../pages/AuthPage'))
-const Home = lazy(() => import('../pages/Home'))
-const Library = lazy(() => import('../pages/Library'))
+const SplashPage = lazy(() => import('../features/splash/SplashPage'))
+const AuthPage = lazy(() => import('../features/auth/AuthPage'))
+const Home = lazy(() => import('../features/home/Home'))
+const Library = lazy(() => import('../features/library/Library'))
 const CreatePage = lazy(() => import('../features/create/CreatePage'))
 const GachaPage = lazy(() => import('../features/gacha/GachaPage'))
 const GalleryPage = lazy(() => import('../features/gallery/GalleryPage'))
 const WorkDetailPage = lazy(() => import('../features/gallery/WorkDetailPage'))
-const PatternDetailPage = lazy(() => import('../pages/PatternDetailPage'))
-const PhotoMatchPage = lazy(() => import('../pages/PhotoMatchPage'))
+const PatternDetailPage = lazy(() => import('../features/library/PatternDetailPage'))
+const PhotoMatchPage = lazy(() => import('../features/photo-match/PhotoMatchPage'))
 const AdminReviewPage = lazy(() => import('../features/gallery/AdminReviewPage'))
-const CuratePage = lazy(() => import('../pages/CuratePage'))
+const CuratePage = lazy(() => import('../features/tools/CuratePage'))
 const SeriesDemoPage = lazy(() => import('../pages/demo/SeriesDemoPage'))
 
 function PageLoader() {

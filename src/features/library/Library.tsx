@@ -1,12 +1,12 @@
 import { lazy, Suspense, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../store/AppState'
-import PatternCard from '../components/cards/PatternCard'
-import { getPatternById, PATTERN_LIBRARY, getAllSeries } from '../store/patternData'
-import type { Pattern, Rarity } from '../store/patternData'
+import { useApp } from '../../store/AppState'
+import PatternCard from '../../components/cards/PatternCard'
+import { getPatternById, PATTERN_LIBRARY, getAllSeries } from '../../store/patternData'
+import type { Pattern, Rarity } from '../../store/patternData'
 
-const GestureCardView = lazy(() => import('../gesture-cards/GestureCardView'))
+const GestureCardView = lazy(() => import('../../gesture-cards/GestureCardView'))
 
 const TABS: { id: 'mine' | 'all'; label: string }[] = [
   { id: 'mine', label: '我的' },

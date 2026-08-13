@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import ELEMENT_MANIFEST from '../../public/elements/manifest.json'
-import APPROVED_DEFAULT from '../../public/elements/approved.json'
+import ELEMENT_MANIFEST from '../../../public/elements/manifest.json'
+import APPROVED_DEFAULT from '../../../public/elements/approved.json'
 
 const STORAGE_KEY = 'wenmai_approved_elements'
 

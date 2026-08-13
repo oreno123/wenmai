@@ -4,10 +4,10 @@ import type { ReactNode } from 'react'
 import App from '../App'
 
 // Stub all lazy-loaded pages so Suspense doesn't suspend in tests.
-vi.mock('../../pages/SplashPage', () => ({ default: () => <div data-testid="splash">Splash</div> }))
-vi.mock('../../pages/Home', () => ({ default: () => <div data-testid="home">Home</div> }))
-vi.mock('../../pages/AuthPage', () => ({ default: () => <div data-testid="auth">Auth</div> }))
-vi.mock('../../pages/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
+vi.mock('../../features/splash/SplashPage', () => ({ default: () => <div data-testid="splash">Splash</div> }))
+vi.mock('../../features/home/Home', () => ({ default: () => <div data-testid="home">Home</div> }))
+vi.mock('../../features/auth/AuthPage', () => ({ default: () => <div data-testid="auth">Auth</div> }))
+vi.mock('../../features/library/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
 vi.mock('../../features/create/modes/FreeMode', () => ({ default: () => <div data-testid="create">Create</div> }))
 vi.mock('../../features/gallery/GalleryPage', () => ({ default: () => <div data-testid="gallery">Gallery</div> }))
 
