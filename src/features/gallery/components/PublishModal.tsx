@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { CSSProperties } from 'react'
-import { publishWork } from '../../lib/galleryApi'
+import { publishWork } from '../../../lib/galleryApi'
 
 // ──────────────────────────────────────────────────────────
 // PublishModal — 发布作品到广场

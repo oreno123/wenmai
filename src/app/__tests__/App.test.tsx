@@ -9,7 +9,7 @@ vi.mock('../../pages/Home', () => ({ default: () => <div data-testid="home">Home
 vi.mock('../../pages/AuthPage', () => ({ default: () => <div data-testid="auth">Auth</div> }))
 vi.mock('../../pages/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
 vi.mock('../../pages/PuzzlePage', () => ({ default: () => <div data-testid="create">Create</div> }))
-vi.mock('../../pages/GalleryPage', () => ({ default: () => <div data-testid="gallery">Gallery</div> }))
+vi.mock('../../features/gallery/GalleryPage', () => ({ default: () => <div data-testid="gallery">Gallery</div> }))
 
 // Stub AppProvider's underlying store hook so we don't need Supabase.
 vi.mock('../../store/AppState', async () => {

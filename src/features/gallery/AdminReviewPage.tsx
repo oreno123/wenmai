@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
-import { listPendingReviews, approveWork, rejectWork } from '../lib/galleryApi'
-import AdminOnlyRoute from '../components/gallery/AdminOnlyRoute'
-import type { GalleryWork } from '../types/gallery'
+import { useAuth } from '../../lib/auth'
+import { listPendingReviews, approveWork, rejectWork } from '../../lib/galleryApi'
+import AdminOnlyRoute from './components/AdminOnlyRoute'
+import type { GalleryWork } from '../../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // AdminReviewPage — /admin 审核队列

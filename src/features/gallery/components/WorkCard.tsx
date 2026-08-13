@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CSSProperties, MouseEvent } from 'react'
-import type { GalleryWork } from '../../types/gallery'
+import type { GalleryWork } from '../../../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // WorkCard — 广场瀑布流卡片

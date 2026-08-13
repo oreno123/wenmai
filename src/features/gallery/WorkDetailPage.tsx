@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { CSSProperties } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
-import { getWork, listForksOf, toggleLike, hasLiked } from '../lib/galleryApi'
-import type { GalleryWork } from '../types/gallery'
+import { useAuth } from '../../lib/auth'
+import { getWork, listForksOf, toggleLike, hasLiked } from '../../lib/galleryApi'
+import type { GalleryWork } from '../../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // WorkDetailPage — /work/:id

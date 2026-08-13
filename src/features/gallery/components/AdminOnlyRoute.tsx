@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchIsAdmin } from '../../lib/galleryApi'
-import { useAuth } from '../../lib/auth'
+import { fetchIsAdmin } from '../../../lib/galleryApi'
+import { useAuth } from '../../../lib/auth'
 
 // ──────────────────────────────────────────────────────────
 // AdminOnlyRoute — 包裹组件，仅 is_admin=true 可访问

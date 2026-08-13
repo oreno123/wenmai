@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
-import { listWorks, toggleLike, hasLiked } from '../lib/galleryApi'
-import WorkCard from '../components/gallery/WorkCard'
-import type { GalleryWork, GallerySortKey } from '../types/gallery'
+import { useAuth } from '../../lib/auth'
+import { listWorks, toggleLike, hasLiked } from '../../lib/galleryApi'
+import WorkCard from './components/WorkCard'
+import type { GalleryWork, GallerySortKey } from '../../types/gallery'
 
 // ──────────────────────────────────────────────────────────
 // GalleryPage — /gallery 广场首页
