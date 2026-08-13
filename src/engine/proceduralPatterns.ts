@@ -114,9 +114,7 @@ function spiralHuiwenPath(startX: number, startY: number, size: number, turns: n
  * 回纹 — 方折螺旋
  */
 export function generateHuiwen(params: GeneratorParams): SVGSVGElement {
-  const size = params.size ?? 512
-  const unit = params.unit ?? 40
-  const turns = params.turns ?? 4
+  const { size = 512, unit = 40, turns = 4 } = params
   const svg = createSVG(size)
 
   // 生成回纹方阵
@@ -173,8 +171,7 @@ function wanziPath(cx: number, cy: number, r: number): string {
  * 万字纹 — 卐 连续图案
  */
 export function generateWanzi(params: GeneratorParams): SVGSVGElement {
-  const size = params.size ?? 512
-  const unit = params.unit ?? 80
+  const { size = 512, unit = 80 } = params
   const svg = createSVG(size)
   const gap = unit * 1.5
   const cols = Math.ceil(size / gap) + 1
@@ -198,8 +195,7 @@ export function generateWanzi(params: GeneratorParams): SVGSVGElement {
  * 冰裂纹 — 随机几何冰裂网络（Voronoi 风格）
  */
 export function generateBinglie(params: GeneratorParams): SVGSVGElement {
-  const size = params.size ?? 512
-  const density = params.density ?? 40
+  const { size = 512, density = 40 } = params
   const svg = createSVG(size)
 
   // 生成随机点
@@ -254,8 +250,7 @@ export function generateBinglie(params: GeneratorParams): SVGSVGElement {
  * 雷纹 — 商周青铜器风格方折回旋
  */
 export function generateLeiwen(params: GeneratorParams): SVGSVGElement {
-  const size = params.size ?? 512
-  const turns = params.turns ?? 8
+  const { size = 512, turns = 8 } = params
   const svg = createSVG(size)
   const margin = size * 0.1
   const inner = size - margin * 2
@@ -295,8 +290,7 @@ export function generateLeiwen(params: GeneratorParams): SVGSVGElement {
  * 绳纹 — 交织绳索纹样
  */
 export function generateShengwen(params: GeneratorParams): SVGSVGElement {
-  const size = params.size ?? 512
-  const strands = params.strands ?? 2
+  const { size = 512, strands = 2 } = params
   const svg = createSVG(size)
   const amplitude = size * 0.15
   const frequency = 3

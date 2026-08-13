@@ -47,7 +47,6 @@ export interface StaticPlacementEntry {
 // ── Constants ─────────────────────────────────────────
 
 const SNAP_THRESHOLD = SNAP_DIST   // from constants
-const SNAP_STRENGTH_VAL_VAL = SNAP_STRENGTH
 
 // ── Functions ─────────────────────────────────────────
 
