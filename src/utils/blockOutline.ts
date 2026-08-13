@@ -7,7 +7,7 @@ const MASK_SIZE = 32
 // backgrounds, or fine bronze engravings) yields a noisy mask where the
 // flood-fill leaks through gaps that should be closed.
 
-function dilateMask(src, size, radius) {
+function dilateMask(src: Uint8Array, size: number, radius: number) {
   const dst = new Uint8Array(size * size)
   const r2 = radius * radius
   for (let y = 0; y < size; y++) {
@@ -28,7 +28,7 @@ function dilateMask(src, size, radius) {
   return dst
 }
 
-function erodeMask(src, size, radius) {
+function erodeMask(src: Uint8Array, size: number, radius: number) {
   const dst = new Uint8Array(size * size)
   const r2 = radius * radius
   for (let y = 0; y < size; y++) {
@@ -50,7 +50,7 @@ function erodeMask(src, size, radius) {
   return dst
 }
 
-function closeMask(src, size, radius) {
+function closeMask(src: Uint8Array, size: number, radius: number) {
   return erodeMask(dilateMask(src, size, radius), size, radius)
 }
 
@@ -73,12 +73,30 @@ function closeMask(src, size, radius) {
  * boundingRadius is normalized to [0, 1] (fraction of half-mask-size),
  * measured from the mask centroid to its farthest occupied cell.
  */
-export function extractShapeData(img, { clearCorners = true } = {}) {
+export interface ShapeDataOptions {
+  clearCorners?: boolean
+}
+
+export interface Centroid {
+  x: number
+  y: number
+}
+
+export interface ShapeData {
+  mask: Uint8Array
+  boundingRadius: number
+  size: number
+  centroid?: Centroid
+}
+
+type ImageSource = HTMLImageElement | HTMLCanvasElement
+
+export function extractShapeData(img: ImageSource, { clearCorners = true }: ShapeDataOptions = {}): ShapeData {
   const size = OUTLINE_SIZE
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d')!
 
   const scale = size / Math.max(img.width, img.height)
   const w = img.width * scale, h = img.height * scale
@@ -153,7 +171,7 @@ export function extractShapeData(img, { clearCorners = true } = {}) {
   // correct "shape" the user sees. Otherwise (continuous line art) fall
   // back to raw so the mask matches the visible lines.
   const outside = new Uint8Array(size * size)
-  const queue = []
+  const queue: number[] = []
   for (let y = 0; y < size; y++)
     for (let x = 0; x < size; x++)
       if ((y === 0 || y === size - 1 || x === 0 || x === size - 1) && !closed[y * size + x]) {
@@ -177,7 +195,7 @@ export function extractShapeData(img, { clearCorners = true } = {}) {
   for (let i = 0; i < outside.length; i++) if (outside[i]) outsideCount++
   const outsideRatio = outsideCount / outside.length
 
-  let mask256
+  let mask256: Uint8Array
   if (outsideRatio > 0.05) {
     // Single-subject: solid = interior (everything flood-fill didn't reach)
     mask256 = new Uint8Array(size * size)
@@ -240,12 +258,17 @@ export function extractShapeData(img, { clearCorners = true } = {}) {
  *   series that are photographic (qinghua — porcelain photos have no
  *   watermark and overpainting corners shows up as visible squares).
  */
-export function createOutlinedBlock(img, { clearCorners = true, mode = 'stamp' } = {}) {
+export interface OutlinedBlockOptions {
+  clearCorners?: boolean
+  mode?: 'stamp' | 'line'
+}
+
+export function createOutlinedBlock(img: ImageSource, { clearCorners = true, mode = 'stamp' }: OutlinedBlockOptions = {}): HTMLCanvasElement {
   const size = OUTLINE_SIZE
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d')!
 
   const scale = size / Math.max(img.width, img.height)
   const w = img.width * scale, h = img.height * scale
@@ -385,7 +408,7 @@ export function createOutlinedBlock(img, { clearCorners = true, mode = 'stamp' }
 
   // ── Single-subject mode: flood-fill + outline + dark backing.
   const outside = new Uint8Array(size * size)
-  const queue = []
+  const queue: number[] = []
   for (let y = 0; y < size; y++)
     for (let x = 0; x < size; x++)
       if ((y === 0 || y === size-1 || x === 0 || x === size-1) && !raw[y*size+x]) {
@@ -434,7 +457,7 @@ export function createOutlinedBlock(img, { clearCorners = true, mode = 'stamp' }
   const srcCanvas = document.createElement('canvas')
   srcCanvas.width = size
   srcCanvas.height = size
-  const srcCtx = srcCanvas.getContext('2d')
+  const srcCtx = srcCanvas.getContext('2d')!
   srcCtx.drawImage(img, ox, oy, w, h)
   const cornerSize = size * 0.18
   srcCtx.clearRect(0, 0, cornerSize, cornerSize)

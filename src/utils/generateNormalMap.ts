@@ -12,14 +12,14 @@
  *
  * Returns an offscreen canvas you can wrap in THREE.CanvasTexture.
  */
-export function generateNormalMap(img, strength = 1.5) {
+export function generateNormalMap(img: HTMLImageElement, strength = 1.5): HTMLCanvasElement {
   const w = img.width
   const h = img.height
 
   const srcCanvas = document.createElement('canvas')
   srcCanvas.width = w
   srcCanvas.height = h
-  const srcCtx = srcCanvas.getContext('2d')
+  const srcCtx = srcCanvas.getContext('2d')!
   srcCtx.drawImage(img, 0, 0)
   const srcData = srcCtx.getImageData(0, 0, w, h).data
 
@@ -47,7 +47,7 @@ export function generateNormalMap(img, strength = 1.5) {
   const dst = document.createElement('canvas')
   dst.width = w
   dst.height = h
-  const dstCtx = dst.getContext('2d')
+  const dstCtx = dst.getContext('2d')!
   const dstImg = dstCtx.createImageData(w, h)
   const d = dstImg.data
 
