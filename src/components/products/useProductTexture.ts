@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 export interface UseProductTextureOptions {
-  wrapS?: THREE.WrappingMode
-  wrapT?: THREE.WrappingMode
+  wrapS?: THREE.Wrapping
+  wrapT?: THREE.Wrapping
   repeat?: [number, number]
 }
 

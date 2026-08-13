@@ -1,12 +1,10 @@
 import { useEffect, useRef } from 'react'
-import type { CSSProperties } from 'react'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../../shaders/flowingFluid'
 
 interface FluidShaderBackgroundProps {
   opacity?: number
   intensity?: number
-  style?: CSSProperties
 }
 
 /**
