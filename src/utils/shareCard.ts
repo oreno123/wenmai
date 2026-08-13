@@ -1,18 +1,14 @@
 /**
  * Generate branded share card image using Canvas
  */
-import { getPatternImage, type Pattern, type SeriesInfo } from '../store/patternData'
+import { getPatternImage, type Pattern, type SeriesInfo, type Rarity } from '../store/patternData'
 
 const W = 750
 const H = 1334
 
-interface ShareCardSeriesInfo {
-  name?: string
-}
-
 export async function generateShareCard(
   pattern: Pattern,
-  seriesInfo?: SeriesInfo | ShareCardSeriesInfo,
+  seriesInfo?: SeriesInfo,
 ): Promise<Blob | null> {
   await document.fonts.ready
 
@@ -88,9 +84,9 @@ export async function generateShareCard(
   ctx.fillText(pattern.name, W / 2, nameY)
 
   // Rarity badge
-  const rarityColors: Record<string, string> = { ssr: '#F2D58A', rare: '#D4AF6A', common: '#8A8A8A' }
-  const rarityLabels: Record<string, string> = { ssr: '传说', rare: '稀有', common: '普通' }
-  const rarityText = rarityLabels[pattern.rarity] || '普通'
+  const rarityColors: Record<Rarity, string> = { ssr: '#F2D58A', rare: '#D4AF6A', common: '#8A8A8A' }
+  const rarityLabels: Record<Rarity, string> = { ssr: '传说', rare: '稀有', common: '普通' }
+  const rarityText = rarityLabels[pattern.rarity]
   ctx.font = '600 22px "Noto Serif SC", serif'
   const rarityW = ctx.measureText(rarityText).width + 32
   const rx = (W - rarityW) / 2

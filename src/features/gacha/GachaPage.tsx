@@ -64,7 +64,7 @@ export default function GachaPage() {
     setSharing(true)
     try {
       const series = getSeriesInfo(pattern.series)
-      const blob = await generateShareCard(pattern, series) as Blob | null
+      const blob = await generateShareCard(pattern, series)
       if (!blob) {
         console.error('Share card generation returned null blob')
         return
