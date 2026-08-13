@@ -1,7 +1,28 @@
 import { useEffect, useRef } from "react";
 
+interface Ray {
+  x: number
+  y: number
+  angle: number
+  len: number
+  w: number
+  alpha: number
+  speed: number
+  t: number
+}
+
+interface Particle {
+  x: number
+  y: number
+  r: number
+  alpha: number
+  vx: number
+  vy: number
+  t: number
+}
+
 export default function GoldBackground() {
-  const cvRef = useRef(null);
+  const cvRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const cv = cvRef.current;
@@ -10,12 +31,13 @@ export default function GoldBackground() {
     cv.width = W * devicePixelRatio;
     cv.height = H * devicePixelRatio;
     const ctx = cv.getContext("2d");
+    if (!ctx) return;
     ctx.scale(devicePixelRatio, devicePixelRatio);
 
     // Toned down from 16 rays / 80 particles — too much motion was competing
     // with foreground cards. Half the density, half the alpha = atmospheric
     // without being noisy.
-    const rays = Array.from({ length: 6 }, () => ({
+    const rays: Ray[] = Array.from({ length: 6 }, () => ({
       x: W * (0.15 + Math.random() * 0.7),
       y: H * (0.0 + Math.random() * 0.4),
       angle: -Math.PI / 2 + (Math.random() - 0.5) * 1.1,
@@ -26,7 +48,7 @@ export default function GoldBackground() {
       t: Math.random() * Math.PI * 2,
     }));
 
-    const particles = Array.from({ length: 40 }, () => ({
+    const particles: Particle[] = Array.from({ length: 40 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: 0.5 + Math.random() * 2,
@@ -36,9 +58,10 @@ export default function GoldBackground() {
       t: Math.random() * Math.PI * 2,
     }));
 
-    let raf;
+    let raf: number | null = null;
 
     function draw() {
+      if (!ctx) return;
       ctx.clearRect(0, 0, W, H);
 
       // Halved glow alpha so the dark base reads through and foreground
@@ -104,7 +127,7 @@ export default function GoldBackground() {
     }
 
     draw();
-    return () => cancelAnimationFrame(raf);
+    return () => { if (raf) cancelAnimationFrame(raf); };
   }, []);
 
   return (

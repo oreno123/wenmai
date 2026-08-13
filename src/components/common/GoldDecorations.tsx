@@ -1,7 +1,13 @@
+import type { CSSProperties, ReactNode } from 'react'
+
 /* 金丝装饰组件 */
 
+interface GoldThreadHProps {
+  style?: CSSProperties
+}
+
 /* 流动金丝线 - 横向 */
-export function GoldThreadH({ style }) {
+export function GoldThreadH({ style }: GoldThreadHProps) {
   return (
     <svg width="100%" height="12" style={{ display: 'block', ...style }} viewBox="0 0 400 12" preserveAspectRatio="none">
       <defs>
@@ -24,15 +30,22 @@ export function GoldThreadH({ style }) {
   )
 }
 
+type CornerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+
+interface CornerOrnamentProps {
+  position?: CornerPosition
+  size?: number
+}
+
 /* 角花装饰 - 左上 */
-export function CornerOrnament({ position = 'top-left', size = 40 }) {
-  const transforms = {
+export function CornerOrnament({ position = 'top-left', size = 40 }: CornerOrnamentProps) {
+  const transforms: Record<CornerPosition, string> = {
     'top-left': '',
     'top-right': 'scale(-1,1)',
     'bottom-left': 'scale(1,-1)',
     'bottom-right': 'scale(-1,-1)',
   }
-  const positions = {
+  const positions: Record<CornerPosition, CSSProperties> = {
     'top-left': { top: 0, left: 0 },
     'top-right': { top: 0, right: 0 },
     'bottom-left': { bottom: 0, left: 0 },
@@ -69,8 +82,14 @@ export function CornerOrnament({ position = 'top-left', size = 40 }) {
   )
 }
 
+interface SpinningGoldMandalaProps {
+  size?: number
+  opacity?: number
+  speed?: number
+}
+
 /* 旋转金丝纹 */
-export function SpinningGoldMandala({ size = 200, opacity = 0.06, speed = 40 }) {
+export function SpinningGoldMandala({ size = 200, opacity = 0.06, speed = 40 }: SpinningGoldMandalaProps) {
   return (
     <div style={{
       width: size, height: size,
@@ -106,8 +125,13 @@ export function SpinningGoldMandala({ size = 200, opacity = 0.06, speed = 40 }) 
   )
 }
 
+interface GoldThreadVProps {
+  x?: number | string
+  height?: number | string
+}
+
 /* 流动金丝 - 垂直装饰线 */
-export function GoldThreadV({ x = 0, height = '100%' }) {
+export function GoldThreadV({ x = 0, height = '100%' }: GoldThreadVProps) {
   return (
     <div style={{
       position: 'absolute',
@@ -129,8 +153,14 @@ export function GoldThreadV({ x = 0, height = '100%' }) {
   )
 }
 
+interface GoldWireBorderProps {
+  children?: ReactNode
+  style?: CSSProperties
+  ssr?: boolean
+}
+
 /* 金丝缠绕边框 */
-export function GoldWireBorder({ children, style, ssr = false }) {
+export function GoldWireBorder({ children, style, ssr = false }: GoldWireBorderProps) {
   return (
     <div style={{ position: 'relative', ...style }}>
       {/* SVG 边框 */}

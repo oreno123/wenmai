@@ -1,11 +1,23 @@
-const PRODUCTS = [
+interface ProductEntry {
+  id: 'mug' | 'case' | 'plate' | 'scarf'
+  label: string
+}
+
+const PRODUCTS: ProductEntry[] = [
   { id: 'mug', label: '杯子' },
   { id: 'case', label: '手机壳' },
   { id: 'plate', label: '圆盘' },
   { id: 'scarf', label: '丝巾' },
 ]
 
-export default function ProductSwitcher({ active, onChange }) {
+type ProductId = ProductEntry['id']
+
+interface ProductSwitcherProps {
+  active: ProductId
+  onChange: (id: ProductId) => void
+}
+
+export default function ProductSwitcher({ active, onChange }: ProductSwitcherProps) {
   return (
     <div style={{
       display: 'flex', gap: '8px', padding: '8px 16px',

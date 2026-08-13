@@ -1,6 +1,14 @@
 import { useState } from 'react'
+import type { CSSProperties, ImgHTMLAttributes } from 'react'
 
-export default function PatternImage({ src, alt, style, fallbackSize = 36, ...props }) {
+export interface PatternImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt' | 'style'> {
+  src?: string
+  alt: string
+  style?: CSSProperties
+  fallbackSize?: number
+}
+
+export default function PatternImage({ src, alt, style, fallbackSize = 36, ...props }: PatternImageProps) {
   const [failed, setFailed] = useState(false)
 
   if (failed || !src) {

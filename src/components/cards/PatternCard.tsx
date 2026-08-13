@@ -1,25 +1,35 @@
+import type { CSSProperties } from 'react'
 import { getRarityLabel, getPatternImage } from '../../store/patternData'
+import type { Pattern } from '../../store/patternData'
 import PatternImage from '../common/PatternImage'
 
-export default function PatternCard({ pattern, onClick, compact = false }) {
+interface PatternCardProps {
+  pattern: Pattern
+  onClick?: () => void
+  compact?: boolean
+}
+
+export default function PatternCard({ pattern, onClick, compact = false }: PatternCardProps) {
   const isSSR = pattern.rarity === 'ssr'
   const isRare = pattern.rarity === 'rare'
   const imgSrc = getPatternImage(pattern)
+
+  const cardStyle: CSSProperties = {
+    cursor: 'pointer',
+    transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    animation: isSSR ? 'pulse-glow 3s ease-in-out infinite' : 'none',
+    border: `1px solid ${
+      isSSR ? 'rgba(201,162,60,0.35)'
+      : isRare ? 'rgba(201,162,60,0.15)'
+      : 'var(--border-glass)'
+    }`,
+  }
 
   return (
     <div
       onClick={onClick}
       className={`glass-card rarity-${pattern.rarity}`}
-      style={{
-        cursor: 'pointer',
-        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        animation: isSSR ? 'pulse-glow 3s ease-in-out infinite' : 'none',
-        border: `1px solid ${
-          isSSR ? 'rgba(201,162,60,0.35)'
-          : isRare ? 'rgba(201,162,60,0.15)'
-          : 'var(--border-glass)'
-        }`,
-      }}
+      style={cardStyle}
     >
       {/* SSR 内发光 */}
       {isSSR && (

@@ -1,6 +1,13 @@
 import { useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../../shaders/flowingFluid'
+
+interface FluidShaderBackgroundProps {
+  opacity?: number
+  intensity?: number
+  style?: CSSProperties
+}
 
 /**
  * Real flowing-fluid background using FBM + domain warping.
@@ -8,15 +15,15 @@ import { vertexShader, fragmentShader } from '../../shaders/flowingFluid'
  * in water. Pure programmatic noise — no external textures, no WebGL
  * context conflicts, no mobile GPU compatibility risk.
  */
-export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 }) {
-  const containerRef = useRef(null)
+export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 }: FluidShaderBackgroundProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     let disposed = false
-    let raf = null
+    let raf: number | null = null
 
     // Match device pixel ratio but cap to keep GPU cost predictable.
     const RENDER_SCALE = 0.5
@@ -35,7 +42,7 @@ export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 
     const scene = new THREE.Scene()
     const camera = new THREE.Camera() // ShaderMaterial doesn't actually use it; presence required.
 
-    const uniforms = {
+    const uniforms: { [uniform: string]: THREE.IUniform } = {
       u_resolution: { value: new THREE.Vector2(W, H) },
       u_time: { value: 0.0 },
       u_intensity: { value: intensity },
@@ -60,7 +67,7 @@ export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 
     // Throttle to ~30fps for battery friendliness.
     let lastTime = 0
     const FRAME_INTERVAL = 1000 / 30
-    const animate = (now) => {
+    const animate = (now: number) => {
       if (disposed) return
       if (now - lastTime < FRAME_INTERVAL) {
         raf = requestAnimationFrame(animate)

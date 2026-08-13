@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Mug from './Mug'
@@ -5,7 +6,18 @@ import PhoneCase from './PhoneCase'
 import Plate from './Plate'
 import Scarf from './Scarf'
 
-const PRODUCT_COMPONENTS = { mug: Mug, case: PhoneCase, plate: Plate, scarf: Scarf }
+type ProductId = 'mug' | 'case' | 'plate' | 'scarf'
+
+interface ProductComponentProps {
+  texture: HTMLCanvasElement | null
+}
+
+const PRODUCT_COMPONENTS: Record<ProductId, (props: ProductComponentProps) => ReactNode> = {
+  mug: Mug as unknown as (props: ProductComponentProps) => ReactNode,
+  case: PhoneCase as unknown as (props: ProductComponentProps) => ReactNode,
+  plate: Plate as unknown as (props: ProductComponentProps) => ReactNode,
+  scarf: Scarf as unknown as (props: ProductComponentProps) => ReactNode,
+}
 
 function Lights() {
   return (
@@ -29,7 +41,12 @@ function Lights() {
   )
 }
 
-export default function ProductScene({ texture, activeProduct }) {
+interface ProductSceneProps {
+  texture: HTMLCanvasElement | null
+  activeProduct: ProductId
+}
+
+export default function ProductScene({ texture, activeProduct }: ProductSceneProps) {
   const ProductComponent = PRODUCT_COMPONENTS[activeProduct] || Mug
 
   return (

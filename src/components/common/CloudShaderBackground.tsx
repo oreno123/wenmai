@@ -1,6 +1,13 @@
 import { useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../../shaders/cloudTrain'
+
+interface CloudShaderBackgroundProps {
+  opacity?: number
+  blur?: number
+  style?: CSSProperties
+}
 
 /**
  * Continuously renders the cloud/fluid shader used by Splash — same warbling
@@ -10,15 +17,15 @@ import { vertexShader, fragmentShader } from '../../shaders/cloudTrain'
  * Renders at 40% resolution + CSS blur for a soft, dreamlike quality without
  * burning the GPU. Throttled to 30 fps.
  */
-export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
-  const containerRef = useRef(null)
+export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }: CloudShaderBackgroundProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     let disposed = false
-    let raf = null
+    let raf: number | null = null
 
     const RENDER_SCALE = 0.4
     const W = Math.round(window.innerWidth * RENDER_SCALE)
@@ -37,7 +44,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
 
-    const uniforms = {
+    const uniforms: { [uniform: string]: THREE.IUniform } = {
       u_resolution: { value: new THREE.Vector3(W, H, 1.0) },
       u_time: { value: 0.0 },
       u_noiseTexture: { value: new THREE.Texture() },
@@ -57,7 +64,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
 
     let lastTime = 0
     const FRAME_INTERVAL = 1000 / 30
-    const animate = (now) => {
+    const animate = (now: number) => {
       if (disposed) return
       if (now - lastTime < FRAME_INTERVAL) {
         raf = requestAnimationFrame(animate)
@@ -69,7 +76,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
       raf = requestAnimationFrame(animate)
     }
 
-    let tex
+    let tex: THREE.Texture | null = null
     fetch('/shaders/noise_base64.txt')
       .then(r => r.text())
       .then(b64 => {
@@ -84,7 +91,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
           tex.magFilter = THREE.NearestFilter
           tex.needsUpdate = true
           uniforms.u_noiseTexture.value = tex
-          uniforms.u_noiseSize.value.set(img.width, img.height)
+          ;(uniforms.u_noiseSize.value as THREE.Vector2).set(img.width, img.height)
           raf = requestAnimationFrame(animate)
         }
         img.src = b64.startsWith('data:image') ? b64 : `data:image/png;base64,${b64}`
@@ -97,7 +104,9 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
       material.dispose()
       try {
         if (tex?.dispose) tex.dispose()
-      } catch {}
+      } catch {
+        // ignore
+      }
       renderer.dispose()
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas)
     }

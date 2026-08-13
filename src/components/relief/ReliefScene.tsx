@@ -1,12 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { generateNormalMap } from '../../utils/generateNormalMap'
 
-function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4A265', normalScale = 1.6, porcelain = false }) {
-  const meshRef = useRef()
-  const [materials, setMaterials] = useState({ map: null, normalMap: null })
+interface ReliefMeshProps {
+  image: string
+  metalness?: number
+  roughness?: number
+  baseColor?: string
+  normalScale?: number
+  porcelain?: boolean
+}
+
+interface Materials {
+  map: THREE.Texture | null
+  normalMap: THREE.CanvasTexture | null
+}
+
+function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4A265', normalScale = 1.6, porcelain = false }: ReliefMeshProps) {
+  const meshRef = useRef<THREE.Group | THREE.Mesh>(null)
+  const [materials, setMaterials] = useState<Materials>({ map: null, normalMap: null })
 
   useEffect(() => {
     if (!image) return
@@ -20,12 +35,13 @@ function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4
       // QH WebPs may have transparent regions where RGB is (0,0,0); with
       // meshStandardMaterial.transparent=false those render as solid black,
       // turning the white-on-blue porcelain into blue-on-black garbage.
-      let tex
+      let tex: THREE.Texture
       if (porcelain) {
         const canvas = document.createElement('canvas')
         canvas.width = img.width
         canvas.height = img.height
         const ctx = canvas.getContext('2d')
+        if (!ctx) return
         ctx.fillStyle = '#FFFFFF'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(img, 0, 0)
@@ -70,7 +86,7 @@ function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4
     // the blue-on-white pattern; the clearcoat adds the glossy specular
     // highlights that read as fired ceramic.
     return (
-      <group ref={meshRef}>
+      <group ref={meshRef as unknown as RefObject<THREE.Group>}>
         {/* Outer unglazed foot ring — slightly warmer, matte */}
         <mesh>
           <circleGeometry args={[2.0, 96]} />
@@ -105,11 +121,11 @@ function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4
   }
 
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef as unknown as RefObject<THREE.Mesh>}>
       <circleGeometry args={[1.85, 96]} />
       <meshStandardMaterial
         map={materials.map}
-        normalMap={materials.normalMap}
+        normalMap={materials.normalMap ?? undefined}
         normalScale={[normalScale, normalScale]}
         metalness={metalness}
         roughness={roughness}
@@ -120,8 +136,12 @@ function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4
   )
 }
 
-function Lights({ porcelain = false }) {
-  const mainRef = useRef()
+interface LightsProps {
+  porcelain?: boolean
+}
+
+function Lights({ porcelain = false }: LightsProps) {
+  const mainRef = useRef<THREE.PointLight>(null)
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
     if (mainRef.current) {
@@ -146,7 +166,16 @@ function Lights({ porcelain = false }) {
   )
 }
 
-export default function ReliefScene({ image, metalness, roughness, baseColor, normalScale, porcelain }) {
+interface ReliefSceneProps {
+  image: string
+  metalness?: number
+  roughness?: number
+  baseColor?: string
+  normalScale?: number
+  porcelain?: boolean
+}
+
+export default function ReliefScene({ image, metalness, roughness, baseColor, normalScale, porcelain }: ReliefSceneProps) {
   // Gold relief reads best on near-black; porcelain needs a warm cream backdrop
   // so the white glaze doesn't clash with a black void.
   const bgColor = porcelain ? '#E8DCC2' : '#0A0807'

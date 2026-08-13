@@ -2,14 +2,18 @@ import * as THREE from 'three'
 import useProductTexture from './useProductTexture'
 import GLBModel from './GLBModel'
 
-function PhoneCaseGeometry({ texture }) {
+interface PhoneCaseGeometryProps {
+  texture: THREE.CanvasTexture | null
+}
+
+function PhoneCaseGeometry({ texture }: PhoneCaseGeometryProps) {
   return (
     <group>
       {/* Back panel - pattern */}
       <mesh position={[0, 0, -0.08]}>
         <boxGeometry args={[1.6, 3.2, 0.1]} />
         <meshStandardMaterial
-          map={texture}
+          map={texture ?? undefined}
           metalness={0.2}
           roughness={0.7}
           color={texture ? '#ffffff' : '#D4AF6A'}
@@ -34,7 +38,11 @@ function PhoneCaseGeometry({ texture }) {
   )
 }
 
-export default function PhoneCase({ texture }) {
+interface PhoneCaseProps {
+  texture: HTMLCanvasElement | null
+}
+
+export default function PhoneCase({ texture }: PhoneCaseProps) {
   const canvasTexture = useProductTexture(texture, {
     wrapS: THREE.ClampToEdgeWrapping,
     wrapT: THREE.ClampToEdgeWrapping,

@@ -1,51 +1,65 @@
 import { useRef, useEffect } from 'react'
 
+interface Point { x: number; y: number }
+interface Trail {
+  points: Point[]
+  width: number
+  speed: number
+  phase: number
+}
+
 /**
  * 熔金光轨 - 粗厚版
  * 2条对角线 molten gold trails，bloom 拉满
  */
 export default function GoldSilkCanvas() {
-  const canvasRef = useRef(null)
-  const animRef = useRef(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animRef = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    let w, h
+    if (!ctx) return
+    let w = 0, h = 0
 
-    function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight }
+    function resize() {
+      if (!canvas) return
+      w = canvas.width = window.innerWidth
+      h = canvas.height = window.innerHeight
+    }
     resize()
     window.addEventListener('resize', resize)
 
-    const trails = [
-      { points: makeDiag(w, h, 0.05, 0.55), width: 35, speed: 0.05, phase: 0 },
-      { points: makeDiag(w, h, 0.45, 0.9), width: 28, speed: 0.04, phase: 2.5 },
-    ]
-
-    function makeDiag(w, h, y0, y1) {
+    function makeDiag(width: number, height: number, y0: number, y1: number): Point[] {
       const n = 8
       return Array.from({ length: n }, (_, i) => {
         const t = i / (n - 1)
         return {
-          x: t * w * 1.4 - w * 0.2,
-          y: h * y0 + (h * (y1 - y0)) * t + (Math.random() - 0.5) * 50,
+          x: t * width * 1.4 - width * 0.2,
+          y: height * y0 + (height * (y1 - y0)) * t + (Math.random() - 0.5) * 50,
         }
       })
     }
 
-    function curve(ctx, pts) {
-      ctx.beginPath()
-      ctx.moveTo(pts[0].x, pts[0].y)
+    const trails: Trail[] = [
+      { points: makeDiag(w, h, 0.05, 0.55), width: 35, speed: 0.05, phase: 0 },
+      { points: makeDiag(w, h, 0.45, 0.9), width: 28, speed: 0.04, phase: 2.5 },
+    ]
+
+    function curve(context: CanvasRenderingContext2D, pts: Point[]) {
+      context.beginPath()
+      context.moveTo(pts[0].x, pts[0].y)
       for (let i = 0; i < pts.length - 1; i++) {
         const xc = (pts[i].x + pts[i + 1].x) / 2
         const yc = (pts[i].y + pts[i + 1].y) / 2
-        ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc)
+        context.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc)
       }
-      ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y)
+      context.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y)
     }
 
     function animate() {
+      if (!ctx) return
       const t = Date.now() * 0.001
       ctx.clearRect(0, 0, w, h)
 
@@ -97,7 +111,10 @@ export default function GoldSilkCanvas() {
       animRef.current = requestAnimationFrame(animate)
     }
     animate()
-    return () => { window.removeEventListener('resize', resize); if (animRef.current) cancelAnimationFrame(animRef.current) }
+    return () => {
+      window.removeEventListener('resize', resize)
+      if (animRef.current) cancelAnimationFrame(animRef.current)
+    }
   }, [])
 
   return (

@@ -1,10 +1,17 @@
+import type { CSSProperties, ReactNode } from 'react'
+
 /**
  * 传统纹样装饰组件
  * 回纹角花、卷草纹边框、缠枝装饰
  */
 
+interface MeanderCornerProps {
+  size?: number
+  opacity?: number
+}
+
 /* 回纹角花 SVG */
-export function MeanderCorner({ size = 32, opacity = 0.35 }) {
+export function MeanderCorner({ size = 32, opacity = 0.35 }: MeanderCornerProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" style={{ display: 'block' }}>
       <path
@@ -40,8 +47,14 @@ export function MeanderCorner({ size = 32, opacity = 0.35 }) {
   )
 }
 
+interface ScrollBorderProps {
+  width?: number | string
+  height?: number
+  flip?: boolean
+}
+
 /* 卷草纹装饰条 */
-export function ScrollBorder({ width = '100%', height = 16, flip = false }) {
+export function ScrollBorder({ width = '100%', height = 16, flip = false }: ScrollBorderProps) {
   return (
     <svg
       width={width} height={height}
@@ -77,8 +90,13 @@ export function ScrollBorder({ width = '100%', height = 16, flip = false }) {
   )
 }
 
+interface CirclePatternProps {
+  size?: number
+  opacity?: number
+}
+
 /* 圆形纹样装饰（用于抽卡卡面中心） */
-export function CirclePattern({ size = 120, opacity = 0.2 }) {
+export function CirclePattern({ size = 120, opacity = 0.2 }: CirclePatternProps) {
   return (
     <svg width={size} height={size} viewBox="-60 -60 120 120" style={{ display: 'block' }}>
       {/* 外圈 */}
@@ -120,10 +138,31 @@ export function CirclePattern({ size = 120, opacity = 0.2 }) {
   )
 }
 
+type CornerKey = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+
+interface OrnateFrameProps {
+  children?: ReactNode
+  style?: CSSProperties
+  ssr?: boolean
+}
+
 /* 完整装饰框（卡片用） */
-export function OrnateFrame({ children, style, ssr = false }) {
+export function OrnateFrame({ children, style, ssr = false }: OrnateFrameProps) {
   const cornerOpacity = ssr ? 0.6 : 0.25
   const borderOpacity = ssr ? 0.35 : 0.12
+
+  const transforms: Record<CornerKey, string> = {
+    'top-left': '',
+    'top-right': 'scaleX(-1)',
+    'bottom-left': 'scaleY(-1)',
+    'bottom-right': 'scale(-1)',
+  }
+  const positions: Record<CornerKey, CSSProperties> = {
+    'top-left': { top: '4px', left: '4px' },
+    'top-right': { top: '4px', right: '4px' },
+    'bottom-left': { bottom: '4px', left: '4px' },
+    'bottom-right': { bottom: '4px', right: '4px' },
+  }
 
   return (
     <div style={{ position: 'relative', borderRadius: '16px', ...style }}>
@@ -182,31 +221,17 @@ export function OrnateFrame({ children, style, ssr = false }) {
       </svg>
 
       {/* 四角回纹 */}
-      {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(pos => {
-        const transforms = {
-          'top-left': '',
-          'top-right': 'scaleX(-1)',
-          'bottom-left': 'scaleY(-1)',
-          'bottom-right': 'scale(-1)',
-        }
-        const positions = {
-          'top-left': { top: '4px', left: '4px' },
-          'top-right': { top: '4px', right: '4px' },
-          'bottom-left': { bottom: '4px', left: '4px' },
-          'bottom-right': { bottom: '4px', right: '4px' },
-        }
-        return (
-          <div key={pos} style={{
-            position: 'absolute',
-            ...positions[pos],
-            zIndex: 3,
-            transform: transforms[pos],
-            pointerEvents: 'none',
-          }}>
-            <MeanderCorner size={ssr ? 36 : 24} opacity={cornerOpacity} />
-          </div>
-        )
-      })}
+      {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as CornerKey[]).map(pos => (
+        <div key={pos} style={{
+          position: 'absolute',
+          ...positions[pos],
+          zIndex: 3,
+          transform: transforms[pos],
+          pointerEvents: 'none',
+        }}>
+          <MeanderCorner size={ssr ? 36 : 24} opacity={cornerOpacity} />
+        </div>
+      ))}
 
       {children}
     </div>

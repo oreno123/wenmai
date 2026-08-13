@@ -1,8 +1,11 @@
 import * as THREE from 'three'
-import { useMemo } from 'react'
 import useProductTexture from './useProductTexture'
 
-function PlateGeometry({ texture }) {
+interface PlateGeometryProps {
+  texture: THREE.CanvasTexture | null
+}
+
+function PlateGeometry({ texture }: PlateGeometryProps) {
   const topRadius = 2.0
   const bottomRadius = 1.6
   const height = 0.3
@@ -27,7 +30,7 @@ function PlateGeometry({ texture }) {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, height / 2 + 0.01, 0]}>
         <circleGeometry args={[topRadius - 0.15, 64]} />
         <meshStandardMaterial
-          map={texture}
+          map={texture ?? undefined}
           metalness={0.12}
           roughness={0.8}
           color={texture ? '#ffffff' : '#F0EBE0'}
@@ -47,7 +50,11 @@ function PlateGeometry({ texture }) {
   )
 }
 
-export default function Plate({ texture }) {
+interface PlateProps {
+  texture: HTMLCanvasElement | null
+}
+
+export default function Plate({ texture }: PlateProps) {
   const canvasTexture = useProductTexture(texture, {
     wrapS: THREE.ClampToEdgeWrapping,
     wrapT: THREE.ClampToEdgeWrapping,

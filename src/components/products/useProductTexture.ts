@@ -2,7 +2,16 @@ import { useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export default function useProductTexture(canvasEl, opts = {}) {
+export interface UseProductTextureOptions {
+  wrapS?: THREE.WrappingMode
+  wrapT?: THREE.WrappingMode
+  repeat?: [number, number]
+}
+
+export default function useProductTexture(
+  canvasEl: HTMLCanvasElement | null,
+  opts: UseProductTextureOptions = {}
+): THREE.CanvasTexture | null {
   const tex = useMemo(() => {
     if (!canvasEl) return null
     const t = new THREE.CanvasTexture(canvasEl)
@@ -10,7 +19,7 @@ export default function useProductTexture(canvasEl, opts = {}) {
     if (opts.wrapT != null) t.wrapT = opts.wrapT
     if (opts.repeat) t.repeat.set(opts.repeat[0], opts.repeat[1])
     return t
-  }, [canvasEl])
+  }, [canvasEl])  // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     return () => { if (tex) tex.dispose() }

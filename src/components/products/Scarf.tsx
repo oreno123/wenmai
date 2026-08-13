@@ -2,10 +2,14 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import useProductTexture from './useProductTexture'
 
-function ScarfGeometry({ texture }) {
+interface ScarfGeometryProps {
+  texture: THREE.CanvasTexture | null
+}
+
+function ScarfGeometry({ texture }: ScarfGeometryProps) {
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(3, 3, 48, 48)
-    const pos = geo.attributes.position
+    const pos = geo.attributes.position as THREE.BufferAttribute
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i)
       const y = pos.getY(i)
@@ -20,7 +24,7 @@ function ScarfGeometry({ texture }) {
   return (
     <mesh geometry={geometry} rotation={[-0.4, 0, 0]}>
       <meshStandardMaterial
-        map={texture}
+        map={texture ?? undefined}
         side={THREE.DoubleSide}
         metalness={0.0}
         roughness={0.92}
@@ -30,7 +34,11 @@ function ScarfGeometry({ texture }) {
   )
 }
 
-export default function Scarf({ texture }) {
+interface ScarfProps {
+  texture: HTMLCanvasElement | null
+}
+
+export default function Scarf({ texture }: ScarfProps) {
   const canvasTexture = useProductTexture(texture, {
     wrapS: THREE.RepeatWrapping,
     wrapT: THREE.RepeatWrapping,

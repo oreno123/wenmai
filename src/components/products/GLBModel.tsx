@@ -1,26 +1,36 @@
 import { Suspense, Component, useEffect, useRef } from 'react'
+import type { ReactNode, ErrorInfo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
-class ErrorBoundary extends Component {
-  state = { hasError: false }
-  static getDerivedStateFromError() { return { hasError: true } }
-  componentDidCatch() { this.setState({ hasError: true }) }
-  render() {
+interface LocalErrorBoundaryProps {
+  children: ReactNode
+  fallback: ReactNode
+}
+interface LocalErrorBoundaryState {
+  hasError: boolean
+}
+
+class ErrorBoundary extends Component<LocalErrorBoundaryProps, LocalErrorBoundaryState> {
+  state: LocalErrorBoundaryState = { hasError: false }
+  static getDerivedStateFromError(): LocalErrorBoundaryState { return { hasError: true } }
+  componentDidCatch(): void { this.setState({ hasError: true }) }
+  override render(): ReactNode {
     return this.state.hasError ? this.props.fallback : this.props.children
   }
 }
 
+type FilterName = 'sides' | 'top'
+
 // Filter: only show texture on faces matching the normal direction
 // sides → horizontal normals (mug body), top → upward normals (plate surface)
-const FILTERS = {
+const FILTERS: Record<FilterName, string> = {
   sides: '1.0 - abs(vLN.y)',
   top: 'vLN.y',
 }
 
-function applyFilter(mat, filterName) {
+function applyFilter(mat: THREE.MeshStandardMaterial, filterName: FilterName): void {
   const expr = FILTERS[filterName]
-  if (!expr) return
   mat.onBeforeCompile = (shader) => {
     // Inject object-space normal into vertex shader
     shader.vertexShader = 'varying vec3 vLN;\n' + shader.vertexShader
@@ -40,7 +50,7 @@ function applyFilter(mat, filterName) {
   }
 }
 
-function normalize(obj, rotation) {
+function normalize(obj: THREE.Object3D, rotation?: [number, number, number]): void {
   if (rotation) {
     obj.rotation.set(rotation[0], rotation[1], rotation[2])
     obj.updateMatrixWorld(true)
@@ -57,9 +67,16 @@ function normalize(obj, rotation) {
   obj.position.set(-center.x * s, -center.y * s + size.y * s * 0.1, -center.z * s)
 }
 
-function GLBScene({ url, texture, rotation, filter }) {
+interface GLBSceneProps {
+  url: string
+  texture: THREE.CanvasTexture | null
+  rotation?: [number, number, number]
+  filter?: FilterName
+}
+
+function GLBScene({ url, texture, rotation, filter }: GLBSceneProps) {
   const { scene } = useGLTF(url)
-  const ref = useRef(null)
+  const ref = useRef<THREE.Object3D>(null)
   if (!ref.current) {
     ref.current = scene.clone(true)
     normalize(ref.current, rotation)
@@ -67,23 +84,33 @@ function GLBScene({ url, texture, rotation, filter }) {
 
   useEffect(() => {
     const root = ref.current
+    if (!root) return
     root.traverse(c => {
-      if (!c.isMesh) return
+      const mesh = c as THREE.Mesh
+      if (!mesh.isMesh) return
       const mat = new THREE.MeshStandardMaterial({
-        map: texture,
+        map: texture ?? undefined,
         color: '#ffffff',
         metalness: 0.15,
         roughness: 0.7,
       })
       if (filter) applyFilter(mat, filter)
-      c.material = mat
+      mesh.material = mat
     })
   }, [texture, filter])
 
   return <primitive object={ref.current} />
 }
 
-export default function GLBModel({ url, texture, fallback, rotation, filter }) {
+interface GLBModelProps {
+  url: string
+  texture: THREE.CanvasTexture | null
+  fallback: ReactNode
+  rotation?: [number, number, number]
+  filter?: FilterName
+}
+
+export default function GLBModel({ url, texture, fallback, rotation, filter }: GLBModelProps) {
   return (
     <ErrorBoundary fallback={fallback}>
       <Suspense fallback={fallback}>

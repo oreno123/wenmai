@@ -2,7 +2,11 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import useProductTexture from './useProductTexture'
 
-function MugGeometry({ texture }) {
+interface MugGeometryProps {
+  texture: THREE.CanvasTexture | null
+}
+
+function MugGeometry({ texture }: MugGeometryProps) {
   const handleGeo = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(1.0, 0.95, 0),
@@ -20,7 +24,7 @@ function MugGeometry({ texture }) {
       <mesh>
         <cylinderGeometry args={[1, 0.9, 2.5, 32, 1, true, -Math.PI / 2, Math.PI]} />
         <meshStandardMaterial
-          map={texture}
+          map={texture ?? undefined}
           side={THREE.DoubleSide}
           metalness={0.25}
           roughness={0.55}
@@ -60,7 +64,11 @@ function MugGeometry({ texture }) {
   )
 }
 
-export default function Mug({ texture }) {
+interface MugProps {
+  texture: HTMLCanvasElement | null
+}
+
+export default function Mug({ texture }: MugProps) {
   const canvasTexture = useProductTexture(texture, {
     wrapS: THREE.ClampToEdgeWrapping,
     wrapT: THREE.ClampToEdgeWrapping,
