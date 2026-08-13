@@ -46,4 +46,17 @@ export default defineConfig({
     tailwindcss(),
     writeFilePlugin(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('@supabase/supabase-js')) return 'supabase'
+            if (id.includes('framer-motion')) return 'motion'
+            if (id.includes('lottie-web')) return 'lottie'
+          }
+        },
+      },
+    },
+  },
 })
