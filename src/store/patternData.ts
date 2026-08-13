@@ -28,7 +28,7 @@ export interface Pattern {
   rarity: Rarity
   tags: string[]
   image: string
-  procedural?: string
+  procedural?: ProceduralPatternType
 }
 
 export interface SeriesInfo {
@@ -206,7 +206,7 @@ export function getPatternImage(pattern: Pattern | undefined): string {
   if (pattern.image) return pattern.image
   if (pattern.procedural) {
     if (!_svgCache.has(pattern.id)) {
-      _svgCache.set(pattern.id, generatePatternDataURL(pattern.procedural as unknown as ProceduralPatternType))
+      _svgCache.set(pattern.id, generatePatternDataURL(pattern.procedural))
     }
     return _svgCache.get(pattern.id)!
   }
