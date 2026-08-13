@@ -50,6 +50,9 @@ export class HandSwipeDetector {
   // Scale detection
   private prevTwoHandDistance: number | null = null
 
+  // Swipe directions accumulator (assigned across state transitions)
+  private swipeDirections: unknown[] = []
+
   // Callbacks cleanup
   private onVisibilityChange: (() => void) | null = null
 

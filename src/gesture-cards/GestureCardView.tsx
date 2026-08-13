@@ -192,6 +192,7 @@ export default function GestureCardView({ patterns, onClose }: Props) {
 
     // 5. Resize handler
     function onResize() {
+      if (!canvas) return
       const w = window.innerWidth
       const h = window.innerHeight
       canvas.width = w
