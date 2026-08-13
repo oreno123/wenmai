@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AppProviders } from './providers'
 import AppRoutes from './Routes'
@@ -7,8 +7,6 @@ import { SeriesSkinLayer } from './SeriesSkinLayer'
 import { useApp } from '../store/AppState'
 import { useAuth } from '../lib/auth'
 import { setSyncUser } from '../store/gameStore'
-
-const GoldBackground = lazy(() => import('../components/common/GoldBackground'))
 
 /**
  * Bridge Supabase auth state to the zustand game store. Must live inside
@@ -41,9 +39,6 @@ function Layout() {
   return (
     <>
       <CloudSync />
-      <Suspense fallback={null}>
-        <GoldBackground />
-      </Suspense>
       <SeriesSkinLayer>
         <AppRoutes />
       </SeriesSkinLayer>
