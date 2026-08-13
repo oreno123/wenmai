@@ -153,9 +153,10 @@ export function useGameStore(): GameStore {
       saveData(next)
       // When logged in, push to cloud (debounced 1s)
       if (syncUserId) {
+        const uid = syncUserId
         if (pushTimer) clearTimeout(pushTimer)
         pushTimer = setTimeout(() => {
-          pushToCloud(syncUserId, next)
+          pushToCloud(uid, next)
         }, 1000)
       }
       return next

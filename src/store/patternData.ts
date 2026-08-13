@@ -1,4 +1,4 @@
-import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/proceduralPatterns'
+import { generatePatternDataURL, PROCEDURAL_GENERATORS, type ProceduralPatternType } from '../engine/proceduralPatterns'
 import { RARITY_WEIGHTS, PITY_THRESHOLD, SOFT_PITY_START } from '../constants'
 import { QINGHUA_PATTERNS } from '../data/qinghuaPatterns'
 import { AI_ASSETS, AiAsset } from '../data/aiAssets'
@@ -206,7 +206,7 @@ export function getPatternImage(pattern: Pattern | undefined): string {
   if (pattern.image) return pattern.image
   if (pattern.procedural) {
     if (!_svgCache.has(pattern.id)) {
-      _svgCache.set(pattern.id, generatePatternDataURL(pattern.procedural))
+      _svgCache.set(pattern.id, generatePatternDataURL(pattern.procedural as unknown as ProceduralPatternType))
     }
     return _svgCache.get(pattern.id)!
   }
