@@ -768,7 +768,7 @@ export default function Home() {
 }
 
 interface SeriesCarouselProps {
-  series: import('../store/patternData').SeriesWithPatterns
+  series: import('../../store/patternData').SeriesWithPatterns
   navigate: (path: string) => void
 }
 
