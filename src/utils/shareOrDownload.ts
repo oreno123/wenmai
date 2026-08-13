@@ -1,15 +1,15 @@
 /**
  * Web Share API + download fallback
  */
-export async function shareImage(blob, filename = 'wenmai-share.png') {
+export async function shareImage(blob: Blob, filename = 'wenmai-share.png') {
   const file = new File([blob], filename, { type: 'image/png' })
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file] })
       return 'shared'
-    } catch (e) {
-      if (e.name === 'AbortError') return 'cancelled'
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === 'AbortError') return 'cancelled'
     }
   }
 
