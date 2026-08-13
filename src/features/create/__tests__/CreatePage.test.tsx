@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route, useSearchParams } from 'react-router-dom'
 import CreatePage from '../CreatePage'
 import { normalizeSub } from '../SubModeTabs'
 
-vi.mock('../../../pages/PuzzlePage', () => ({
+vi.mock('../modes/FreeMode', () => ({
   __esModule: true,
   default: () => <div data-testid="free-mode">FreeMode</div>,
 }))
