@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import { useApp } from '../../store/AppState'
-import { getRandomPattern, getRarityLabel } from '../../store/patternData'
-import type { Pattern } from '../../store/patternData'
+import { useApp } from '../../../store/AppState'
+import { getRandomPattern, getRarityLabel } from '../../../store/patternData'
+import type { Pattern } from '../../../store/patternData'
 
 type PullState = 'idle' | 'pulling' | 'revealed'
 

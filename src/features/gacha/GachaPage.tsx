@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useApp } from '../store/AppState'
-import { getRandomPattern, getRarityLabel, getPatternImage, getTenPullPatterns, getSeriesInfo } from '../store/patternData'
-import type { Pattern } from '../store/patternData'
-import { PULL_COST, TEN_PULL_COST } from '../constants'
-import { generateShareCard } from '../utils/shareCard'
-import PatternImage from '../components/common/PatternImage'
+import { useApp } from '../../store/AppState'
+import { getRandomPattern, getRarityLabel, getPatternImage, getTenPullPatterns, getSeriesInfo } from '../../store/patternData'
+import type { Pattern } from '../../store/patternData'
+import { PULL_COST, TEN_PULL_COST } from '../../constants'
+import { generateShareCard } from '../../utils/shareCard'
+import PatternImage from '../../components/common/PatternImage'
 
 /* 太极 + 能量环 SVG */
 function YinYangSymbol({ size = 120, bloom = false }: { size?: number; bloom?: boolean }) {

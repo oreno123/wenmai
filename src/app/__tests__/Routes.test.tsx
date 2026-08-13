@@ -11,7 +11,7 @@ vi.mock('../../pages/AuthPage', () => ({ default: () => <div data-testid="auth">
 vi.mock('../../pages/Home', () => ({ default: () => <div data-testid="home">Home</div> }))
 vi.mock('../../pages/Library', () => ({ default: () => <div data-testid="library">Library</div> }))
 vi.mock('../../pages/PuzzlePage', () => ({ default: () => <div data-testid="create">Create</div> }))
-vi.mock('../../pages/GachaPage', () => ({ default: () => <div data-testid="gacha">Gacha</div> }))
+vi.mock('../../features/gacha/GachaPage', () => ({ default: () => <div data-testid="gacha">Gacha</div> }))
 vi.mock('../../features/gallery/GalleryPage', () => ({ default: () => <div data-testid="gallery">Gallery</div> }))
 vi.mock('../../features/gallery/WorkDetailPage', () => ({ default: () => <div data-testid="work">Work</div> }))
 vi.mock('../../pages/PatternDetailPage', () => ({ default: () => <div data-testid="pattern">Pattern</div> }))
