@@ -1,9 +1,27 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision'
+import type { NormalizedLandmark } from '@mediapipe/tasks-vision'
 import { GESTURE_OPEN_THRESHOLD, GESTURE_CLOSE_THRESHOLD, GESTURE_FRAMES } from './constants'
 
-export default function useHandGesture() {
-  const [state, setState] = useState({
+void useCallback
+
+export interface Landmark {
+  x: number
+  y: number
+  z: number
+}
+
+export interface HandGestureState {
+  isOpen: boolean
+  isFist: boolean
+  isReady: boolean
+  error: string | null
+  allLandmarks: Landmark[][]
+  videoEl: HTMLVideoElement | null
+}
+
+export default function useHandGesture(): HandGestureState {
+  const [state, setState] = useState<HandGestureState>({
     isOpen: false,
     isFist: false,
     isReady: false,
@@ -12,12 +30,12 @@ export default function useHandGesture() {
     videoEl: null,
   })
 
-  const handLandmarkerRef = useRef(null)
-  const videoRef = useRef(null)
+  const handLandmarkerRef = useRef<HandLandmarker | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const openFramesRef = useRef(0)
   const closeFramesRef = useRef(0)
   const gestureRef = useRef({ isOpen: false, isFist: false })
-  const rafRef = useRef(null)
+  const rafRef = useRef<number | null>(null)
   const lastTimestamp = useRef(-1)
 
   useEffect(() => {
@@ -59,12 +77,13 @@ export default function useHandGesture() {
         if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return }
 
         video.srcObject = stream
-        await new Promise((resolve) => { video.onloadedmetadata = () => video.play().then(resolve) })
+        await new Promise<void>((resolve) => { video.onloadedmetadata = () => video.play().then(resolve) })
 
         setState((s) => ({ ...s, isReady: true, videoEl: video }))
         detect()
       } catch (err) {
-        setState((s) => ({ ...s, error: err.message }))
+        const message = err instanceof Error ? err.message : String(err)
+        setState((s) => ({ ...s, error: message }))
       }
     }
 
@@ -95,10 +114,10 @@ export default function useHandGesture() {
         const result = hl.detectForVideo(vid, timestamp)
         if (result.landmarks && result.landmarks.length > 0) {
           // Store all hands' landmarks
-          setState(s => ({ ...s, allLandmarks: result.landmarks }))
+          setState(s => ({ ...s, allLandmarks: result.landmarks as Landmark[][] }))
 
           // Use first hand for gesture detection
-          const landmarks = result.landmarks[0]
+          const landmarks: NormalizedLandmark[] = result.landmarks[0]
           const wrist = landmarks[0]
           const middleMCP = landmarks[9]
           const palmScale = dist3D(wrist, middleMCP)
@@ -155,7 +174,7 @@ export default function useHandGesture() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       if (videoRef.current) {
         const s = videoRef.current.srcObject
-        if (s) s.getTracks().forEach((t) => t.stop())
+        if (s && s instanceof MediaStream) s.getTracks().forEach((t) => t.stop())
         videoRef.current.remove()
       }
       if (handLandmarkerRef.current) {
@@ -168,6 +187,6 @@ export default function useHandGesture() {
   return state
 }
 
-function dist3D(a, b) {
+function dist3D(a: Landmark, b: Landmark): number {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2)
 }

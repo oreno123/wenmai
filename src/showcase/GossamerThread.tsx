@@ -3,29 +3,37 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Line } from '@react-three/drei'
 import { GOLD_COLOR, BREAK_DISTANCE } from './constants'
+import type { Vec3 } from './FragmentMesh'
 
-export default function GossamerThread({ pieceA, pieceB, originalDist }) {
-  const groupRef = useRef()
+interface GossamerThreadProps {
+  pieceA: { position: Vec3 }
+  pieceB: { position: Vec3 }
+  originalDist?: number
+}
+
+export default function GossamerThread({ pieceA, pieceB }: GossamerThreadProps) {
+  const groupRef = useRef<THREE.Group>(null)
   const breakThreshold = BREAK_DISTANCE
 
-  const defaultPoints = useMemo(() => [
+  const defaultPoints = useMemo<[THREE.Vector3, THREE.Vector3, THREE.Vector3]>(() => [
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 0),
   ], [])
 
   useFrame(() => {
-    if (!groupRef.current) return
+    const group = groupRef.current
+    if (!group) return
     const dx = pieceA.position.x - pieceB.position.x
     const dy = pieceA.position.y - pieceB.position.y
     const dz = pieceA.position.z - pieceB.position.z
     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
     if (dist > breakThreshold || dist < 0.01) {
-      groupRef.current.visible = false
+      group.visible = false
       return
     }
-    groupRef.current.visible = true
+    group.visible = true
 
     const opacity = Math.max(0, 1 - dist / breakThreshold)
     const midX = (pieceA.position.x + pieceB.position.x) / 2
@@ -38,8 +46,8 @@ export default function GossamerThread({ pieceA, pieceB, originalDist }) {
     pts[1].set(midX, midY - sag, midZ)
     pts[2].set(pieceB.position.x, pieceB.position.y, pieceB.position.z)
 
-    const coreLine = groupRef.current.children[0]
-    const glowLine = groupRef.current.children[1]
+    const coreLine = group.children[0] as unknown as { material?: { opacity: number; linewidth: number } }
+    const glowLine = group.children[1] as unknown as { material?: { opacity: number; linewidth: number } }
     if (coreLine?.material) {
       coreLine.material.opacity = opacity
       coreLine.material.linewidth = Math.max(0.5, 2 * opacity)

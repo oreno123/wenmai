@@ -1,13 +1,14 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import ShatterScene from '../../../showcase/ShatterScene'
+import type { ShatterSceneProps } from '../../../showcase/ShatterScene'
 import useHandGesture from '../../../showcase/useHandGesture'
 import { BG_COLOR } from '../../../showcase/constants'
 
 // ── Types ─────────────────────────────────────────────
-// useHandGesture.js is untyped; landmarks come from MediaPipe and
-// sessionStorage JSON is free-form. We type them loosely here so the
-// showcase shell stays logic-neutral during the .tsx migration.
+// useHandGesture exports its own HandGestureState now, but sessionStorage
+// JSON is free-form — placements are cast at the call site to stay
+// logic-neutral about the puzzle page's exact schema.
 interface Landmark {
   x: number
   y: number
@@ -161,7 +162,7 @@ export default function Shatter() {
             isOpen={isOpen}
             isFist={isFist}
             imageUrl={userImage}
-            placements={placements}
+            placements={placements as ShatterSceneProps['placements']}
             allLandmarks={allLandmarks}
           />
         </Suspense>

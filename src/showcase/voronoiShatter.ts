@@ -1,23 +1,44 @@
 import Delaunator from 'delaunator'
 
-export function voronoiShatter(width, height, count, seed) {
-  const rng = seed ? createRng(seed) : Math.random
+export type Point = [number, number]
+
+export interface UVBounds {
+  minU: number
+  minV: number
+  maxU: number
+  maxV: number
+}
+
+export interface Fragment {
+  id: number
+  seed: Point
+  polygon: Point[]
+  uvBounds: UVBounds
+  neighbors: number[]
+}
+
+type RngFn = () => number
+
+type Delaunay = Delaunator<number[]>
+
+export function voronoiShatter(width: number, height: number, count: number, seed?: number): Fragment[] {
+  const rng: RngFn = seed ? createRng(seed) : Math.random
   const points = generatePoints(width, height, count, rng)
-  const delaunay = new Delaunator(points.flat())
+  const delaunay: Delaunay = new Delaunator(points.flat())
   const cells = computeVoronoiCells(points, delaunay, width, height)
   const neighbors = computeNeighbors(delaunay, count)
 
   return cells.map((polygon, i) => ({
     id: i,
-    seed: [points[i][0] / width, points[i][1] / height],
-    polygon: polygon.map(([x, y]) => [x / width, y / height]),
+    seed: [points[i][0] / width, points[i][1] / height] as Point,
+    polygon: polygon.map(([x, y]) => [x / width, y / height] as Point),
     uvBounds: computeUVBounds(polygon, width, height),
     neighbors: neighbors[i] || [],
   }))
 }
 
-function generatePoints(width, height, count, rng) {
-  const points = []
+function generatePoints(width: number, height: number, count: number, rng: RngFn): Point[] {
+  const points: Point[] = []
   const cx = width / 2, cy = height / 2
   for (let i = 0; i < count; i++) {
     const angle = rng() * Math.PI * 2
@@ -30,17 +51,18 @@ function generatePoints(width, height, count, rng) {
   return points
 }
 
-function computeVoronoiCells(points, delaunay, width, height) {
+function computeVoronoiCells(points: Point[], delaunay: Delaunay, width: number, height: number): Point[][] {
   const { triangles, halfedges } = delaunay
   const n = points.length
   const circumcenters = computeCircumcenters(points, triangles)
 
-  const cells = Array.from({ length: n }, () => [])
+  const cells: Point[][] = Array.from({ length: n }, () => [])
 
   for (let e = 0; e < triangles.length; e++) {
     const t = Math.floor(e / 3)
     const p = triangles[e]
     const prev = triangles[e - (e % 3 === 0 ? -2 : 1)]
+    void prev
     const opp = halfedges[e]
     if (opp === -1 || opp < e) continue
 
@@ -53,8 +75,10 @@ function computeVoronoiCells(points, delaunay, width, height) {
 
   return cells.map((cell) => {
     if (cell.length === 0) return [[0, 0], [width, 0], [width, height], [0, height]]
-    const center = [cell.reduce((s, p) => s + p[0], 0) / cell.length,
-                    cell.reduce((s, p) => s + p[1], 0) / cell.length]
+    const center: Point = [
+      cell.reduce<number>((s, p) => s + p[0], 0) / cell.length,
+      cell.reduce<number>((s, p) => s + p[1], 0) / cell.length,
+    ]
     const sorted = cell.sort((a, b) => {
       return Math.atan2(a[1] - center[1], a[0] - center[0]) -
              Math.atan2(b[1] - center[1], b[0] - center[0])
@@ -63,9 +87,9 @@ function computeVoronoiCells(points, delaunay, width, height) {
   })
 }
 
-function computeCircumcenters(points, triangles) {
+function computeCircumcenters(points: Point[], triangles: Uint32Array): Point[] {
   const count = triangles.length / 3
-  const result = []
+  const result: Point[] = []
   for (let t = 0; t < count; t++) {
     const i = triangles[t * 3], j = triangles[t * 3 + 1], k = triangles[t * 3 + 2]
     const [ax, ay] = points[i], [bx, by] = points[j], [cx, cy] = points[k]
@@ -83,15 +107,18 @@ function computeCircumcenters(points, triangles) {
   return result
 }
 
-function clipPolygon(polygon, w, h) {
+type ClipTest = [(v: number) => boolean, 0 | 1, number]
+
+function clipPolygon(polygon: Point[], w: number, h: number): Point[] {
   if (polygon.length < 3) return [[0, 0], [w, 0], [w, h], [0, h]]
-  let output = polygon
-  for (const [inside, axis, limit] of [
+  let output: Point[] = polygon
+  const tests: ClipTest[] = [
     [(x) => x >= 0, 0, 0],
     [(x) => x <= w, 0, w],
     [(y) => y >= 0, 1, 0],
     [(y) => y <= h, 1, h],
-  ]) {
+  ]
+  for (const [inside, axis, limit] of tests) {
     if (output.length === 0) break
     const input = output
     output = []
@@ -108,9 +135,9 @@ function clipPolygon(polygon, w, h) {
   return output.length >= 3 ? output : polygon
 }
 
-function computeNeighbors(delaunay, count) {
+function computeNeighbors(delaunay: Delaunay, count: number): number[][] {
   const { triangles, halfedges } = delaunay
-  const neighbors = Array.from({ length: count }, () => new Set())
+  const neighbors: Set<number>[] = Array.from({ length: count }, () => new Set<number>())
   for (let e = 0; e < halfedges.length; e++) {
     const opp = halfedges[e]
     if (opp === -1) continue
@@ -121,7 +148,7 @@ function computeNeighbors(delaunay, count) {
   return neighbors.map((s) => [...s])
 }
 
-function computeUVBounds(polygon, w, h) {
+function computeUVBounds(polygon: Point[], w: number, h: number): UVBounds {
   let minU = Infinity, minV = Infinity, maxU = -Infinity, maxV = -Infinity
   for (const [x, y] of polygon) {
     minU = Math.min(minU, x); minV = Math.min(minV, y)
@@ -130,7 +157,7 @@ function computeUVBounds(polygon, w, h) {
   return { minU: minU / w, minV: minV / h, maxU: maxU / w, maxV: maxV / h }
 }
 
-function createRng(seed) {
+function createRng(seed: number): RngFn {
   let s = seed
   return () => { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646 }
 }

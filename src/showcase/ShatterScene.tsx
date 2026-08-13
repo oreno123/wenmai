@@ -3,19 +3,22 @@ import { useFrame, useLoader } from '@react-three/fiber'
 import * as THREE from 'three'
 import { updateSpring } from './springPhysics'
 import { voronoiShatter } from './voronoiShatter'
+import type { Fragment } from './voronoiShatter'
 import { SHATTER_SPRING, ASSEMBLE_SPRING, ROTATION_SPRING, GOLD_COLOR, BREAK_DISTANCE, FRAGMENT_COUNT } from './constants'
 import { getPatternById, getPatternImage } from '../store/patternData'
 import { createOutlinedBlock } from '../utils/blockOutline'
+import type { Landmark } from './useHandGesture'
+import type { Vec3, FragmentAnimState } from './FragmentMesh'
 
 // Module-level cache: same element file is processed once across all Showcase sessions.
-const _outlinedTextureCache = new Map()
+const _outlinedTextureCache = new Map<string, THREE.CanvasTexture | Promise<THREE.CanvasTexture>>()
 
-function loadOutlinedTexture(path, clearCorners = true) {
-  if (_outlinedTextureCache.has(path)) {
-    const cached = _outlinedTextureCache.get(path)
+function loadOutlinedTexture(path: string, clearCorners = true): Promise<THREE.CanvasTexture> {
+  const cached = _outlinedTextureCache.get(path)
+  if (cached) {
     return cached instanceof Promise ? cached : Promise.resolve(cached)
   }
-  const promise = new Promise((resolve, reject) => {
+  const promise = new Promise<THREE.CanvasTexture>((resolve, reject) => {
     const img = new Image()
     img.onload = () => {
       try {
@@ -49,11 +52,11 @@ const BLOCKS = [
   { id: 'zuoxia',         col: -1, row: -1 },
   { id: 'zhongxin_xia',   col:  0, row: -1 },
   { id: 'youxia',         col:  1, row: -1 },
-]
+] as const
 
 const BLOCK_PATHS = BLOCKS.map(b => `/puzzle/${b.id}_block.png`)
 
-const ADJ = [
+const ADJ: Array<[number, number]> = [
   [0,1],[0,3],[0,5],
   [1,2],[1,4],
   [2,4],[2,7],
@@ -65,20 +68,31 @@ const ADJ = [
 
 const CELL = 1.0
 
-function ClassicScene({ isOpen, isFist }) {
-  const textures = useLoader(THREE.TextureLoader, BLOCK_PATHS)
-  const meshRefs = useRef([])
-  const state = useRef(null)
+interface ClassicAnimState extends FragmentAnimState {
+  home: Vec3
+  shatterPos: Vec3
+  shatterRot: Vec3
+}
+
+interface ClassicSceneProps {
+  isOpen: boolean
+  isFist: boolean
+}
+
+function ClassicScene({ isOpen, isFist }: ClassicSceneProps) {
+  const textures = useLoader(THREE.TextureLoader, BLOCK_PATHS as unknown as string[])
+  const meshRefs = useRef<(THREE.Mesh | null)[]>([])
+  const state = useRef<ClassicAnimState[] | null>(null)
   const isShattered = useRef(false)
   const prevOpen = useRef(false)
   const prevFist = useRef(false)
-  const lightRef = useRef()
+  const lightRef = useRef<THREE.PointLight>(null)
 
   if (!state.current) {
     state.current = BLOCKS.map((b) => {
       const hx = b.col * CELL
       const hy = b.row * CELL
-      const home = { x: hx, y: hy, z: 0 }
+      const home: Vec3 = { x: hx, y: hy, z: 0 }
       const angle = Math.atan2(hy, hx) + (Math.random() - 0.5) * 0.6
       const dist = 1.8 + Math.random() * 1.0
       return {
@@ -122,7 +136,8 @@ function ClassicScene({ isOpen, isFist }) {
       lightRef.current.position.z = 3 + Math.sin(t * 0.4) * 0.5
     }
 
-    const pieces = state.current
+    const pieces = state.current!
+    if (!pieces) return
 
     if (isOpen && !prevOpen.current && !isShattered.current) {
       isShattered.current = true
@@ -146,12 +161,12 @@ function ClassicScene({ isOpen, isFist }) {
     for (let i = 0; i < pieces.length; i++) {
       const st = pieces[i]
       const spring = st.isAssembling ? ASSEMBLE_SPRING : SHATTER_SPRING
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.position[a], st.target[a], st.velocity[a], spring.stiffness, spring.damping, dt)
         st.position[a] = r.position
         st.velocity[a] = r.velocity
       }
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.rotation[a], st.targetRotation[a], st.rotVelocity[a], ROTATION_SPRING.stiffness, ROTATION_SPRING.damping, dt)
         st.rotation[a] = r.position
         st.rotVelocity[a] = r.velocity
@@ -172,7 +187,7 @@ function ClassicScene({ isOpen, isFist }) {
       const dy = stA.position.y - stB.position.y
       const dz = stA.position.z - stB.position.z
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
-      const pos = geo.attributes.position
+      const pos = geo.attributes.position as THREE.BufferAttribute
       if (dist > BREAK_DISTANCE || dist < 0.05) {
         pos.setXYZ(0, 0, 0, 0); pos.setXYZ(1, 0, 0, 0); pos.setXYZ(2, 0, 0, 0)
         pos.needsUpdate = true
@@ -187,25 +202,27 @@ function ClassicScene({ isOpen, isFist }) {
       pos.setXYZ(1, midX, midY - sag, midZ)
       pos.setXYZ(2, stB.position.x, stB.position.y, stB.position.z)
       pos.needsUpdate = true
-      const mat = geo.userData.matRef
+      const mat = (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef
       if (mat) mat.opacity = opacity * 0.8
     }
   })
 
   useEffect(() => {
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault()
+        const pieces = state.current
+        if (!pieces) return
         if (isShattered.current) {
           isShattered.current = false
-          for (const st of state.current) {
+          for (const st of pieces) {
             st.target = { ...st.home }
             st.targetRotation = { x: 0, y: 0, z: 0 }
             st.isAssembling = true
           }
         } else {
           isShattered.current = true
-          for (const st of state.current) {
+          for (const st of pieces) {
             st.target = { ...st.shatterPos }
             st.targetRotation = { ...st.shatterRot }
             st.isAssembling = false
@@ -223,7 +240,7 @@ function ClassicScene({ isOpen, isFist }) {
       <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#F2D58A" />
 
       {BLOCKS.map((block, i) => (
-        <mesh key={block.id} ref={(el) => meshRefs.current[i] = el}>
+        <mesh key={block.id} ref={(el) => { meshRefs.current[i] = el }}>
           <planeGeometry args={[1, 1, 32, 32]} />
           <meshBasicMaterial
             map={textures[i]}
@@ -236,15 +253,15 @@ function ClassicScene({ isOpen, isFist }) {
 
       <group>
         {threadGeos.map((geo, i) => (
-          <line key={i} geometry={geo}>
+          <threeLine key={i} geometry={geo}>
             <lineBasicMaterial
-              ref={(el) => { if (el) geo.userData.matRef = el }}
+              ref={(el) => { if (el) (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef = el }}
               color={GOLD_COLOR}
               transparent
               opacity={0}
               blending={THREE.AdditiveBlending}
             />
-          </line>
+          </threeLine>
         ))}
       </group>
     </group>
@@ -253,7 +270,13 @@ function ClassicScene({ isOpen, isFist }) {
 
 // ── User creation mode: voronoi shatter on single texture ──
 
-function UserCreationScene({ imageUrl, isOpen, isFist }) {
+interface UserCreationSceneProps {
+  imageUrl: string
+  isOpen: boolean
+  isFist: boolean
+}
+
+function UserCreationScene({ imageUrl, isOpen, isFist }: UserCreationSceneProps) {
   const texture = useMemo(() => {
     const tex = new THREE.TextureLoader().load(imageUrl)
     tex.minFilter = THREE.LinearFilter
@@ -266,12 +289,12 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
     voronoiShatter(1024, 1024, FRAGMENT_COUNT, 42),
   [])
 
-  const meshRefs = useRef([])
-  const state = useRef(null)
+  const meshRefs = useRef<(THREE.Mesh | null)[]>([])
+  const state = useRef<UserCreationAnimState[] | null>(null)
   const isShattered = useRef(false)
   const prevOpen = useRef(false)
   const prevFist = useRef(false)
-  const lightRef = useRef()
+  const lightRef = useRef<THREE.PointLight>(null)
 
   const aspect = 1.0
   const TOTAL_SIZE = 2.8
@@ -280,7 +303,7 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
     state.current = fragments.map((frag) => {
       const sx = (frag.seed[0] - 0.5) * TOTAL_SIZE
       const sy = (0.5 - frag.seed[1]) * TOTAL_SIZE
-      const home = { x: sx, y: sy, z: 0 }
+      const home: Vec3 = { x: sx, y: sy, z: 0 }
       const angle = Math.atan2(sy, sx) + (Math.random() - 0.5) * 0.8
       const dist = 2.2 + Math.random() * 1.5
       return {
@@ -308,8 +331,8 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
 
   // Build neighbor pairs for threads
   const neighborPairs = useMemo(() => {
-    const seen = new Set()
-    const pairs = []
+    const seen = new Set<string>()
+    const pairs: Array<[number, number]> = []
     for (const frag of fragments) {
       for (const ni of frag.neighbors) {
         const key = Math.min(frag.id, ni) + '-' + Math.max(frag.id, ni)
@@ -340,7 +363,8 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
       lightRef.current.position.z = 3 + Math.sin(t * 0.4) * 0.5
     }
 
-    const pieces = state.current
+    const pieces = state.current!
+    if (!pieces) return
 
     if (isOpen && !prevOpen.current && !isShattered.current) {
       isShattered.current = true
@@ -364,12 +388,12 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
     for (let i = 0; i < pieces.length; i++) {
       const st = pieces[i]
       const spring = st.isAssembling ? ASSEMBLE_SPRING : SHATTER_SPRING
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.position[a], st.target[a], st.velocity[a], spring.stiffness, spring.damping, dt)
         st.position[a] = r.position
         st.velocity[a] = r.velocity
       }
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.rotation[a], st.targetRotation[a], st.rotVelocity[a], ROTATION_SPRING.stiffness, ROTATION_SPRING.damping, dt)
         st.rotation[a] = r.position
         st.rotVelocity[a] = r.velocity
@@ -386,7 +410,7 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
       const dy = stA.position.y - stB.position.y
       const dz = stA.position.z - stB.position.z
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
-      const pos = geo.attributes.position
+      const pos = geo.attributes.position as THREE.BufferAttribute
       if (dist > BREAK_DISTANCE || dist < 0.05) {
         pos.setXYZ(0, 0, 0, 0); pos.setXYZ(1, 0, 0, 0); pos.setXYZ(2, 0, 0, 0)
         pos.needsUpdate = true
@@ -401,25 +425,27 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
       pos.setXYZ(1, midX, midY - sag, midZ)
       pos.setXYZ(2, stB.position.x, stB.position.y, stB.position.z)
       pos.needsUpdate = true
-      const mat = geo.userData.matRef
+      const mat = (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef
       if (mat) mat.opacity = opacity * 0.8
     }
   })
 
   useEffect(() => {
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault()
+        const pieces = state.current
+        if (!pieces) return
         if (isShattered.current) {
           isShattered.current = false
-          for (const st of state.current) {
+          for (const st of pieces) {
             st.target = { ...st.home }
             st.targetRotation = { x: 0, y: 0, z: 0 }
             st.isAssembling = true
           }
         } else {
           isShattered.current = true
-          for (const st of state.current) {
+          for (const st of pieces) {
             st.target = { ...st.shatterPos }
             st.targetRotation = { ...st.shatterRot }
             st.isAssembling = false
@@ -441,33 +467,46 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
           key={frag.id}
           fragment={frag}
           texture={texture}
-          animState={state.current[i]}
+          animState={state.current![i]}
           aspectRatio={aspect}
-          ref={(el) => meshRefs.current[i] = el}
+          ref={(el) => { meshRefs.current[i] = el }}
         />
       ))}
 
       <group>
         {threadGeos.map((geo, i) => (
-          <line key={i} geometry={geo}>
+          <threeLine key={i} geometry={geo}>
             <lineBasicMaterial
-              ref={(el) => { if (el) geo.userData.matRef = el }}
+              ref={(el) => { if (el) (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef = el }}
               color={GOLD_COLOR}
               transparent
               opacity={0}
               blending={THREE.AdditiveBlending}
             />
-          </line>
+          </threeLine>
         ))}
       </group>
     </group>
   )
 }
 
+interface UserCreationAnimState extends FragmentAnimState {
+  home: Vec3
+  shatterPos: Vec3
+  shatterRot: Vec3
+}
+
 // ── Voronoi fragment mesh (inline, self-animating) ──
 
-const VoronoiMesh = React.forwardRef(function VoronoiMesh({ fragment, texture, animState, aspectRatio }, ref) {
-  const internalRef = useRef()
+interface VoronoiMeshProps {
+  fragment: Fragment
+  texture: THREE.Texture
+  animState: UserCreationAnimState
+  aspectRatio: number
+}
+
+const VoronoiMesh = React.forwardRef<THREE.Mesh, VoronoiMeshProps>(function VoronoiMesh({ fragment, texture, animState, aspectRatio }, ref) {
+  const internalRef = useRef<THREE.Mesh>(null)
 
   const geometry = useMemo(() => {
     const shape = new THREE.Shape()
@@ -518,9 +557,26 @@ const VoronoiMesh = React.forwardRef(function VoronoiMesh({ fragment, texture, a
 
 // ── Main export: dispatches to classic or user creation ──
 
-export default function ShatterScene({ isOpen, isFist, imageUrl, placements, allLandmarks }) {
+interface PlacementEntry {
+  id: string
+  x?: number
+  y?: number
+  scale?: number
+  size?: number
+  rotation?: number
+}
+
+export interface ShatterSceneProps {
+  isOpen: boolean
+  isFist: boolean
+  imageUrl?: string | null
+  placements?: PlacementEntry[] | null
+  allLandmarks?: Landmark[][] | null
+}
+
+export default function ShatterScene({ isOpen, isFist, imageUrl, placements, allLandmarks }: ShatterSceneProps) {
   if (placements && placements.length > 0) {
-    return <UserPlacementScene placements={placements} isOpen={isOpen} isFist={isFist} allLandmarks={allLandmarks} />
+    return <UserPlacementScene placements={placements} isOpen={isOpen} isFist={isFist} allLandmarks={allLandmarks ?? []} />
   }
   if (imageUrl) {
     return <UserCreationScene imageUrl={imageUrl} isOpen={isOpen} isFist={isFist} />
@@ -532,13 +588,34 @@ export default function ShatterScene({ isOpen, isFist, imageUrl, placements, all
 
 const PLACEMENT_TOTAL_SIZE = 2.8
 
-function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
+interface UserPlacementSceneProps {
+  placements: PlacementEntry[]
+  isOpen: boolean
+  isFist: boolean
+  allLandmarks: Landmark[][]
+}
+
+interface PlacementItem {
+  texture: THREE.CanvasTexture | null
+  home: Vec3
+  size: number
+  rotation: number
+}
+
+interface PlacementAnimState extends FragmentAnimState {
+  home: Vec3
+  homeRotationZ: number
+  shatterPos: Vec3
+  shatterRot: Vec3
+}
+
+function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }: UserPlacementSceneProps) {
   // Resolve each placement's pattern image URL via the pattern store.
   // Placements now reference pattern IDs (cloud-4, qh-50, etc.) rather than
   // element IDs, so we can pull from the full PATTERN_LIBRARY.
   const elementFiles = useMemo(() => {
-    const seen = new Set()
-    const files = []
+    const seen = new Set<string>()
+    const files: string[] = []
     for (const p of placements) {
       const pat = getPatternById(p.id)
       if (!pat) continue
@@ -550,9 +627,9 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
     return files
   }, [placements])
 
-  const [textureByPath, setTextureByPath] = useState(() => {
+  const [textureByPath, setTextureByPath] = useState<Map<string, THREE.CanvasTexture>>(() => {
     // Seed from cache so already-processed textures (re-visits) show instantly
-    const m = new Map()
+    const m = new Map<string, THREE.CanvasTexture>()
     for (const path of elementFiles) {
       const cached = _outlinedTextureCache.get(path)
       if (cached && !(cached instanceof Promise)) m.set(path, cached)
@@ -566,7 +643,7 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
     Promise.all(elementFiles.map(path => {
       // qinghua porcelain photos have no AI watermark — don't clear corners
       const isQinghua = path.includes('/patterns/qinghua/')
-      return loadOutlinedTexture(path, !isQinghua).then(tex => [path, tex])
+      return loadOutlinedTexture(path, !isQinghua).then(tex => [path, tex] as const)
     }))
       .then(entries => {
         if (cancelled) return
@@ -576,11 +653,11 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
     return () => { cancelled = true }
   }, [elementFiles])
 
-  const items = useMemo(() => {
+  const items = useMemo<PlacementItem[]>(() => {
     return placements.map((p) => {
       const pat = getPatternById(p.id)
       const path = pat ? getPatternImage(pat) : null
-      const texture = path ? textureByPath.get(path) : null
+      const texture = path ? textureByPath.get(path) ?? null : null
       const sx = ((p.x ?? 512) / 1024 - 0.5) * PLACEMENT_TOTAL_SIZE
       const sy = (0.5 - (p.y ?? 512) / 1024) * PLACEMENT_TOTAL_SIZE
       const baseSize = ((p.scale ?? 1) * (p.size ?? 100)) / 1024 * PLACEMENT_TOTAL_SIZE
@@ -594,11 +671,11 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
   }, [placements, textureByPath])
 
   // Spring state per fragment
-  const stateRef = useRef(null)
+  const stateRef = useRef<PlacementAnimState[] | null>(null)
   const isShattered = useRef(false)
   const prevOpen = useRef(false)
   const prevFist = useRef(false)
-  const lightRef = useRef()
+  const lightRef = useRef<THREE.PointLight>(null)
 
   if (!stateRef.current) {
     stateRef.current = items.map((item) => {
@@ -634,8 +711,8 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
   // Threads: connect each fragment to its 2 nearest home-position neighbors
   const neighborPairs = useMemo(() => {
     if (items.length < 2) return []
-    const pairs = []
-    const seen = new Set()
+    const pairs: Array<[number, number]> = []
+    const seen = new Set<string>()
     for (let i = 0; i < items.length; i++) {
       const candidates = items
         .map((it, j) => ({ j, d: Math.hypot(it.home.x - items[i].home.x, it.home.y - items[i].home.y) }))
@@ -733,12 +810,12 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
 
     for (const st of pieces) {
       const spring = st.isAssembling ? ASSEMBLE_SPRING : SHATTER_SPRING
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.position[a], st.target[a], st.velocity[a], spring.stiffness, spring.damping, dt)
         st.position[a] = r.position
         st.velocity[a] = r.velocity
       }
-      for (const a of ['x', 'y', 'z']) {
+      for (const a of ['x', 'y', 'z'] as const) {
         const r = updateSpring(st.rotation[a], st.targetRotation[a], st.rotVelocity[a], ROTATION_SPRING.stiffness, ROTATION_SPRING.damping, dt)
         st.rotation[a] = r.position
         st.rotVelocity[a] = r.velocity
@@ -755,7 +832,7 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
       const dy = stA.position.y - stB.position.y
       const dz = stA.position.z - stB.position.z
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
-      const pos = geo.attributes.position
+      const pos = geo.attributes.position as THREE.BufferAttribute
       if (dist > BREAK_DISTANCE || dist < 0.05) {
         pos.setXYZ(0, 0, 0, 0); pos.setXYZ(1, 0, 0, 0); pos.setXYZ(2, 0, 0, 0)
         pos.needsUpdate = true
@@ -770,13 +847,13 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
       pos.setXYZ(1, midX, midY - sag, midZ)
       pos.setXYZ(2, stB.position.x, stB.position.y, stB.position.z)
       pos.needsUpdate = true
-      const mat = geo.userData.matRef
+      const mat = (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef
       if (mat) mat.opacity = opacity * 0.8
     }
   })
 
   useEffect(() => {
-    const handleKey = (e) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.code !== 'Space') return
       e.preventDefault()
       const pieces = stateRef.current
@@ -811,29 +888,35 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
           key={i}
           texture={item.texture}
           size={item.size}
-          animState={stateRef.current[i]}
+          animState={stateRef.current![i]}
         />
       ))}
 
       <group>
         {threadGeos.map((geo, i) => (
-          <line key={i} geometry={geo}>
+          <threeLine key={i} geometry={geo}>
             <lineBasicMaterial
-              ref={(el) => { if (el) geo.userData.matRef = el }}
+              ref={(el) => { if (el) (geo.userData as { matRef?: THREE.LineBasicMaterial }).matRef = el }}
               color={GOLD_COLOR}
               transparent
               opacity={0}
               blending={THREE.AdditiveBlending}
             />
-          </line>
+          </threeLine>
         ))}
       </group>
     </group>
   )
 }
 
-const PlacementMesh = React.forwardRef(function PlacementMesh({ texture, size, animState }, ref) {
-  const internalRef = useRef()
+interface PlacementMeshProps {
+  texture: THREE.CanvasTexture | null
+  size: number
+  animState: PlacementAnimState
+}
+
+const PlacementMesh = React.forwardRef<THREE.Mesh, PlacementMeshProps>(function PlacementMesh({ texture, size, animState }, ref) {
+  const internalRef = useRef<THREE.Mesh>(null)
   const geometry = useMemo(() => new THREE.PlaneGeometry(size, size), [size])
 
   useFrame(() => {
