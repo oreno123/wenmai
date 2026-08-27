@@ -189,4 +189,17 @@ describe('parseVlmOutput', () => {
     expect(parseVlmOutput('')).toEqual({ names: [], explanation: '' })
     expect(parseVlmOutput('  \n  ')).toEqual({ names: [], explanation: '' })
   })
+
+  it('讲解行内含"答案："字样不被当答案行', () => {
+    const raw = '答案：龙纹\n讲解：该纹样的答案：龙纹。'
+    const r = parseVlmOutput(raw)
+    expect(r.names).toEqual(['龙纹'])
+    expect(r.explanation).toBe('该纹样的答案：龙纹')
+  })
+
+  it('无答案行且末行是讲解行：不把讲解当候选名', () => {
+    const r = parseVlmOutput('饕餮纹\n讲解：商代青铜器典型纹样')
+    expect(r.names).toEqual(['饕餮纹'])
+    expect(r.explanation).toBe('商代青铜器典型纹样')
+  })
 })

@@ -58,11 +58,13 @@ export interface VlmParsedOutput {
  */
 export function parseVlmOutput(raw: string): VlmParsedOutput {
   const lines = (raw || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean)
-  const answerLine = lines.find(l => /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
-  const nameSource = answerLine ?? lines[lines.length - 1] ?? ''
+  const isExplain = (l: string) => /^讲解[:：]/.test(l)
+  const answerLine = lines.find(l => !isExplain(l) && /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
+  const fallbackPool = lines.filter(l => !isExplain(l))
+  const nameSource = answerLine ?? fallbackPool[fallbackPool.length - 1] ?? ''
   const names = parseVlmNames(nameSource)
 
-  const explainLine = lines.find(l => /^讲解[:：]/.test(l))
+  const explainLine = lines.find(isExplain)
   let explanation = explainLine ? explainLine.replace(/^讲解[:：]\s*/, '').trim() : ''
   explanation = explanation.replace(/[。.]+$/, '').trim()
 
