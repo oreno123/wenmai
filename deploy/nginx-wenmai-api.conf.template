@@ -1,0 +1,87 @@
+# wenmai-api.ruoziqing.cn — Supabase 核心容器反代
+# 证书：通配符证书 *.ruoziqing.cn（已部署在服务器）
+# 域名必须 Stay 二级，*.ruoziqing.cn 只覆盖一层子域（api.wenmai.* 不行）
+# 2026-08-27：/auth/v1 加 OPTIONS 预检直答 —— GoTrue v2.189 内置 CORS 白名单
+# 不含 apikey 头，浏览器端 supabase-js 预检被拒 → "Failed to fetch"。
+# 官方云 Supabase 靠 Kong 网关应答预检，纯 nginx 需自答。
+# 同日：/vlm/ 反代 Step Fun（认证在本层注入，key 只存在服务器，不入 git）。
+# 部署：sed 替换 <STEPFUN_KEY> 后 scp 到服务器 sites-available/wenmai-api。
+
+server {
+    listen 80;
+    server_name wenmai-api.ruoziqing.cn;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name wenmai-api.ruoziqing.cn;
+
+    ssl_certificate     /etc/nginx/ssl/ruoziqing/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/ruoziqing/key.pem;
+
+    client_max_body_size 60m;
+
+    # GoTrue — 认证（后端挂根路径，proxy_pass 尾斜杠剥掉 /auth/v1 前缀）
+    location /auth/v1/ {
+        # 预检直答：放行 apikey 等头，不进 GoTrue
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Accept, Authorization, Content-Type, apikey, X-Client-Info, OTP, X-Supabase-Api-Version, Prefer";
+            add_header Access-Control-Max-Age "86400";
+            return 204;
+        }
+        proxy_pass http://127.0.0.1:9999/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    # VLM 反代 — Step Fun（key 只存服务器，bundle 零 key）
+    location /vlm/ {
+        limit_req zone=vlm burst=5 nodelay;
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "POST, OPTIONS";
+            add_header Access-Control-Allow-Headers "Content-Type";
+            add_header Access-Control-Max-Age "86400";
+            return 204;
+        }
+        proxy_pass https://api.stepfun.com/v1/;
+        proxy_set_header Host api.stepfun.com;
+        proxy_ssl_server_name on;
+        proxy_set_header Authorization "Bearer <STEPFUN_KEY>";
+        proxy_read_timeout 60s;
+    }
+
+    # PostgREST — 数据
+    location /rest/v1/ {
+        proxy_pass http://127.0.0.1:5433/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    # Storage — 作品封面图（storage-api 1.69 同样挂根路径）
+    location /storage/v1/ {
+        proxy_pass http://127.0.0.1:5434/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    # PostgREST 根路径健康检查
+    location /rest/ {
+        proxy_pass http://127.0.0.1:5433/;
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        return 404 '{"error":"not found"}';
+        add_header Content-Type application/json;
+    }
+}
