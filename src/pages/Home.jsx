@@ -483,13 +483,14 @@ export default function Home() {
 
           {/* ── 更多工具（折叠的次要入口）── */}
           <motion.div variants={stagger} initial="initial" animate="animate"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 14 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 14 }}
           >
             {[
               { icon: 'camera', label: '找相似', path: '/photo-match' },
               { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
               { icon: 'hand', label: '手势展示', path: '/showcase' },
               { icon: 'compose', label: '自由拼', path: '/puzzle' },
+              { icon: 'cube', label: '文物提取', path: '/relic' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
