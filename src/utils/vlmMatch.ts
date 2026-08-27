@@ -11,6 +11,7 @@
  */
 
 import type { Pattern } from '../store/patternData'
+import type { CropRect } from './imageComparison'
 
 export type MatchSource = 'exact' | 'fuzzy' | 'fallback'
 
@@ -150,23 +151,28 @@ export function matchPattern(vlmNames: string[], library: Pattern[]): MatchResul
   }
 }
 
-const STEPFUN_ENDPOINT = 'https://api.stepfun.com/v1/chat/completions'
+// 生产=wenmai-api nginx 反代（注入 key），dev=vite server.proxy 转发到同一反代。
+// 前端 bundle 永远不含 api.stepfun.com 域名和 key。
+const VLM_ENDPOINT = '/vlm/chat/completions'
 const STEPFUN_MODEL = 'step-3.7-flash'
 
 const VLM_PROMPT = `识别图中的中国传统纹样。
 
-输出规则：
-- 只输出纹样名，不要解释、不要标点
-- 多主题时按主次输出 1-3 个，用 | 分隔
-- 示例：团龙纹 / 缠枝纹 / 龙|云纹|海水 / 莲瓣纹
+输出规则（严格两行，不要多余内容）：
+第一行 答案：纹样名（多主题时按主次输出 1-3 个，用 | 分隔）
+第二行 讲解：60 字内说明这是什么纹样、盛行朝代、寓意
+
+示例：
+答案：团龙纹|云纹
+讲解：团龙纹为龙体盘踞成团的圆形适合纹样，盛行于明清，寓意尊贵吉祥。
 
 常见纹样参考（不限于）：团龙纹、行龙纹、蟠龙纹、云雷纹、回纹、卷草纹、缠枝纹、莲瓣纹、如意云纹、海水江崖纹、宝相花、冰裂纹、万字纹、绳纹、饕餮纹、凤鸟纹、牡丹纹、菊花纹、兰花纹、青花龙纹、青花山水
 
-最终用一行输出：
-答案：纹样名`
+最终输出：
+答案：纹样名
+讲解：一句话介绍`
 
 export interface VlmCallOptions {
-  apiKey: string
   imageBase64: string  // 不带 data: 前缀的纯 base64
   signal?: AbortSignal
 }
@@ -174,6 +180,7 @@ export interface VlmCallOptions {
 export interface VlmCallResult {
   rawOutput: string
   candidates: string[]
+  explanation: string
 }
 
 /**
@@ -183,6 +190,7 @@ export interface VlmCallResult {
  * 1. content 字段经常空，真实输出在 reasoning_content / reasoning
  * 2. max_tokens 给 4000+（reasoning 模型会先思考）
  * 3. 错误时抛异常，调用方 try/catch 走 fallback
+ * 4. 认证由 nginx /vlm/ 反代注入，本函数不再接收 apiKey
  */
 export async function callStepFunVision(opts: VlmCallOptions): Promise<VlmCallResult> {
   const body = {
@@ -202,11 +210,10 @@ export async function callStepFunVision(opts: VlmCallOptions): Promise<VlmCallRe
     ],
   }
 
-  const resp = await fetch(STEPFUN_ENDPOINT, {
+  const resp = await fetch(VLM_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${opts.apiKey}`,
     },
     body: JSON.stringify(body),
     signal: opts.signal,
@@ -230,9 +237,49 @@ export async function callStepFunVision(opts: VlmCallOptions): Promise<VlmCallRe
     throw new Error('Step Fun API 返回空内容（content/reasoning_content/reasoning 都为空）')
   }
 
+  const parsed = parseVlmOutput(rawOutput)
+
   return {
     rawOutput,
-    candidates: parseVlmNames(rawOutput),
+    candidates: parsed.names,
+    explanation: parsed.explanation,
+  }
+}
+
+/**
+ * 上传图 → 压缩 base64（VLM 用）。有框选画框内区域，否则整图。
+ * 最长边 1024 / JPEG q0.82：手机原图 5-10MB → 约 200KB，上行快约 10 倍。
+ * crop 坐标为图片自然像素（与 imageComparison 同一约定）。
+ */
+export async function fileToCompressedBase64(
+  file: File,
+  crop: CropRect | null = null,
+): Promise<string> {
+  const url = URL.createObjectURL(file)
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image()
+      el.onload = () => resolve(el)
+      el.onerror = () => reject(new Error('image load failed: ' + file.name))
+      el.src = url
+    })
+    const srcW = crop ? crop.w : img.naturalWidth
+    const srcH = crop ? crop.h : img.naturalHeight
+    const MAX = 1024
+    const scale = Math.min(1, MAX / Math.max(srcW, srcH))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(srcW * scale))
+    canvas.height = Math.max(1, Math.round(srcH * scale))
+    const ctx = canvas.getContext('2d')!
+    if (crop) {
+      ctx.drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, canvas.width, canvas.height)
+    } else {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    }
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.82)
+    return dataUrl.split(',')[1] ?? ''
+  } finally {
+    URL.revokeObjectURL(url)
   }
 }
 
