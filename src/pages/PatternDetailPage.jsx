@@ -3,6 +3,7 @@ import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { getPatternById, getPatternImage, getRarityLabel, getSeriesInfo } from '../store/patternData'
 import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
+import { getArtifactsForPattern, ARTIFACT_DIR } from '../data/artifactMap'
 import PatternImage from '../components/common/PatternImage'
 
 const GOLD_MAIN = '#D4AF6A'
@@ -52,6 +53,8 @@ export default function PatternDetailPage() {
   const imgSrc = pattern ? getPatternImage(pattern) : ''
   const isOwned = pattern ? data.library.includes(pattern.id) : false
   const rarityStyle = pattern ? RARITY_STYLES[pattern.rarity] : RARITY_STYLES.common
+  const artifacts = patternId ? getArtifactsForPattern(patternId) : []
+  const bgArtifact = artifacts[0]
 
   // ── Not found state ──
   if (!pattern) {
@@ -97,7 +100,48 @@ export default function PatternDetailPage() {
   )
 
   return (
-    <div style={{ padding: '16px', paddingBottom: '80px' }}>
+    <div style={{
+      position: 'relative',
+      minHeight: '100vh',
+      paddingBottom: '80px',
+      overflow: 'hidden',
+    }}>
+
+      {/* ── Artifact background card ── */}
+      {bgArtifact && (
+        <>
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${ARTIFACT_DIR}${bgArtifact.img})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.38,
+            filter: 'blur(0.5px) saturate(0.9)',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }} />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(180deg, rgba(15,15,16,0.68) 0%, rgba(15,15,16,0.55) 40%, rgba(15,15,16,0.62) 100%)',
+            zIndex: 0,
+            pointerEvents: 'none',
+          }} />
+          <div style={{
+            position: 'absolute', top: '12px', right: '16px',
+            zIndex: 1,
+            fontSize: '10px', color: GOLD_MAIN, opacity: 0.6,
+            letterSpacing: '1px', textIndent: '1px',
+            background: 'rgba(15,15,16,0.5)',
+            padding: '3px 8px', borderRadius: '10px',
+            border: '1px solid rgba(212,175,106,0.15)',
+            pointerEvents: 'none',
+          }}>
+            原型 · {bgArtifact.name}
+          </div>
+        </>
+      )}
+
+      <div style={{ position: 'relative', zIndex: 1, padding: '16px' }}>
 
       {/* ── Back button ── */}
       <button
@@ -290,6 +334,7 @@ export default function PatternDetailPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
