@@ -26,3 +26,10 @@ dist-ssr
 # Python
 __pycache__/
 *.pyc
+
+# Visual Companion
+.superpowers/
+
+# Claude Code 本地状态 / 鸿蒙构建产物
+.claude/
+dist_harmony/
