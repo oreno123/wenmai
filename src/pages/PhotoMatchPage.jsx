@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { PATTERN_LIBRARY, getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
@@ -28,6 +28,10 @@ export default function PhotoMatchPage() {
   const [vlm, setVlm] = useState(null)                 // { candidates, explanation } | null
   const [matchResult, setMatchResult] = useState(null) // matchPattern 的 MatchResult | null
   const [aiDown, setAiDown] = useState(false)          // true = VLM 失败走了本地兜底
+  const abortRef = useRef(null)
+
+  // 离开页面时中止进行中的 VLM 请求
+  useEffect(() => () => { abortRef.current?.abort() }, [])
 
   // Crop rect in CSS pixels, relative to the displayed <img> element
   const [cropRect, setCropRect] = useState(null) // { x, y, w, h }
@@ -39,6 +43,9 @@ export default function PhotoMatchPage() {
     setError(null)
     setCropRect(null)
     setMatches([])
+    setVlm(null)
+    setMatchResult(null)
+    setAiDown(false)
     setPendingFile(file)
     setPreviewUrl(URL.createObjectURL(file))
     setMatchState('crop')
@@ -123,6 +130,7 @@ export default function PhotoMatchPage() {
 
       // AI 识别，25s 超时
       const ctrl = new AbortController()
+      abortRef.current = ctrl
       const timer = setTimeout(() => ctrl.abort(), 25000)
       try {
         const base64 = await fileToCompressedBase64(pendingFile, crop)
