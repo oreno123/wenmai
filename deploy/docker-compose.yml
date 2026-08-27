@@ -1,0 +1,90 @@
+services:
+  db:
+    image: docker.1ms.run/library/postgres:17
+    container_name: wenmai-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rest:
+    image: docker.1ms.run/postgrest/postgrest:v14.17
+    container_name: wenmai-rest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    ports:
+      - "127.0.0.1:5433:3000"
+
+  auth:
+    # 对齐官方 supabase/docker compose 的版本与 JWT 配置（v2.195.0 曾踩坑，勿随手升级）
+    image: docker.1ms.run/supabase/gotrue:v2.189.0
+    container_name: wenmai-auth
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: https://wenmai-api.ruoziqing.cn
+      GOTRUE_DB_DRIVER: postgres
+      # search_path 必须在 DSN 里显式给：官方栈靠专用角色 supabase_auth_admin 的默认 search_path，
+      # 这里直连 postgres，不加的话 gotrue 运行时查 auth.identities 会 42P01
+      GOTRUE_DB_DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable&search_path=auth,public"
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      # role claim 写进 users.role 列（注册时 SetRole）。缺了 token.role 为空 → PostgREST 401
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_SITE_URL: https://wenmai.ruoziqing.cn
+      GOTRUE_URI_ALLOW_LIST: "https://wenmai.ruoziqing.cn"
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      # 开发期：注册免邮箱验证（与原云端行为一致）
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_SMS_AUTOCONFIRM: "true"
+      GOTRUE_LOG_LEVEL: info
+    ports:
+      - "127.0.0.1:9999:9999"
+
+  storage:
+    image: docker.1ms.run/supabase/storage-api:v1.69.9
+    container_name: wenmai-storage
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      REGION: local
+      GLOBAL_BUCKET_FILE_SIZE_LIMIT: "52428800"
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+    volumes:
+      - storage-data:/var/lib/storage
+    ports:
+      - "127.0.0.1:5434:5000"
+
+volumes:
+  db-data:
+  storage-data:
