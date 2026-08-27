@@ -3,6 +3,7 @@ import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
 import { PATTERN_LIBRARY, getPatternById, getPatternImage, getRarityLabel } from '../store/patternData'
 import { extractHashFromFileWithCrop, findTopMatches, buildLibraryHashes } from '../utils/imageComparison'
+import { callStepFunVision, matchPattern, fileToCompressedBase64 } from '../utils/vlmMatch'
 import PatternImage from '../components/common/PatternImage'
 
 function similarityLabel(score) {
@@ -14,16 +15,19 @@ function similarityLabel(score) {
 
 export default function PhotoMatchPage() {
   const navigate = useNavigate()
-  const { data } = useApp()
+  useApp()
   const fileRef = useRef(null)
   const imgRef = useRef(null)
 
-  // 'idle' → 'crop' (let user draw box) → 'loading' → 'results'
+  // 'idle' → 'crop' → 'loading' → 'results'(本地) / 'results-ai'(AI)
   const [matchState, setMatchState] = useState('idle')
   const [previewUrl, setPreviewUrl] = useState(null)
   const [pendingFile, setPendingFile] = useState(null)
   const [matches, setMatches] = useState([])
   const [error, setError] = useState(null)
+  const [vlm, setVlm] = useState(null)                 // { candidates, explanation } | null
+  const [matchResult, setMatchResult] = useState(null) // matchPattern 的 MatchResult | null
+  const [aiDown, setAiDown] = useState(false)          // true = VLM 失败走了本地兜底
 
   // Crop rect in CSS pixels, relative to the displayed <img> element
   const [cropRect, setCropRect] = useState(null) // { x, y, w, h }
@@ -100,6 +104,7 @@ export default function PhotoMatchPage() {
   const runIdentify = useCallback(async (useCrop) => {
     if (!pendingFile || !imgInfo) return
     setMatchState('loading')
+    setError(null)
     try {
       let crop = null
       if (useCrop && cropRect && cropRect.w > 8 && cropRect.h > 8) {
@@ -112,13 +117,42 @@ export default function PhotoMatchPage() {
           h: cropRect.h * sy,
         }
       }
+
+      // 本地 hash 先算好（兜底与"未收录"态都要用）
       const userHash = await extractHashFromFileWithCrop(pendingFile, crop)
-      const patterns = PATTERN_LIBRARY.filter(p => p.image)
-      const libHashes = await buildLibraryHashes(patterns)
-      const topMatches = findTopMatches(userHash, libHashes, 3)
-      setMatches(topMatches)
-      setMatchState('results')
-    } catch (e) {
+
+      // AI 识别，25s 超时
+      const ctrl = new AbortController()
+      const timer = setTimeout(() => ctrl.abort(), 25000)
+      try {
+        const base64 = await fileToCompressedBase64(pendingFile, crop)
+        const result = await callStepFunVision({ imageBase64: base64, signal: ctrl.signal })
+        clearTimeout(timer)
+
+        const m = matchPattern(result.candidates, PATTERN_LIBRARY)
+        setVlm(result)
+        setMatchResult(m)
+        setAiDown(false)
+
+        if (m.source === 'fallback') {
+          // VLM 认出了名字但图鉴未收录：补 hash top3 作"相似参考"
+          const libHashes = await buildLibraryHashes(PATTERN_LIBRARY.filter(p => p.image))
+          setMatches(findTopMatches(userHash, libHashes, 3))
+        } else {
+          setMatches([])
+        }
+        setMatchState('results-ai')
+      } catch {
+        clearTimeout(timer)
+        // VLM 失败（超时/网络/5xx/空输出）→ 静默落回本地匹配
+        const libHashes = await buildLibraryHashes(PATTERN_LIBRARY.filter(p => p.image))
+        setMatches(findTopMatches(userHash, libHashes, 3))
+        setVlm(null)
+        setMatchResult(null)
+        setAiDown(true)
+        setMatchState('results')
+      }
+    } catch {
       setError('图片分析失败，请换一张试试')
       setMatchState('crop')
     }
@@ -132,8 +166,62 @@ export default function PhotoMatchPage() {
     setError(null)
     setCropRect(null)
     setImgInfo(null)
+    setVlm(null)
+    setMatchResult(null)
+    setAiDown(false)
     if (fileRef.current) fileRef.current.value = ''
   }, [])
+
+  const renderMatchCards = (list) => list.map((match, idx) => {
+    const pattern = getPatternById(match.patternId)
+    if (!pattern) return null
+    const { label, color } = similarityLabel(match.score)
+    return (
+      <div key={match.patternId} style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: 12, marginBottom: 8,
+        background: idx === 0 ? 'rgba(201,162,60,0.08)' : 'rgba(255,255,255,0.02)',
+        borderRadius: 12,
+        border: `1px solid ${idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)'}`,
+      }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: '50%',
+          background: idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 13, fontWeight: 700, color: idx === 0 ? '#F2D58A' : '#6A6A6A',
+          flexShrink: 0,
+        }}>
+          {idx + 1}
+        </div>
+        <div style={{
+          width: 48, height: 48, borderRadius: 8, overflow: 'hidden',
+          background: 'rgba(0,0,0,0.3)', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <PatternImage src={getPatternImage(pattern)} alt={pattern.name} fallbackSize={24} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#F5F1E8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {pattern.name}
+          </div>
+          <div style={{ fontSize: 11, color: '#6A6A6A', marginTop: 2 }}>
+            <span className={`rarity-badge rarity-${pattern.rarity}`} style={{ fontSize: 10, padding: '1px 6px' }}>
+              {getRarityLabel(pattern.rarity)}
+            </span>
+            <span style={{ marginLeft: 6 }}>{pattern.type}</span>
+          </div>
+        </div>
+        <div style={{
+          fontSize: 12, fontWeight: 600, color,
+          padding: '3px 8px', borderRadius: 8,
+          background: 'rgba(0,0,0,0.3)',
+          flexShrink: 0,
+        }}>
+          {label}
+        </div>
+      </div>
+    )
+  })
 
   const cropIsValid = cropRect && cropRect.w > 8 && cropRect.h > 8
 
@@ -297,7 +385,7 @@ export default function PhotoMatchPage() {
             }} />
           )}
           <div style={{ color: '#D4AF6A', fontSize: 15, letterSpacing: 2 }}>
-            正在匹配纹样...
+            AI 正在识别纹样...
           </div>
         </div>
       )}
@@ -322,60 +410,13 @@ export default function PhotoMatchPage() {
             最像的纹样
           </div>
 
-          {matches.map((match, idx) => {
-            const pattern = getPatternById(match.patternId)
-            if (!pattern) return null
-            const { label, color } = similarityLabel(match.score)
+          {renderMatchCards(matches)}
 
-            return (
-              <div key={match.patternId} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: 12, marginBottom: 8,
-                background: idx === 0 ? 'rgba(201,162,60,0.08)' : 'rgba(255,255,255,0.02)',
-                borderRadius: 12,
-                border: `1px solid ${idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)'}`,
-              }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%',
-                  background: idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 13, fontWeight: 700, color: idx === 0 ? '#F2D58A' : '#6A6A6A',
-                  flexShrink: 0,
-                }}>
-                  {idx + 1}
-                </div>
-
-                <div style={{
-                  width: 48, height: 48, borderRadius: 8, overflow: 'hidden',
-                  background: 'rgba(0,0,0,0.3)', flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <PatternImage src={getPatternImage(pattern)} alt={pattern.name} fallbackSize={24} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#F5F1E8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {pattern.name}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#6A6A6A', marginTop: 2 }}>
-                    <span className={`rarity-badge rarity-${pattern.rarity}`} style={{ fontSize: 10, padding: '1px 6px' }}>
-                      {getRarityLabel(pattern.rarity)}
-                    </span>
-                    <span style={{ marginLeft: 6 }}>{pattern.type}</span>
-                  </div>
-                </div>
-
-                <div style={{
-                  fontSize: 12, fontWeight: 600, color,
-                  padding: '3px 8px', borderRadius: 8,
-                  background: 'rgba(0,0,0,0.3)',
-                  flexShrink: 0,
-                }}>
-                  {label}
-                </div>
-              </div>
-            )
-          })}
+          {aiDown && (
+            <div style={{ textAlign: 'center', color: '#E8A35D', fontSize: 12, marginTop: 12 }}>
+              AI 识别不可用，已用本地匹配
+            </div>
+          )}
 
           <div style={{
             fontSize: 11, color: '#5a5a5a', textAlign: 'center',
@@ -409,6 +450,137 @@ export default function PhotoMatchPage() {
               {error}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Results — AI 识别 */}
+      {matchState === 'results-ai' && vlm && matchResult && (
+        <div>
+          <div style={{
+            textAlign: 'center', marginBottom: 24,
+            padding: 16, background: 'rgba(201,162,60,0.03)',
+            borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
+          }}>
+            <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
+            <img src={previewUrl} alt="上传图片" style={{
+              maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
+            }} />
+          </div>
+
+          {matchResult.source === 'exact' && matchResult.primaryMatch ? (
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>AI 识别为</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#F2D58A', letterSpacing: 4 }}>
+                {matchResult.primaryMatch.name}
+              </div>
+              <div style={{ margin: '14px auto', width: 48, height: 1, background: 'rgba(212,175,106,0.4)' }} />
+              {vlm.explanation && (
+                <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '0 auto 16px' }}>
+                  {vlm.explanation}
+                </div>
+              )}
+              <button
+                onClick={() => navigate(`/pattern/${matchResult.primaryMatch.id}`)}
+                style={{
+                  padding: '10px 28px', borderRadius: 10, fontSize: 13,
+                  background: 'linear-gradient(135deg, #D4AF6A, #B8860B)',
+                  color: '#1a1a1a', border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontWeight: 600,
+                }}
+              >
+                查看百科 →
+              </button>
+            </div>
+          ) : matchResult.source === 'fuzzy' ? (
+            <div>
+              <div style={{ fontSize: 14, color: '#F5F1E8', fontWeight: 600, marginBottom: 8, letterSpacing: 1 }}>
+                AI 认为可能是：{vlm.candidates.join('、')}
+              </div>
+              {vlm.explanation && (
+                <div style={{ fontSize: 12, color: '#8a7a4a', lineHeight: 1.8, marginBottom: 16 }}>
+                  {vlm.explanation}
+                </div>
+              )}
+              <div style={{ fontSize: 13, color: '#C8B896', marginBottom: 10 }}>图鉴内近似纹样（点击查看百科）</div>
+              {matchResult.fuzzyMatches.map(p => (
+                <div
+                  key={p.id}
+                  onClick={() => navigate(`/pattern/${p.id}`)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: 12, marginBottom: 8, borderRadius: 12,
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer',
+                  }}
+                >
+                  <div style={{
+                    width: 48, height: 48, borderRadius: 8, overflow: 'hidden',
+                    background: 'rgba(0,0,0,0.3)', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <PatternImage src={getPatternImage(p)} alt={p.name} fallbackSize={24} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#F5F1E8' }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: '#6A6A6A', marginTop: 2 }}>
+                      <span className={`rarity-badge rarity-${p.rarity}`} style={{ fontSize: 10, padding: '1px 6px' }}>
+                        {getRarityLabel(p.rarity)}
+                      </span>
+                      <span style={{ marginLeft: 6 }}>{p.type}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div>
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>
+                  图鉴暂未收录 · AI 识别为
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: '#D4AF6A', letterSpacing: 3 }}>
+                  {vlm.candidates.join('、') || '未能识别'}
+                </div>
+                {vlm.explanation && (
+                  <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
+                    {vlm.explanation}
+                  </div>
+                )}
+              </div>
+              {matches.length > 0 && (
+                <>
+                  <div style={{ fontSize: 13, color: '#C8B896', marginBottom: 10 }}>相似参考（本地匹配）</div>
+                  {renderMatchCards(matches)}
+                </>
+              )}
+            </div>
+          )}
+
+          <div style={{
+            fontSize: 11, color: '#5a5a5a', textAlign: 'center',
+            marginTop: 12, fontStyle: 'italic',
+          }}>
+            AI 识别 + 库内匹配 · 拍博物馆实物效果最好
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
+            <button onClick={() => setMatchState('crop')} style={{
+              padding: '10px 24px', borderRadius: 10, fontSize: 13,
+              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              border: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              重新框选
+            </button>
+            <button onClick={handleReset} style={{
+              padding: '10px 24px', borderRadius: 10, fontSize: 13,
+              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              border: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              换一张
+            </button>
+          </div>
         </div>
       )}
     </div>
