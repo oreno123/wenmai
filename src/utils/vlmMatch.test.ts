@@ -197,6 +197,29 @@ describe('parseVlmOutput', () => {
     expect(r.explanation).toBe('该纹样的答案：龙纹')
   })
 
+  it('无纹样拒绝：答案为"无"→ names 空，讲解保留', () => {
+    const r = parseVlmOutput('答案：无\n讲解：图中是一只咖啡杯')
+    expect(r).toEqual({ names: [], explanation: '图中是一只咖啡杯' })
+  })
+
+  it('无纹样拒绝：纯"无"（无答案行，走 fallback 末行路径）→ names 空', () => {
+    const r = parseVlmOutput('无')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('')
+  })
+
+  it('无纹样拒绝：变体"无纹样。"也判为无', () => {
+    const r = parseVlmOutput('答案：无纹样。\n讲解：照片是现代印花，非传统纹样')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('照片是现代印花，非传统纹样')
+  })
+
+  it('回归：正常纹样名不受否定判定影响', () => {
+    const r = parseVlmOutput('答案：缠枝莲纹\n讲解：枝蔓缠绕成带状。')
+    expect(r.names).toEqual(['缠枝莲纹'])
+    expect(r.explanation).toBe('枝蔓缠绕成带状')
+  })
+
   it('无答案行且末行是讲解行：不把讲解当候选名', () => {
     const r = parseVlmOutput('饕餮纹\n讲解：商代青铜器典型纹样')
     expect(r.names).toEqual(['饕餮纹'])

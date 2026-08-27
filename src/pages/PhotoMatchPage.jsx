@@ -137,10 +137,19 @@ export default function PhotoMatchPage() {
         const result = await callStepFunVision({ imageBase64: base64, signal: ctrl.signal })
         clearTimeout(timer)
 
-        const m = matchPattern(result.candidates, PATTERN_LIBRARY)
         setVlm(result)
-        setMatchResult(m)
         setAiDown(false)
+
+        if (result.candidates.length === 0) {
+          // VLM 明确回答"无"：图里没有传统纹样，不跑库内匹配、不展示 hash 参考
+          setMatchResult(null)
+          setMatches([])
+          setMatchState('results-ai')
+          return
+        }
+
+        const m = matchPattern(result.candidates, PATTERN_LIBRARY)
+        setMatchResult(m)
 
         if (m.source === 'fallback') {
           // VLM 认出了名字但图鉴未收录：补 hash top3 作"相似参考"
@@ -462,6 +471,57 @@ export default function PhotoMatchPage() {
       )}
 
       {/* Results — AI 识别 */}
+      {matchState === 'results-ai' && vlm && matchResult === null && (
+        <div>
+          <div style={{
+            textAlign: 'center', marginBottom: 24,
+            padding: 16, background: 'rgba(201,162,60,0.03)',
+            borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
+          }}>
+            <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
+            <img src={previewUrl} alt="上传图片" style={{
+              maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
+            }} />
+          </div>
+
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>
+              未检测到
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#D4AF6A', letterSpacing: 3 }}>
+              中国传统纹样
+            </div>
+            <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
+              试试对准器物上的纹样特写重新拍摄
+            </div>
+            {vlm.explanation && (
+              <div style={{ fontSize: 11, color: '#5a5a5a', lineHeight: 1.8, maxWidth: 320, margin: '8px auto 0', fontStyle: 'italic' }}>
+                AI 看到的内容：{vlm.explanation}
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
+            <button onClick={() => setMatchState('crop')} style={{
+              padding: '10px 24px', borderRadius: 10, fontSize: 13,
+              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              border: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              重新框选
+            </button>
+            <button onClick={handleReset} style={{
+              padding: '10px 24px', borderRadius: 10, fontSize: 13,
+              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              border: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              换一张
+            </button>
+          </div>
+        </div>
+      )}
+
       {matchState === 'results-ai' && vlm && matchResult && (
         <div>
           <div style={{

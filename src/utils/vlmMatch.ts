@@ -62,7 +62,14 @@ export function parseVlmOutput(raw: string): VlmParsedOutput {
   const answerLine = lines.find(l => !isExplain(l) && /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
   const fallbackPool = lines.filter(l => !isExplain(l))
   const nameSource = answerLine ?? fallbackPool[fallbackPool.length - 1] ?? ''
-  const names = parseVlmNames(nameSource)
+
+  // 无纹样拒绝出口：答案行剥掉前缀/句读后是极短否定（"无"/"无纹样"/"没有"）→ names 为空。
+  // 用整词枚举 + 首尾锚定，避免误伤正常纹样名（正常名字不会恰好是这几个否定词）。
+  const stripped = nameSource
+    .replace(/^.*?(?:答案|识别结果|最终答案)[:：]\s*/, '')
+    .replace(/[。．.!！?？\s]+$/g, '')
+  const isNoPattern = /^(无|無|没有|沒有|无纹样|沒有纹样|没有纹样|未检测到纹样)$/.test(stripped)
+  const names = isNoPattern ? [] : parseVlmNames(nameSource)
 
   const explainLine = lines.find(isExplain)
   let explanation = explainLine ? explainLine.replace(/^讲解[:：]\s*/, '').trim() : ''
@@ -163,6 +170,7 @@ const VLM_PROMPT = `识别图中的中国传统纹样。
 输出规则（严格两行，不要多余内容）：
 第一行 答案：纹样名（多主题时按主次输出 1-3 个，用 | 分隔）
 第二行 讲解：60 字内说明这是什么纹样、盛行朝代、寓意
+若图中没有中国传统纹样：第一行只写 答案：无，不要编造纹样名；第二行简述图中实际是什么
 
 示例：
 答案：团龙纹|云纹
