@@ -220,6 +220,29 @@ describe('parseVlmOutput', () => {
     expect(r.explanation).toBe('枝蔓缠绕成带状')
   })
 
+  it('无纹样拒绝：带引号“无”→ names 空', () => {
+    const r = parseVlmOutput('答案：“无”\n讲解：图中是一只咖啡杯')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('图中是一只咖啡杯')
+  })
+
+  it('无纹样拒绝：自由措辞"图中无纹样"→ names 空', () => {
+    const r = parseVlmOutput('答案：图中无纹样\n讲解：照片是现代建筑')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('照片是现代建筑')
+  })
+
+  it('无纹样拒绝：自由措辞"照片中没有传统纹样"→ names 空', () => {
+    const r = parseVlmOutput('答案：照片中没有传统纹样')
+    expect(r.names).toEqual([])
+  })
+
+  it('反例：万字曲水纹（"纹"结尾正常名）不受尾部否定匹配影响', () => {
+    const r = parseVlmOutput('答案：万字曲水纹\n讲解：以万字连续排列成带状。')
+    expect(r.names).toEqual(['万字曲水纹'])
+    expect(r.explanation).toBe('以万字连续排列成带状')
+  })
+
   it('无答案行且末行是讲解行：不把讲解当候选名', () => {
     const r = parseVlmOutput('饕餮纹\n讲解：商代青铜器典型纹样')
     expect(r.names).toEqual(['饕餮纹'])

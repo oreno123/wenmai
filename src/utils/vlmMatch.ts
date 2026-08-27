@@ -63,13 +63,19 @@ export function parseVlmOutput(raw: string): VlmParsedOutput {
   const fallbackPool = lines.filter(l => !isExplain(l))
   const nameSource = answerLine ?? fallbackPool[fallbackPool.length - 1] ?? ''
 
-  // 无纹样拒绝出口：答案行剥掉前缀/句读后是极短否定（"无"/"无纹样"/"没有"）→ names 为空。
-  // 用整词枚举 + 首尾锚定，避免误伤正常纹样名（正常名字不会恰好是这几个否定词）。
+  // 无纹样拒绝出口：答案行剥掉前缀/引号/句读后是极短否定（"无"/"无纹样"/"没有"）
+  // 或尾部否定短语（"图中无纹样"/"照片中没有传统纹样"）→ names 为空。
+  // 整词枚举兜最短形态；尾部匹配锚定句尾、否定词后限 0-6 字，真名不会以否定词开头且以"纹样"结尾。
   const stripped = nameSource
     .replace(/^.*?(?:答案|识别结果|最终答案)[:：]\s*/, '')
+    .replace(/^["'“”‘’]+/, '')
+    .replace(/["'“”‘’]+$/g, '')
     .replace(/[。．.!！?？\s]+$/g, '')
-  const isNoPattern = /^(无|無|没有|沒有|无纹样|沒有纹样|没有纹样|未检测到纹样)$/.test(stripped)
-  const names = isNoPattern ? [] : parseVlmNames(nameSource)
+    .replace(/^["'“”‘’]+/, '')
+    .replace(/["'“”‘’]+$/g, '')
+  const isExactNegative = /^(无|無|没有|沒有|无纹样|沒有纹样|没有纹样|未检测到纹样)$/.test(stripped)
+  const isTailNegative = /(无|無|没有|沒有|未检测到|未见).{0,6}(纹样|图案|传统纹样)$/.test(stripped)
+  const names = isExactNegative || isTailNegative ? [] : parseVlmNames(nameSource)
 
   const explainLine = lines.find(isExplain)
   let explanation = explainLine ? explainLine.replace(/^讲解[:：]\s*/, '').trim() : ''
