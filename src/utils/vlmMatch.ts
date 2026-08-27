@@ -46,6 +46,28 @@ export function parseVlmNames(raw: string): string[] {
   return cleanedNames.slice(0, MAX_CANDIDATES)
 }
 
+export interface VlmParsedOutput {
+  names: string[]
+  explanation: string
+}
+
+/**
+ * 解析双行输出：优先找 "答案：" 行（reasoning 模型答案行不一定在末尾），
+ * 找不到退回 parseVlmNames 的"取最后一行"老逻辑；"讲解：" 行必须以行首"讲解"开头。
+ */
+export function parseVlmOutput(raw: string): VlmParsedOutput {
+  const lines = (raw || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+  const answerLine = lines.find(l => /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
+  const nameSource = answerLine ?? lines[lines.length - 1] ?? ''
+  const names = parseVlmNames(nameSource)
+
+  const explainLine = lines.find(l => /^讲解[:：]/.test(l))
+  let explanation = explainLine ? explainLine.replace(/^讲解[:：]\s*/, '').trim() : ''
+  explanation = explanation.replace(/[。.]+$/, '').trim()
+
+  return { names, explanation }
+}
+
 /**
  * 提取纹样名的核心关键词用于模糊匹配。
  * "团龙纹" → "团龙"（去"纹"后缀，取末 2 字）

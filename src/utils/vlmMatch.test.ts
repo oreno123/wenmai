@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseVlmNames, extractKeyword, matchPattern, type MatchResult } from './vlmMatch'
+import { parseVlmNames, extractKeyword, matchPattern, parseVlmOutput, type MatchResult } from './vlmMatch'
 import type { Pattern } from '../store/patternData'
 
 describe('parseVlmNames', () => {
@@ -148,5 +148,45 @@ describe('matchPattern', () => {
     const r = matchPattern(['神兽'], MOCK_LIB)
     expect(r.source).toBe('fuzzy')
     expect(r.fuzzyMatches.map(p => p.id)).toContain('taotie-1')
+  })
+})
+
+describe('parseVlmOutput', () => {
+  it('标准双行输出：答案行 + 讲解行', () => {
+    const raw = '答案：团龙纹|云纹\n讲解：团龙纹为龙体盘踞成团的圆形适合纹样，盛行于明清，寓意尊贵吉祥。'
+    const r = parseVlmOutput(raw)
+    expect(r.names).toEqual(['团龙纹', '云纹'])
+    expect(r.explanation).toBe('团龙纹为龙体盘踞成团的圆形适合纹样，盛行于明清，寓意尊贵吉祥')
+  })
+
+  it('reasoning 包裹：答案行不在最后一行', () => {
+    const raw = '先分析图中龙的形态。\n答案：团龙纹\n讲解：龙纹盘踞成团。'
+    const r = parseVlmOutput(raw)
+    expect(r.names).toEqual(['团龙纹'])
+    expect(r.explanation).toBe('龙纹盘踞成团')
+  })
+
+  it('只有答案行、无讲解行', () => {
+    const r = parseVlmOutput('答案：回纹')
+    expect(r.names).toEqual(['回纹'])
+    expect(r.explanation).toBe('')
+  })
+
+  it('无答案前缀（老格式）：退回取最后一行做名字', () => {
+    const r = parseVlmOutput('这是多行推理。\n饕餮纹')
+    expect(r.names).toEqual(['饕餮纹'])
+    expect(r.explanation).toBe('')
+  })
+
+  it('讲解行必须以"讲解"开头才算（行中出现不算）', () => {
+    const raw = '答案：龙纹\n这是对纹样的讲解：龙纹威严。'
+    const r = parseVlmOutput(raw)
+    expect(r.names).toEqual(['龙纹'])
+    expect(r.explanation).toBe('')
+  })
+
+  it('空输入返回空', () => {
+    expect(parseVlmOutput('')).toEqual({ names: [], explanation: '' })
+    expect(parseVlmOutput('  \n  ')).toEqual({ names: [], explanation: '' })
   })
 })
