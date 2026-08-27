@@ -248,4 +248,34 @@ describe('parseVlmOutput', () => {
     expect(r.names).toEqual(['饕餮纹'])
     expect(r.explanation).toBe('商代青铜器典型纹样')
   })
+
+  it('三行格式：判定为是 → 正常解析答案行', () => {
+    const r = parseVlmOutput('判定：是\n答案：饕餮纹\n讲解：商代青铜器典型兽面纹样。')
+    expect(r.names).toEqual(['饕餮纹'])
+    expect(r.explanation).toBe('商代青铜器典型兽面纹样')
+  })
+
+  it('三行格式：判定为否 + 答案：无 → names 空，讲解保留', () => {
+    const r = parseVlmOutput('判定：否\n答案：无\n讲解：图中是一只现代咖啡杯')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('图中是一只现代咖啡杯')
+  })
+
+  it('判定门优先：判定为否但答案行硬写了名字 → 仍然 names 空', () => {
+    const r = parseVlmOutput('判定：否\n答案：云纹\n讲解：现代印花布料，非传统纹样')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('现代印花布料，非传统纹样')
+  })
+
+  it('判定行变体（空格+句读）也能识别为否', () => {
+    const r = parseVlmOutput('判定： 否。\n答案：无\n讲解：一只猫')
+    expect(r.names).toEqual([])
+    expect(r.explanation).toBe('一只猫')
+  })
+
+  it('旧两行格式无判定行：走原逻辑正常解析', () => {
+    const r = parseVlmOutput('答案：回纹|莲瓣纹\n讲解：几何连续纹样。')
+    expect(r.names).toEqual(['回纹', '莲瓣纹'])
+    expect(r.explanation).toBe('几何连续纹样')
+  })
 })

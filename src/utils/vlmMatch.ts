@@ -59,8 +59,15 @@ export interface VlmParsedOutput {
 export function parseVlmOutput(raw: string): VlmParsedOutput {
   const lines = (raw || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   const isExplain = (l: string) => /^讲解[:：]/.test(l)
-  const answerLine = lines.find(l => !isExplain(l) && /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
-  const fallbackPool = lines.filter(l => !isExplain(l))
+
+  // 判定门（gate-first）：找行首 "判定：是/否"。
+  // 内容含 否/无/非 → 无条件 names: []（即使答案行仍硬写了名字也忽略）。
+  const verdictLine = lines.find(l => /^判定[:：]/.test(l))
+  const verdictText = verdictLine ? verdictLine.replace(/^判定[:：]\s*/, '') : ''
+  const isNegativeVerdict = verdictText.length > 0 && /[否无非]/.test(verdictText)
+
+  const answerLine = lines.find(l => !isExplain(l) && !/^判定[:：]/.test(l) && /(^|\s)(答案|识别结果|最终答案)[:：]/.test(l))
+  const fallbackPool = lines.filter(l => !isExplain(l) && !/^判定[:：]/.test(l))
   const nameSource = answerLine ?? fallbackPool[fallbackPool.length - 1] ?? ''
 
   // 无纹样拒绝出口：答案行剥掉前缀/引号/句读后是极短否定（"无"/"无纹样"/"没有"）
@@ -75,7 +82,10 @@ export function parseVlmOutput(raw: string): VlmParsedOutput {
     .replace(/["'“”‘’]+$/g, '')
   const isExactNegative = /^(无|無|没有|沒有|无纹样|沒有纹样|没有纹样|未检测到纹样)$/.test(stripped)
   const isTailNegative = /(无|無|没有|沒有|未检测到|未见).{0,6}(纹样|图案|传统纹样)$/.test(stripped)
-  const names = isExactNegative || isTailNegative ? [] : parseVlmNames(nameSource)
+  // 判定门优先：判定为"否" → 无条件空（答案行内容忽略）
+  const names = isNegativeVerdict || isExactNegative || isTailNegative
+    ? []
+    : parseVlmNames(nameSource)
 
   const explainLine = lines.find(isExplain)
   let explanation = explainLine ? explainLine.replace(/^讲解[:：]\s*/, '').trim() : ''
@@ -171,22 +181,22 @@ export function matchPattern(vlmNames: string[], library: Pattern[]): MatchResul
 const VLM_ENDPOINT = '/vlm/chat/completions'
 const STEPFUN_MODEL = 'step-3.7-flash'
 
-const VLM_PROMPT = `识别图中的中国传统纹样。
+const VLM_PROMPT = `你是中国传统纹样鉴定专家。只按以下三行格式回答，不要输出其他内容：
+判定：<是|否>（图中是否出现中国传统纹样，如青铜器纹、瓷器纹、织绣纹、建筑彩画、吉祥图案；现代图案/风景/人物/物品不算）
+答案：<判定为"是"时写纹样名，1-3 个按主次用 | 分隔；判定为"否"时只写：无>
+讲解：<60 字内。判定为"是"：说明是什么/盛行朝代/寓意；判定为"否"：简述图中实际是什么>
 
-输出规则（严格两行，不要多余内容）：
-第一行 答案：纹样名（多主题时按主次输出 1-3 个，用 | 分隔）
-第二行 讲解：60 字内说明这是什么纹样、盛行朝代、寓意
-若图中没有中国传统纹样：第一行只写 答案：无，不要编造纹样名；第二行简述图中实际是什么
-
-示例：
+示例一：
+判定：是
 答案：团龙纹|云纹
 讲解：团龙纹为龙体盘踞成团的圆形适合纹样，盛行于明清，寓意尊贵吉祥。
 
-常见纹样参考（不限于）：团龙纹、行龙纹、蟠龙纹、云雷纹、回纹、卷草纹、缠枝纹、莲瓣纹、如意云纹、海水江崖纹、宝相花、冰裂纹、万字纹、绳纹、饕餮纹、凤鸟纹、牡丹纹、菊花纹、兰花纹、青花龙纹、青花山水
+示例二：
+判定：否
+答案：无
+讲解：图中是一只现代咖啡杯，无传统纹样。
 
-最终输出：
-答案：纹样名
-讲解：一句话介绍`
+常见纹样参考（不限于）：团龙纹、行龙纹、蟠龙纹、云雷纹、回纹、卷草纹、缠枝纹、莲瓣纹、如意云纹、海水江崖纹、宝相花、冰裂纹、万字纹、绳纹、饕餮纹、凤鸟纹、牡丹纹、菊花纹、兰花纹、青花龙纹、青花山水`
 
 export interface VlmCallOptions {
   imageBase64: string  // 不带 data: 前缀的纯 base64
@@ -248,6 +258,10 @@ export async function callStepFunVision(opts: VlmCallOptions): Promise<VlmCallRe
     (typeof msg.reasoning_content === 'string' && msg.reasoning_content) ||
     (typeof msg.reasoning === 'string' && msg.reasoning) ||
     ''
+
+  if (import.meta.env.DEV) {
+    console.debug('[vlm] raw output:', rawOutput)
+  }
 
   if (!rawOutput) {
     throw new Error('Step Fun API 返回空内容（content/reasoning_content/reasoning 都为空）')
