@@ -46,4 +46,17 @@ export default defineConfig({
     tailwindcss(),
     writeFilePlugin(),
   ],
+  server: {
+    proxy: {
+      // dev 下把 /vlm 转到生产反代（key 在服务器 nginx 注入），与生产同一条代码路径
+      '/vlm': {
+        target: 'https://wenmai-api.ruoziqing.cn',
+        changeOrigin: true,
+      },
+    },
+  },
+  test: {
+    // 排除 .claude/worktrees 旧 worktree 里的过时测试副本（vitest 会递归扫到）
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**', '**/cypress/**', '**/.{idea,git,cache,output,temp}/**'],
+  },
 })
