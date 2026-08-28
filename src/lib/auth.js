@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase'
+import { INITIAL_POINTS, DAILY_FREE_PULLS } from '../constants'
 
 /**
  * Subscribe to Supabase auth state. Returns { user, loading, configured }.
@@ -47,14 +48,22 @@ export async function signUpWithEmail(email, password, username) {
   // their own row, but the user is now authenticated so this works.
   // Welcome bundle matches DEFAULT_DATA: 3 commons + 6 SSRs.
   if (data.user) {
+    // Seed the full welcome state: the profiles table defaults are all 0 and
+    // syncFromCloud treats cloud rows as source of truth, so a row created
+    // without points/free_pulls locks new users out of the gacha.
     await supabase.from('profiles').upsert({
       user_id: data.user.id,
       username,
+      points: INITIAL_POINTS,
+      free_pulls: DAILY_FREE_PULLS,
+      pity_counter: 0,
+      daily_pull_date: null,
       library: [
         'basic-1', 'basic-2', 'basic-3',
         'dragon-4', 'cloud-4', 'taotie-3', 'scroll-3',
         'sj-7', 'sj-12',
       ],
+      creations: [],
       updated_at: new Date().toISOString(),
     })
   }
