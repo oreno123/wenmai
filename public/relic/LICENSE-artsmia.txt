@@ -1,0 +1,8 @@
+Model Information:
+* title:	Gui (Chinese food vessel)
+* source:	https://sketchfab.com/3d-models/gui-chinese-food-vessel-81983aad41fe4981b06dd2f26d98213c
+* author:	Minneapolis Institute of Art (https://sketchfab.com/artsmia)
+
+Model License:
+* license type:	CC0-1.0 (http://creativecommons.org/publicdomain/zero/1.0/)
+* requirements:	Credit is not mandatory. Commercial use is allowed.

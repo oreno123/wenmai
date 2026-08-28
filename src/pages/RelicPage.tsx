@@ -9,10 +9,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 /* 资产                                                                */
 /* ------------------------------------------------------------------ */
 
-const RELIC = '/relic/gui_lite_vc.glb?v=2'
+const RELIC = '/relic/shang_gui.glb?v=1'
+const MAX_ELEMS = 32
 
 interface ElemInfo {
   id: number
+  label?: string
   level?: 'main' | 'ground'
   bbox: [number, number, number, number]
   area: number
@@ -56,12 +58,28 @@ interface VesselProps {
   onHover: (id: number | null) => void
 }
 
-function pickElem(uv: THREE.Vector2 | undefined, elems: ElemInfo[]): number | null {
-  if (!uv) return null
-  const imgV = 1 - uv.y
+function pickElem(
+  ev: { uv?: THREE.Vector2; face?: { a: number } | null },
+  elems: ElemInfo[],
+  geo: THREE.BufferGeometry | null,
+): number | null {
+  // 首选: 命中面顶点色里的元素 ID (摄影测量 UV 岛拥挤, UV 矩形会误触)
+  if (ev.face && geo) {
+    const col = geo.getAttribute('color')
+    if (col) {
+      const r = col.getX(ev.face.a)
+      const cr = r > 1 ? r / 255 : r
+      const id = Math.floor(cr * 255 + 0.5) - 1
+      if (id >= 0) return id
+      return null
+    }
+  }
+  // 兜底: UV 矩形包含
+  if (!ev.uv) return null
+  const imgV = 1 - ev.uv.y
   for (const e of elems) {
     const { u0, v0, u1, v1 } = e.uv
-    if (uv.x >= u0 && uv.x <= u1 && imgV >= v0 && imgV <= v1) return e.id
+    if (ev.uv.x >= u0 && ev.uv.x <= u1 && imgV >= v0 && imgV <= v1) return e.id
   }
   return null
 }
@@ -70,7 +88,7 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
   const { scene } = useGLTF(RELIC)
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.ShaderMaterial | null>(null)
-  const opRef = useRef<number[]>(new Array(24).fill(0.95))
+  const opRef = useRef<number[]>(new Array(MAX_ELEMS).fill(0.95))
 
   const body = useMemo(() => {
     const root = scene.clone(true)
@@ -95,13 +113,16 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
 
   const { bronzeGeo, baseMat } = useMemo(() => {
     const geo = bodyMesh ? (bodyMesh.geometry as THREE.BufferGeometry) : null
+    const src = bodyMesh?.material as THREE.MeshStandardMaterial | undefined
+    const photo = Boolean(src?.map)
     const mat = new THREE.MeshStandardMaterial({
-      color: '#c99a5f',
-      metalness: 0.72,
-      roughness: 0.42,
-      emissive: new THREE.Color('#3a2a12'),
-      emissiveIntensity: 0.55,
-      map: (bodyMesh?.material as THREE.MeshStandardMaterial)?.map ?? undefined,
+      color: photo ? '#ffffff' : '#c99a5f',
+      metalness: photo ? 0.5 : 0.72,
+      roughness: photo ? 0.62 : 0.42,
+      emissive: new THREE.Color(photo ? '#221708' : '#3a2a12'),
+      emissiveIntensity: photo ? 0.35 : 0.55,
+      map: src?.map ?? undefined,
+      normalMap: src?.normalMap ?? undefined,
     })
     return { bronzeGeo: geo, baseMat: mat }
   }, [bodyMesh])
@@ -111,11 +132,11 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
   const overlayMat = useMemo(() => {
     const mat = new THREE.ShaderMaterial({
       uniforms: {
-        uOp: { value: new Array(24).fill(0.95) },
+        uOp: { value: new Array(MAX_ELEMS).fill(0.95) },
         uMainColor: { value: new THREE.Color('#ffd060') },
         uGroundColor: { value: new THREE.Color('#48daba') },
         uEdgeColor: { value: new THREE.Color('#ffffe6') },
-        uNMain: { value: 16 },
+        uNMain: { value: MAX_ELEMS },
       },
       vertexShader: /* glsl */ `
         attribute vec4 color;
@@ -125,7 +146,7 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: /* glsl */ `
-        uniform float uOp[24];
+        uniform float uOp[${MAX_ELEMS}];
         uniform vec3 uMainColor;
         uniform vec3 uGroundColor;
         uniform vec3 uEdgeColor;
@@ -137,7 +158,7 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
           if (id < -0.5) discard;
           int idx = int(id + 0.5);
           float op = 0.0;
-          for (int i = 0; i < 24; i++) {
+          for (int i = 0; i < ${MAX_ELEMS}; i++) {
             if (i == idx) op = uOp[i];
           }
           if (op < 0.01) discard;
@@ -153,11 +174,17 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
 
   matRef.current = overlayMat
 
+  useEffect(() => {
+    // main 元素排在前 (manifest 已按此序), shader 按 id<uNMain 区分主纹/地纹色
+    const nMain = elems.filter((e) => e.level !== 'ground').length
+    if (matRef.current) matRef.current.uniforms.uNMain.value = nMain
+  }, [elems])
+
   useFrame((_, dt) => {
     const k = Math.min(1, dt * 6)
     let dirty = false
     for (const e of elems) {
-      if (e.id > 23) continue
+      if (e.id >= MAX_ELEMS) continue
       const target = picked.has(e.id) ? 0 : hovered === e.id ? 1 : 0.95
       const cur = opRef.current[e.id]
       if (Math.abs(target - cur) > 0.002) {
@@ -166,7 +193,7 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
       }
     }
     if (dirty && matRef.current) {
-      ;(matRef.current.uniforms.uOp.value as number[]).splice(0, 24, ...opRef.current)
+      ;(matRef.current.uniforms.uOp.value as number[]).splice(0, MAX_ELEMS, ...opRef.current)
     }
     if (groupRef.current && hovered === null) {
       groupRef.current.rotation.y += dt * 0.12
@@ -175,11 +202,11 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
 
   const handleClick = (ev: ThreeEvent<MouseEvent>) => {
     ev.stopPropagation()
-    const id = pickElem(ev.uv, elems)
+    const id = pickElem(ev, elems, bronzeGeo)
     if (id !== null) onPick(id)
   }
   const handleMove = (ev: ThreeEvent<PointerEvent>) => {
-    const id = pickElem(ev.uv, elems)
+    const id = pickElem(ev, elems, bronzeGeo)
     onHover(id)
     document.body.style.cursor = id !== null && !picked.has(id) ? 'pointer' : 'default'
   }
@@ -245,7 +272,7 @@ export default function RelicPage() {
     if (picked.has(id)) return
     setPicked((prev) => new Set(prev).add(id))
     const e = elems.find((x) => x.id === id)
-    const name = e?.level === 'ground' ? '地纹云雷' : '主纹元素'
+    const name = e?.label ?? (e?.level === 'ground' ? '地纹云雷' : '主纹元素')
     setFlash(`已提取：${name} · 元素 #${String(id).padStart(2, '0')}`)
     window.setTimeout(() => setFlash(null), 1800)
   }
@@ -460,7 +487,7 @@ export default function RelicPage() {
                   />
                   <div>
                     <div style={{ fontSize: 14, color: '#ffe6a8', display: 'flex', gap: 8, alignItems: 'center' }}>
-                      元素 #{String(e.id).padStart(2, '0')}
+                      {e.label ?? `元素 #${String(e.id).padStart(2, '0')}`}
                       <span
                         style={{
                           fontSize: 10,
@@ -477,7 +504,7 @@ export default function RelicPage() {
                       </span>
                     </div>
                     <div style={{ fontSize: 11.5, opacity: 0.55, marginTop: 4, lineHeight: 1.6 }}>
-                      面积 {e.area.toLocaleString()} px · 曲面 UV 定位
+                      元素 #{String(e.id).padStart(2, '0')} · 面积 {e.area.toLocaleString()} px
                       <br />
                       点击送往拼贴画布 →
                     </div>
@@ -517,8 +544,8 @@ export default function RelicPage() {
               paddingTop: 12,
             }}
           >
-            流水线：圆柱展开 (θ,y) → 形态学开运算分离器型背景 → 残差浮雕 → 连通域拆件。
-            演示资产由纹样基因库程序生成，流水线可直接接入博物馆 3D 数字化资产。
+            流水线：柱面展开 (θ,y) → 浮雕残差定位扉棱 → 三面板纹带分割 → 顶点色烘焙。
+            几何与贴图：明尼阿波利斯艺术博物馆藏商代青铜簋摄影测量扫描件（CC0）。
           </div>
         </aside>
       </div>
