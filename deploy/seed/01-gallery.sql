@@ -110,7 +110,49 @@ CREATE TRIGGER trg_works_count_review
   FOR EACH ROW EXECUTE FUNCTION update_works_count_on_review();
 
 -- ──────────────────────────────────────────────────────────
--- 5. RLS — 行级安全策略
+-- 5. RLS 辅助函数（SECURITY DEFINER，防策略自引用递归 42P17）
+-- 教训：策略里直接 SELECT works/profiles 会触发 RLS 再入 → infinite recursion，
+-- 必须用 SECURITY DEFINER 函数绕开（云版时代踩过，重写迁移时丢失过一次）
+-- ──────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION public.is_wm_admin(uid UUID)
+RETURNS BOOLEAN
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE user_id = uid AND is_admin);
+$$;
+
+CREATE OR REPLACE FUNCTION public.works_published_today(uid UUID)
+RETURNS INT
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT COUNT(*)::INT FROM public.works
+  WHERE author_id = uid AND created_at > NOW() - INTERVAL '1 day';
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_wm_admin(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.works_published_today(UUID) TO anon, authenticated;
+
+-- ──────────────────────────────────────────────────────────
+-- 5b. 审核状态守卫：非管理员不得变更 status/reviewed_by（防自审绕过）
+-- ──────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION public.guard_work_status() RETURNS TRIGGER
+LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN
+  IF (NEW.status IS DISTINCT FROM OLD.status
+      OR NEW.reviewed_by IS DISTINCT FROM OLD.reviewed_by)
+     AND NOT public.is_wm_admin(auth.uid()) THEN
+    RAISE EXCEPTION '只有管理员可以变更审核状态';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_guard_work_status ON works;
+CREATE TRIGGER trg_guard_work_status BEFORE UPDATE ON works
+FOR EACH ROW EXECUTE FUNCTION public.guard_work_status();
+
+-- ──────────────────────────────────────────────────────────
+-- 5c. RLS — 行级安全策略
 -- ──────────────────────────────────────────────────────────
 
 ALTER TABLE works ENABLE ROW LEVEL SECURITY;
@@ -122,27 +164,26 @@ CREATE POLICY "read_approved_or_own_or_admin" ON works FOR SELECT
   USING (
     status = 'approved'
     OR author_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND is_admin)
+    OR public.is_wm_admin(auth.uid())
   );
 
 -- works 写：登录用户发布，每用户每天 ≤ 3 件
+-- status 强制 'pending' + reviewed_by 强制 NULL —— 防直发 approved 绕过审核
 DROP POLICY IF EXISTS "insert_own_with_daily_limit" ON works;
 CREATE POLICY "insert_own_with_daily_limit" ON works FOR INSERT
   WITH CHECK (
     author_id = auth.uid()
-    AND (
-      SELECT COUNT(*) FROM works
-      WHERE author_id = auth.uid()
-        AND created_at > NOW() - INTERVAL '1 day'
-    ) < 3
+    AND status = 'pending'
+    AND reviewed_by IS NULL
+    AND public.works_published_today(auth.uid()) < 3
   );
 
--- works 改：作者可改自己 / 管理员可审
+-- works 改：作者可改自己（status/reviewed_by 由 5b 触发器拦）/ 管理员可审
 DROP POLICY IF EXISTS "update_own_or_admin" ON works;
 CREATE POLICY "update_own_or_admin" ON works FOR UPDATE
   USING (
     author_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND is_admin)
+    OR public.is_wm_admin(auth.uid())
   );
 
 -- likes：登录可 like / 自己可 unlike
