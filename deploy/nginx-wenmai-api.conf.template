@@ -66,7 +66,17 @@ server {
     }
 
     # Storage — 作品封面图（storage-api 1.69 同样挂根路径）
+    # 2026-08-28：加 OPTIONS 预检直答 —— storage-api 预检返回 404 无 CORS 头，
+    # 广场封面上传（supabase-js 带 x-upsert 头）预检被拒。
     location /storage/v1/ {
+        # 预检直答：放行 apikey/x-upsert 等头，不进 storage-api
+        if ($request_method = OPTIONS) {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Accept, Authorization, Content-Type, apikey, X-Client-Info, X-Supabase-Api-Version, x-upsert, cache-control, Prefer";
+            add_header Access-Control-Max-Age "86400";
+            return 204;
+        }
         proxy_pass http://127.0.0.1:5434/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
