@@ -100,6 +100,7 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
     const s = 2.4 / Math.max(size.x, size.y, size.z)
     root.scale.setScalar(s)
     root.position.set(-center.x * s, -center.y * s, -center.z * s)
+    root.updateMatrixWorld(true)
     return root
   }, [scene])
 
@@ -112,7 +113,12 @@ function Vessel({ elems, picked, hovered, onPick, onHover }: VesselProps) {
   }, [body])
 
   const { bronzeGeo, baseMat } = useMemo(() => {
-    const geo = bodyMesh ? (bodyMesh.geometry as THREE.BufferGeometry) : null
+    // body 里算好的归一化矩阵 (缩放至 2.4 + 居中) 烘进几何, JSX mesh 不再复用原始小尺寸几何
+    let geo: THREE.BufferGeometry | null = null
+    if (bodyMesh) {
+      geo = bodyMesh.geometry.clone()
+      geo.applyMatrix4(bodyMesh.matrixWorld)
+    }
     const src = bodyMesh?.material as THREE.MeshStandardMaterial | undefined
     const photo = Boolean(src?.map)
     const mat = new THREE.MeshStandardMaterial({
