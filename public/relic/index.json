@@ -1,0 +1,184 @@
+{
+ "models": [
+  {
+   "id": "shang_gui",
+   "name": "青铜簋",
+   "zh": "簋",
+   "dynasty": "商 · 前12–11世纪",
+   "glb": "/relic/m/shang_gui/model.glb",
+   "manifest": "/relic/m/shang_gui/manifest.json",
+   "thumb": "/relic/m/shang_gui/thumb.png"
+  },
+  {
+   "id": "ding_shang",
+   "name": "兽纹鼎",
+   "zh": "鼎",
+   "dynasty": "商 · 前12世纪",
+   "glb": "/relic/m/ding_shang/model.glb",
+   "manifest": "/relic/m/ding_shang/manifest.json",
+   "thumb": "/relic/m/ding_shang/thumb.png"
+  },
+  {
+   "id": "ding_warring",
+   "name": "错金银鼎",
+   "zh": "鼎",
+   "dynasty": "战国 · 前5世纪",
+   "glb": "/relic/m/ding_warring/model.glb",
+   "manifest": "/relic/m/ding_warring/manifest.json",
+   "thumb": "/relic/m/ding_warring/thumb.png"
+  },
+  {
+   "id": "ding_west_zhou",
+   "name": "鼎",
+   "zh": "鼎",
+   "dynasty": "西周 · 前11–10世纪",
+   "glb": "/relic/m/ding_west_zhou/model.glb",
+   "manifest": "/relic/m/ding_west_zhou/manifest.json",
+   "thumb": "/relic/m/ding_west_zhou/thumb.png"
+  },
+  {
+   "id": "double_owl_you",
+   "name": "双鸮卣",
+   "zh": "卣",
+   "dynasty": "西周 · 前11世纪",
+   "glb": "/relic/m/double_owl_you/model.glb",
+   "manifest": "/relic/m/double_owl_you/manifest.json",
+   "thumb": "/relic/m/double_owl_you/thumb.png"
+  },
+  {
+   "id": "ewer_huo",
+   "name": "提梁壶",
+   "zh": "壶",
+   "dynasty": "商末周初",
+   "glb": "/relic/m/ewer_huo/model.glb",
+   "manifest": "/relic/m/ewer_huo/manifest.json",
+   "thumb": "/relic/m/ewer_huo/thumb.png"
+  },
+  {
+   "id": "fanghu",
+   "name": "方壶",
+   "zh": "壶",
+   "dynasty": "战国 · 前5–4世纪",
+   "glb": "/relic/m/fanghu/model.glb",
+   "manifest": "/relic/m/fanghu/manifest.json",
+   "thumb": "/relic/m/fanghu/thumb.png"
+  },
+  {
+   "id": "fangyi",
+   "name": "方彝",
+   "zh": "彝",
+   "dynasty": "商",
+   "glb": "/relic/m/fangyi/model.glb",
+   "manifest": "/relic/m/fangyi/manifest.json",
+   "thumb": "/relic/m/fangyi/thumb.png"
+  },
+  {
+   "id": "guang",
+   "name": "觥",
+   "zh": "觥",
+   "dynasty": "商末周初",
+   "glb": "/relic/m/guang/model.glb",
+   "manifest": "/relic/m/guang/manifest.json",
+   "thumb": "/relic/m/guang/thumb.png"
+  },
+  {
+   "id": "gui_zhou",
+   "name": "簋",
+   "zh": "簋",
+   "dynasty": "西周 · 约前10世纪",
+   "glb": "/relic/m/gui_zhou/model.glb",
+   "manifest": "/relic/m/gui_zhou/manifest.json",
+   "thumb": "/relic/m/gui_zhou/thumb.png"
+  },
+  {
+   "id": "gui_zhou_2",
+   "name": "簋",
+   "zh": "簋",
+   "dynasty": "西周 · 前11–10世纪",
+   "glb": "/relic/m/gui_zhou_2/model.glb",
+   "manifest": "/relic/m/gui_zhou_2/manifest.json",
+   "thumb": "/relic/m/gui_zhou_2/thumb.png"
+  },
+  {
+   "id": "he",
+   "name": "盉",
+   "zh": "盉",
+   "dynasty": "西周 · 前11–10世纪",
+   "glb": "/relic/m/he/model.glb",
+   "manifest": "/relic/m/he/manifest.json",
+   "thumb": "/relic/m/he/thumb.png"
+  },
+  {
+   "id": "hu",
+   "name": "壶",
+   "zh": "壶",
+   "dynasty": "战国 · 前5–4世纪",
+   "glb": "/relic/m/hu/model.glb",
+   "manifest": "/relic/m/hu/manifest.json",
+   "thumb": "/relic/m/hu/thumb.png"
+  },
+  {
+   "id": "jia",
+   "name": "斝",
+   "zh": "斝",
+   "dynasty": "商 · 前13–12世纪",
+   "glb": "/relic/m/jia/model.glb",
+   "manifest": "/relic/m/jia/manifest.json",
+   "thumb": "/relic/m/jia/thumb.png"
+  },
+  {
+   "id": "liding",
+   "name": "鬲鼎",
+   "zh": "鬲",
+   "dynasty": "商末周初 · 前12–11世纪",
+   "glb": "/relic/m/liding/model.glb",
+   "manifest": "/relic/m/liding/manifest.json",
+   "thumb": "/relic/m/liding/thumb.png"
+  },
+  {
+   "id": "owl_zun",
+   "name": "鸮尊",
+   "zh": "尊",
+   "dynasty": "商 · 前13–12世纪",
+   "glb": "/relic/m/owl_zun/model.glb",
+   "manifest": "/relic/m/owl_zun/manifest.json",
+   "thumb": "/relic/m/owl_zun/thumb.png"
+  },
+  {
+   "id": "shengding",
+   "name": "升鼎",
+   "zh": "鼎",
+   "dynasty": "春秋 · 约前575年",
+   "glb": "/relic/m/shengding/model.glb",
+   "manifest": "/relic/m/shengding/manifest.json",
+   "thumb": "/relic/m/shengding/thumb.png"
+  },
+  {
+   "id": "ting_shang",
+   "name": "鼎",
+   "zh": "鼎",
+   "dynasty": "商 · 前12世纪",
+   "glb": "/relic/m/ting_shang/model.glb",
+   "manifest": "/relic/m/ting_shang/manifest.json",
+   "thumb": "/relic/m/ting_shang/thumb.png"
+  },
+  {
+   "id": "xianglu",
+   "name": "铜香炉",
+   "zh": "炉",
+   "dynasty": "后期",
+   "glb": "/relic/m/xianglu/model.glb",
+   "manifest": "/relic/m/xianglu/manifest.json",
+   "thumb": "/relic/m/xianglu/thumb.png"
+  },
+  {
+   "id": "you_shang",
+   "name": "卣",
+   "zh": "卣",
+   "dynasty": "商末周初 · 前12–11世纪",
+   "glb": "/relic/m/you_shang/model.glb",
+   "manifest": "/relic/m/you_shang/manifest.json",
+   "thumb": "/relic/m/you_shang/thumb.png"
+  }
+ ]
+}
