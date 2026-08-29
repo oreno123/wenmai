@@ -1,0 +1,601 @@
+[
+ {
+  "slug": "ding_hd",
+  "name": "兽面纹鼎",
+  "zh": "鼎",
+  "dynasty": "商",
+  "cards": [
+   {
+    "id": "face2",
+    "score": 5,
+    "webp": "ding_hd/face2.webp",
+    "svg": "ding_hd/face2.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ding_hd/face0.webp",
+    "svg": "ding_hd/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ding_shang",
+  "name": "兽纹鼎",
+  "zh": "鼎",
+  "dynasty": "商 · 前12世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ding_shang/face0.webp",
+    "svg": "ding_shang/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ding_src",
+  "name": "兽面纹鼎·Cleveland源档",
+  "zh": "鼎",
+  "dynasty": "商",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "ding_src/face0.webp",
+    "svg": "ding_src/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "ding_src/face1.webp",
+    "svg": "ding_src/face1.svg"
+   },
+   {
+    "id": "face2",
+    "score": 4,
+    "webp": "ding_src/face2.webp",
+    "svg": "ding_src/face2.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ding_warring",
+  "name": "错金银鼎",
+  "zh": "鼎",
+  "dynasty": "战国 · 前5世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ding_warring/face0.webp",
+    "svg": "ding_warring/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "ding_warring/face1.webp",
+    "svg": "ding_warring/face1.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ding_west_zhou",
+  "name": "鼎",
+  "zh": "鼎",
+  "dynasty": "西周 · 前11–10世纪",
+  "cards": [
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "ding_west_zhou/face1.webp",
+    "svg": "ding_west_zhou/face1.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ding_west_zhou/face0.webp",
+    "svg": "ding_west_zhou/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "double_owl_you",
+  "name": "双鸮卣",
+  "zh": "卣",
+  "dynasty": "西周 · 前11世纪",
+  "cards": [
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "double_owl_you/v3.webp"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "double_owl_you/face1.webp",
+    "svg": "double_owl_you/face1.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ewer_huo",
+  "name": "提梁壶",
+  "zh": "壶",
+  "dynasty": "商末周初",
+  "cards": [
+   {
+    "id": "band_g",
+    "score": 5,
+    "webp": "ewer_huo/band_g.webp"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ewer_huo/face0.webp",
+    "svg": "ewer_huo/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "fangding_src",
+  "name": "fangding_src",
+  "zh": "",
+  "dynasty": "",
+  "cards": [
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "fangding_src/band.webp"
+   },
+   {
+    "id": "face3",
+    "score": 4,
+    "webp": "fangding_src/face3.webp",
+    "svg": "fangding_src/face3.svg"
+   }
+  ]
+ },
+ {
+  "slug": "fanghu",
+  "name": "方壶",
+  "zh": "壶",
+  "dynasty": "战国 · 前5–4世纪",
+  "cards": [
+   {
+    "id": "v2",
+    "score": 4,
+    "webp": "fanghu/v2.webp"
+   }
+  ]
+ },
+ {
+  "slug": "fangyi",
+  "name": "方彝",
+  "zh": "彝",
+  "dynasty": "商",
+  "cards": [
+   {
+    "id": "face3",
+    "score": 5,
+    "webp": "fangyi/face3.webp",
+    "svg": "fangyi/face3.svg"
+   }
+  ]
+ },
+ {
+  "slug": "fangyi_src",
+  "name": "方彝·源档150k",
+  "zh": "彝",
+  "dynasty": "商 · 前12-11世纪",
+  "cards": [
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "fangyi_src/band.webp"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "fangyi_src/face0.webp",
+    "svg": "fangyi_src/face0.svg"
+   },
+   {
+    "id": "face3",
+    "score": 4,
+    "webp": "fangyi_src/face3.webp",
+    "svg": "fangyi_src/face3.svg"
+   },
+   {
+    "id": "v6",
+    "score": 4,
+    "webp": "fangyi_src/v6.webp"
+   }
+  ]
+ },
+ {
+  "slug": "guang",
+  "name": "觥",
+  "zh": "觥",
+  "dynasty": "商末周初",
+  "cards": [
+   {
+    "id": "face2",
+    "score": 5,
+    "webp": "guang/face2.webp",
+    "svg": "guang/face2.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "guang/face1.webp",
+    "svg": "guang/face1.svg"
+   }
+  ]
+ },
+ {
+  "slug": "guang_src",
+  "name": "觥·源档",
+  "zh": "觥",
+  "dynasty": "商末周初",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "guang_src/face0.webp",
+    "svg": "guang_src/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "gui_zhou",
+  "name": "簋",
+  "zh": "簋",
+  "dynasty": "西周 · 约前10世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "gui_zhou/face0.webp",
+    "svg": "gui_zhou/face0.svg"
+   },
+   {
+    "id": "face3",
+    "score": 4,
+    "webp": "gui_zhou/face3.webp",
+    "svg": "gui_zhou/face3.svg"
+   }
+  ]
+ },
+ {
+  "slug": "gui_zhou_2",
+  "name": "簋",
+  "zh": "簋",
+  "dynasty": "西周 · 前11–10世纪",
+  "cards": [
+   {
+    "id": "face3",
+    "score": 5,
+    "webp": "gui_zhou_2/face3.webp",
+    "svg": "gui_zhou_2/face3.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "gui_zhou_2/face0.webp",
+    "svg": "gui_zhou_2/face0.svg"
+   },
+   {
+    "id": "face2",
+    "score": 4,
+    "webp": "gui_zhou_2/face2.webp",
+    "svg": "gui_zhou_2/face2.svg"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "gui_zhou_2/band.webp"
+   }
+  ]
+ },
+ {
+  "slug": "he",
+  "name": "盉",
+  "zh": "盉",
+  "dynasty": "西周 · 前11–10世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "he/face0.webp",
+    "svg": "he/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "hu",
+  "name": "壶",
+  "zh": "壶",
+  "dynasty": "战国 · 前5–4世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "hu/face0.webp",
+    "svg": "hu/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "hu/face1.webp",
+    "svg": "hu/face1.svg"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "hu/band.webp"
+   },
+   {
+    "id": "band_g",
+    "score": 4,
+    "webp": "hu/band_g.webp"
+   }
+  ]
+ },
+ {
+  "slug": "huo_src",
+  "name": "huo_src",
+  "zh": "",
+  "dynasty": "",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "huo_src/face0.webp",
+    "svg": "huo_src/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "huo_src/face1.webp",
+    "svg": "huo_src/face1.svg"
+   }
+  ]
+ },
+ {
+  "slug": "jia",
+  "name": "斝",
+  "zh": "斝",
+  "dynasty": "商 · 前13–12世纪",
+  "cards": [
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "jia/face1.webp",
+    "svg": "jia/face1.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "jia/face0.webp",
+    "svg": "jia/face0.svg"
+   },
+   {
+    "id": "band_g",
+    "score": 4,
+    "webp": "jia/band_g.webp"
+   }
+  ]
+ },
+ {
+  "slug": "liding",
+  "name": "鬲鼎",
+  "zh": "鬲",
+  "dynasty": "商末周初 · 前12–11世纪",
+  "cards": [
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "liding/face1.webp",
+    "svg": "liding/face1.svg"
+   },
+   {
+    "id": "face2",
+    "score": 4,
+    "webp": "liding/face2.webp",
+    "svg": "liding/face2.svg"
+   }
+  ]
+ },
+ {
+  "slug": "owl_you_src",
+  "name": "owl_you_src",
+  "zh": "",
+  "dynasty": "",
+  "cards": [
+   {
+    "id": "face2",
+    "score": 5,
+    "webp": "owl_you_src/face2.webp",
+    "svg": "owl_you_src/face2.svg"
+   },
+   {
+    "id": "face3",
+    "score": 5,
+    "webp": "owl_you_src/face3.webp",
+    "svg": "owl_you_src/face3.svg"
+   },
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "owl_you_src/v3.webp"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "owl_you_src/band.webp"
+   }
+  ]
+ },
+ {
+  "slug": "owl_zun",
+  "name": "鸮尊",
+  "zh": "尊",
+  "dynasty": "商 · 前13–12世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "owl_zun/face0.webp",
+    "svg": "owl_zun/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "owl_zun/face1.webp",
+    "svg": "owl_zun/face1.svg"
+   }
+  ]
+ },
+ {
+  "slug": "shang_gui",
+  "name": "青铜簋",
+  "zh": "簋",
+  "dynasty": "商 · 前12–11世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "shang_gui/face0.webp",
+    "svg": "shang_gui/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "shang_gui/face1.webp",
+    "svg": "shang_gui/face1.svg"
+   },
+   {
+    "id": "face2",
+    "score": 5,
+    "webp": "shang_gui/face2.webp",
+    "svg": "shang_gui/face2.svg"
+   }
+  ]
+ },
+ {
+  "slug": "shengding",
+  "name": "升鼎",
+  "zh": "鼎",
+  "dynasty": "春秋 · 约前575年",
+  "cards": [
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "shengding/face1.webp",
+    "svg": "shengding/face1.svg"
+   },
+   {
+    "id": "face2",
+    "score": 4,
+    "webp": "shengding/face2.webp",
+    "svg": "shengding/face2.svg"
+   }
+  ]
+ },
+ {
+  "slug": "ting_shang",
+  "name": "鼎",
+  "zh": "鼎",
+  "dynasty": "商 · 前12世纪",
+  "cards": [
+   {
+    "id": "face2",
+    "score": 5,
+    "webp": "ting_shang/face2.webp",
+    "svg": "ting_shang/face2.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "ting_shang/face0.webp",
+    "svg": "ting_shang/face0.svg"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "ting_shang/band.webp"
+   }
+  ]
+ },
+ {
+  "slug": "xianglu",
+  "name": "铜香炉",
+  "zh": "炉",
+  "dynasty": "后期",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "xianglu/face0.webp",
+    "svg": "xianglu/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "you_shang",
+  "name": "卣",
+  "zh": "卣",
+  "dynasty": "商末周初 · 前12–11世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "you_shang/face0.webp",
+    "svg": "you_shang/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 4,
+    "webp": "you_shang/face1.webp",
+    "svg": "you_shang/face1.svg"
+   },
+   {
+    "id": "face2",
+    "score": 4,
+    "webp": "you_shang/face2.webp",
+    "svg": "you_shang/face2.svg"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "you_shang/band.webp"
+   },
+   {
+    "id": "band_g",
+    "score": 4,
+    "webp": "you_shang/band_g.webp"
+   }
+  ]
+ },
+ {
+  "slug": "yu_src",
+  "name": "盂·9.5M原档",
+  "zh": "盂",
+  "dynasty": "商末周初 · 前12-11世纪",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "yu_src/face0.webp",
+    "svg": "yu_src/face0.svg"
+   },
+   {
+    "id": "face1",
+    "score": 5,
+    "webp": "yu_src/face1.webp",
+    "svg": "yu_src/face1.svg"
+   }
+  ]
+ }
+]

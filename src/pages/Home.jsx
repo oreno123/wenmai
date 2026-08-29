@@ -103,6 +103,12 @@ function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
         <path d="M12 22V12M3 7l9 5 9-5" />
       </>
     ),
+    ink: (
+      <>
+        <path d="M20 4c-4 1-9 5-12 9l3 3c4-3 8-8 9-12z" />
+        <path d="M8 13c-2 .5-4 2.5-4 5 1.5 0 2.5.5 3 2 2.5-.5 4-2.5 4-4" />
+      </>
+    ),
     hand: (
       <>
         <path d="M9 11V5a1.8 1.8 0 1 1 3.6 0v5" />
@@ -483,7 +489,7 @@ export default function Home() {
 
           {/* ── 更多工具（折叠的次要入口）── */}
           <motion.div variants={stagger} initial="initial" animate="animate"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 14 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, marginTop: 14 }}
           >
             {[
               { icon: 'camera', label: '找相似', path: '/photo-match' },
@@ -491,9 +497,10 @@ export default function Home() {
               { icon: 'hand', label: '手势展示', path: '/showcase' },
               { icon: 'compose', label: '自由拼', path: '/puzzle' },
               { icon: 'cube', label: '文物提取', path: '/relic' },
+              { icon: 'ink', label: 'AI 纹样库', path: '/ai-patterns' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: item.path ? 'pointer' : 'default' }}>
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0, cursor: item.path ? 'pointer' : 'default' }}>
                 <div style={{
                   width: 44, height: 44,
                   background: 'linear-gradient(145deg, #1A1812, #0F0D08)',
