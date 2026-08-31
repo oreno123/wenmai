@@ -55,15 +55,19 @@ export default function AiPatternsPage() {
                   background: '#F7F3EA', borderRadius: 8, padding: 8, cursor: 'pointer',
                   border: '1px solid rgba(212,175,106,0.2)',
                 }}>
-                <img src={`/relic/ai/${c.webp}`} alt={c.id} loading="lazy"
+                <img src={`/relic/ai/${c.webp}`} alt={c.name || c.id} loading="lazy"
                   style={{ width: '100%', display: 'block', borderRadius: 4 }} />
                 <div style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, gap: 6,
                 }}>
-                  <span style={{ color: '#8A7D68', fontSize: 10, fontFamily: 'Noto Serif SC, serif' }}>
-                    {c.id === 'band' ? '整带纹样' : c.id.startsWith('v') ? `视角 ${c.id.slice(1)}` : `兽面 ${c.id.replace('face', '')}`}
+                  <span style={{ color: '#2B221A', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600 }}>
+                    {c.name || c.id}
                   </span>
-                  <span style={{ color: '#C0392B', fontSize: 10, letterSpacing: -1 }}>{'★'.repeat(c.score)}</span>
+                  <span style={{ color: '#C0392B', fontSize: 10, letterSpacing: -1, whiteSpace: 'nowrap' }}>{'★'.repeat(c.score)}</span>
+                </div>
+                <div style={{ color: '#8A7D68', fontSize: 9.5, marginTop: 2 }}>
+                  {c.id === 'band' ? '整带纹样' : c.id.startsWith('v') ? `视角 ${c.id.slice(1)}` : `兽面 ${c.id.replace('face', '')}`}
+                  {c.sub ? ` · ${c.sub}衬地` : ''}
                 </div>
               </motion.div>
             ))}
@@ -82,14 +86,20 @@ export default function AiPatternsPage() {
             <motion.div initial={{ scale: 0.94, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.94 }}
               onClick={e => e.stopPropagation()}
               style={{ background: '#F7F3EA', borderRadius: 12, padding: 16, maxWidth: 'min(680px, 92vw)', maxHeight: '88vh', overflow: 'auto' }}>
-              <img src={`/relic/ai/${pick.webp}`} alt={pick.id}
+              <img src={`/relic/ai/${pick.webp}`} alt={pick.name || pick.id}
                 style={{ width: '100%', display: 'block', borderRadius: 6 }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 15, color: '#2B221A' }}>
-                    {pick.vessel.name} · {pick.id}
+                  <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600, color: '#2B221A' }}>
+                    {pick.name || pick.id}
+                    <span style={{ color: '#C0392B', fontSize: 11, letterSpacing: -1, marginLeft: 8 }}>{'★'.repeat(pick.score)}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#8A7D68', marginTop: 2 }}>{pick.vessel.dynasty}</div>
+                  <div style={{ fontSize: 11, color: '#8A7D68', marginTop: 2 }}>
+                    {pick.vessel.name} · {pick.vessel.dynasty}{pick.sub ? ` · ${pick.sub}衬地` : ''}
+                  </div>
+                  {pick.desc && (
+                    <div style={{ fontSize: 11, color: '#6B5F4D', marginTop: 4 }}>{pick.desc}</div>
+                  )}
                 </div>
                 <a href={`/relic/ai/${pick.webp}`} download
                   style={{

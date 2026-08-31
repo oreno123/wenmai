@@ -9,13 +9,19 @@
     "id": "face2",
     "score": 5,
     "webp": "ding_hd/face2.webp",
-    "svg": "ding_hd/face2.svg"
+    "svg": "ding_hd/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "商代兽面纹，对称构图，张口露齿"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "ding_hd/face0.webp",
-    "svg": "ding_hd/face0.svg"
+    "svg": "ding_hd/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "商代兽面纹，双目圆睁，巨口獠牙"
    }
   ]
  },
@@ -29,7 +35,10 @@
     "id": "face0",
     "score": 4,
     "webp": "ding_shang/face0.webp",
-    "svg": "ding_shang/face0.svg"
+    "svg": "ding_shang/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代牛首兽面，巨角上卷"
    }
   ]
  },
@@ -43,19 +52,28 @@
     "id": "face0",
     "score": 5,
     "webp": "ding_src/face0.webp",
-    "svg": "ding_src/face0.svg"
+    "svg": "ding_src/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代兽面纹,对称牛角,双目怒视"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "ding_src/face1.webp",
-    "svg": "ding_src/face1.svg"
+    "svg": "ding_src/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代兽面纹饰，云雷纹地"
    },
    {
     "id": "face2",
     "score": 4,
     "webp": "ding_src/face2.webp",
-    "svg": "ding_src/face2.svg"
+    "svg": "ding_src/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代兽面纹，正面对称，巨目獠牙"
    }
   ]
  },
@@ -69,13 +87,19 @@
     "id": "face0",
     "score": 4,
     "webp": "ding_warring/face0.webp",
-    "svg": "ding_warring/face0.svg"
+    "svg": "ding_warring/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "牛角兽面，张口鼓目，对称构图"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "ding_warring/face1.webp",
-    "svg": "ding_warring/face1.svg"
+    "svg": "ding_warring/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "正面兽面,双目突出,云雷地纹"
    }
   ]
  },
@@ -89,13 +113,19 @@
     "id": "face1",
     "score": 5,
     "webp": "ding_west_zhou/face1.webp",
-    "svg": "ding_west_zhou/face1.svg"
+    "svg": "ding_west_zhou/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "正面獠牙兽面，外环曲折地纹"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "ding_west_zhou/face0.webp",
-    "svg": "ding_west_zhou/face0.svg"
+    "svg": "ding_west_zhou/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "兽面纹，角内卷，下有云雷纹地"
    }
   ]
  },
@@ -108,13 +138,19 @@
    {
     "id": "v3",
     "score": 5,
-    "webp": "double_owl_you/v3.webp"
+    "webp": "double_owl_you/v3.webp",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "对称牛首兽面，角眉清晰，纹饰繁复"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "double_owl_you/face1.webp",
-    "svg": "double_owl_you/face1.svg"
+    "svg": "double_owl_you/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "正面对称兽面，有角，暴目巨鼻"
    }
   ]
  },
@@ -127,13 +163,19 @@
    {
     "id": "band_g",
     "score": 5,
-    "webp": "ewer_huo/band_g.webp"
+    "webp": "ewer_huo/band_g.webp",
+    "name": "龙纹",
+    "sub": "云雷纹",
+    "desc": "侧面卷尾龙纹带状装饰"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "ewer_huo/face0.webp",
-    "svg": "ewer_huo/face0.svg"
+    "svg": "ewer_huo/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "商末周初壶饰，饕餮居中，双目凸起"
    }
   ]
  },
@@ -146,13 +188,19 @@
    {
     "id": "band",
     "score": 4,
-    "webp": "fangding_src/band.webp"
+    "webp": "fangding_src/band.webp",
+    "name": "龙纹",
+    "sub": "云雷纹",
+    "desc": "侧面龙形，张口，有角，身披鳞纹"
    },
    {
     "id": "face3",
     "score": 4,
     "webp": "fangding_src/face3.webp",
-    "svg": "fangding_src/face3.svg"
+    "svg": "fangding_src/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "正面兽面，额部生角，两侧饰羽翼纹"
    }
   ]
  },
@@ -165,7 +213,10 @@
    {
     "id": "v2",
     "score": 4,
-    "webp": "fanghu/v2.webp"
+    "webp": "fanghu/v2.webp",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "对称兽面，额生双角，巨目宽鼻"
    }
   ]
  },
@@ -179,7 +230,10 @@
     "id": "face3",
     "score": 5,
     "webp": "fangyi/face3.webp",
-    "svg": "fangyi/face3.svg"
+    "svg": "fangyi/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代兽面纹，双角上卷，正面构图"
    }
   ]
  },
@@ -192,24 +246,36 @@
    {
     "id": "band",
     "score": 4,
-    "webp": "fangyi_src/band.webp"
+    "webp": "fangyi_src/band.webp",
+    "name": "虎纹",
+    "sub": "云雷纹",
+    "desc": "侧身虎形，张口鼓目，体饰卷云纹"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "fangyi_src/face0.webp",
-    "svg": "fangyi_src/face0.svg"
+    "svg": "fangyi_src/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代彝器正面兽面纹，对称构图"
    },
    {
     "id": "face3",
     "score": 4,
     "webp": "fangyi_src/face3.webp",
-    "svg": "fangyi_src/face3.svg"
+    "svg": "fangyi_src/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代兽面纹，对称构图，双角巨目"
    },
    {
     "id": "v6",
     "score": 4,
-    "webp": "fangyi_src/v6.webp"
+    "webp": "fangyi_src/v6.webp",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代方彝主纹,兽面双角,对称构图"
    }
   ]
  },
@@ -223,13 +289,19 @@
     "id": "face2",
     "score": 5,
     "webp": "guang/face2.webp",
-    "svg": "guang/face2.svg"
+    "svg": "guang/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "商末周初青铜兽面主纹"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "guang/face1.webp",
-    "svg": "guang/face1.svg"
+    "svg": "guang/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商末周初典型兽面纹样"
    }
   ]
  },
@@ -243,7 +315,10 @@
     "id": "face0",
     "score": 4,
     "webp": "guang_src/face0.webp",
-    "svg": "guang_src/face0.svg"
+    "svg": "guang_src/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商末周初典型兽面纹，有角有目"
    }
   ]
  },
@@ -257,13 +332,19 @@
     "id": "face0",
     "score": 5,
     "webp": "gui_zhou/face0.webp",
-    "svg": "gui_zhou/face0.svg"
+    "svg": "gui_zhou/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "牛首饕餮,卷云地纹,獠牙外露"
    },
    {
     "id": "face3",
     "score": 4,
     "webp": "gui_zhou/face3.webp",
-    "svg": "gui_zhou/face3.svg"
+    "svg": "gui_zhou/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "西周兽面主纹，双目圆睁"
    }
   ]
  },
@@ -277,24 +358,36 @@
     "id": "face3",
     "score": 5,
     "webp": "gui_zhou_2/face3.webp",
-    "svg": "gui_zhou_2/face3.svg"
+    "svg": "gui_zhou_2/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "对称兽面纹，双目突出，角耳外展"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "gui_zhou_2/face0.webp",
-    "svg": "gui_zhou_2/face0.svg"
+    "svg": "gui_zhou_2/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "对称兽面，双角瞪目，张口露齿"
    },
    {
     "id": "face2",
     "score": 4,
     "webp": "gui_zhou_2/face2.webp",
-    "svg": "gui_zhou_2/face2.svg"
+    "svg": "gui_zhou_2/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "带角兽面，对称构图，西周典型"
    },
    {
     "id": "band",
     "score": 4,
-    "webp": "gui_zhou_2/band.webp"
+    "webp": "gui_zhou_2/band.webp",
+    "name": "夔龙纹",
+    "sub": "云雷纹",
+    "desc": "西周青铜簋夔龙纹饰"
    }
   ]
  },
@@ -308,7 +401,10 @@
     "id": "face0",
     "score": 5,
     "webp": "he/face0.webp",
-    "svg": "he/face0.svg"
+    "svg": "he/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "对称兽面纹，双目獠牙为特征"
    }
   ]
  },
@@ -322,23 +418,35 @@
     "id": "face0",
     "score": 5,
     "webp": "hu/face0.webp",
-    "svg": "hu/face0.svg"
+    "svg": "hu/face0.svg",
+    "name": "龙纹",
+    "sub": "云纹",
+    "desc": "战国壶上龙首吐舌，曲身带状"
    },
    {
     "id": "face1",
     "score": 5,
     "webp": "hu/face1.webp",
-    "svg": "hu/face1.svg"
+    "svg": "hu/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "对称兽面，圆目犄角，张口露齿"
    },
    {
     "id": "band",
     "score": 4,
-    "webp": "hu/band.webp"
+    "webp": "hu/band.webp",
+    "name": "龙纹",
+    "sub": "云雷纹",
+    "desc": "战国壶身龙纹带，侧身卷尾角爪具"
    },
    {
     "id": "band_g",
     "score": 4,
-    "webp": "hu/band_g.webp"
+    "webp": "hu/band_g.webp",
+    "name": "蟠螭纹",
+    "sub": "云雷纹",
+    "desc": "交龙蟠曲，作风古朴"
    }
   ]
  },
@@ -352,13 +460,19 @@
     "id": "face0",
     "score": 4,
     "webp": "huo_src/face0.webp",
-    "svg": "huo_src/face0.svg"
+    "svg": "huo_src/face0.svg",
+    "name": "龙纹",
+    "sub": "云雷纹",
+    "desc": "侧面龙形，云纹填充装饰"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "huo_src/face1.webp",
-    "svg": "huo_src/face1.svg"
+    "svg": "huo_src/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "正面兽面，双目圆睁，额生双角"
    }
   ]
  },
@@ -372,18 +486,27 @@
     "id": "face1",
     "score": 5,
     "webp": "jia/face1.webp",
-    "svg": "jia/face1.svg"
+    "svg": "jia/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代饕餮纹，牛角圆目，云雷地纹"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "jia/face0.webp",
-    "svg": "jia/face0.svg"
+    "svg": "jia/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代兽面纹，正面带冠侧面有角"
    },
    {
     "id": "band_g",
     "score": 4,
-    "webp": "jia/band_g.webp"
+    "webp": "jia/band_g.webp",
+    "name": "虎纹",
+    "sub": "云雷纹",
+    "desc": "商代虎纹带云雷地"
    }
   ]
  },
@@ -397,13 +520,19 @@
     "id": "face1",
     "score": 4,
     "webp": "liding/face1.webp",
-    "svg": "liding/face1.svg"
+    "svg": "liding/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "兽面纹居中，地纹云雷"
    },
    {
     "id": "face2",
     "score": 4,
     "webp": "liding/face2.webp",
-    "svg": "liding/face2.svg"
+    "svg": "liding/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商周青铜器常见兽面纹"
    }
   ]
  },
@@ -417,23 +546,35 @@
     "id": "face2",
     "score": 5,
     "webp": "owl_you_src/face2.webp",
-    "svg": "owl_you_src/face2.svg"
+    "svg": "owl_you_src/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "回纹",
+    "desc": "对称兽面，巨目阔口，双角突起"
    },
    {
     "id": "face3",
     "score": 5,
     "webp": "owl_you_src/face3.webp",
-    "svg": "owl_you_src/face3.svg"
+    "svg": "owl_you_src/face3.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "卷云纹",
+    "desc": "正面对称兽面，宽鼻巨目，周饰卷云"
    },
    {
     "id": "v3",
     "score": 5,
-    "webp": "owl_you_src/v3.webp"
+    "webp": "owl_you_src/v3.webp",
+    "name": "牛纹",
+    "sub": "云雷纹",
+    "desc": "牛首纹样，双角对称，面部写实"
    },
    {
     "id": "band",
     "score": 4,
-    "webp": "owl_you_src/band.webp"
+    "webp": "owl_you_src/band.webp",
+    "name": "龙纹",
+    "sub": "云雷纹",
+    "desc": "有翼龙纹衬云雷纹地"
    }
   ]
  },
@@ -447,13 +588,19 @@
     "id": "face0",
     "score": 5,
     "webp": "owl_zun/face0.webp",
-    "svg": "owl_zun/face0.svg"
+    "svg": "owl_zun/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代典型兽面纹，对称构图，具角目鼻齿"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "owl_zun/face1.webp",
-    "svg": "owl_zun/face1.svg"
+    "svg": "owl_zun/face1.svg",
+    "name": "鸮纹",
+    "sub": "",
+    "desc": "商代鸮尊鸮面纹样"
    }
   ]
  },
@@ -467,19 +614,28 @@
     "id": "face0",
     "score": 5,
     "webp": "shang_gui/face0.webp",
-    "svg": "shang_gui/face0.svg"
+    "svg": "shang_gui/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "商代典型兽面纹，大角卷发对称构图"
    },
    {
     "id": "face1",
     "score": 5,
     "webp": "shang_gui/face1.webp",
-    "svg": "shang_gui/face1.svg"
+    "svg": "shang_gui/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "正面兽面，双角立耳，张目露齿"
    },
    {
     "id": "face2",
     "score": 5,
     "webp": "shang_gui/face2.webp",
-    "svg": "shang_gui/face2.svg"
+    "svg": "shang_gui/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "对称兽面，突睛阔鼻，曲角立耳"
    }
   ]
  },
@@ -493,13 +649,19 @@
     "id": "face1",
     "score": 5,
     "webp": "shengding/face1.webp",
-    "svg": "shengding/face1.svg"
+    "svg": "shengding/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "对称兽面,双目突出,巨口獠牙"
    },
    {
     "id": "face2",
     "score": 4,
     "webp": "shengding/face2.webp",
-    "svg": "shengding/face2.svg"
+    "svg": "shengding/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "",
+    "desc": "三兽面并列，双目凸起，巨口露齿"
    }
   ]
  },
@@ -513,18 +675,27 @@
     "id": "face2",
     "score": 5,
     "webp": "ting_shang/face2.webp",
-    "svg": "ting_shang/face2.svg"
+    "svg": "ting_shang/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "居中饕餮兽面，侧饰卷云纹"
    },
    {
     "id": "face0",
     "score": 4,
     "webp": "ting_shang/face0.webp",
-    "svg": "ting_shang/face0.svg"
+    "svg": "ting_shang/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "商代鼎腹饕餮纹，双目突出，两侧伴云"
    },
    {
     "id": "band",
     "score": 4,
-    "webp": "ting_shang/band.webp"
+    "webp": "ting_shang/band.webp",
+    "name": "夔龙纹",
+    "sub": "",
+    "desc": "侧面卷曲龙形纹，构图规整，线条劲健。"
    }
   ]
  },
@@ -538,7 +709,10 @@
     "id": "face0",
     "score": 5,
     "webp": "xianglu/face0.webp",
-    "svg": "xianglu/face0.svg"
+    "svg": "xianglu/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "典型牛首饕餮，双目圆睁，角对称展开"
    }
   ]
  },
@@ -552,29 +726,44 @@
     "id": "face0",
     "score": 4,
     "webp": "you_shang/face0.webp",
-    "svg": "you_shang/face0.svg"
+    "svg": "you_shang/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "牛首饕餮纹,云雷地"
    },
    {
     "id": "face1",
     "score": 4,
     "webp": "you_shang/face1.webp",
-    "svg": "you_shang/face1.svg"
+    "svg": "you_shang/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "正脸兽面巨目阔口，周匝云雷"
    },
    {
     "id": "face2",
     "score": 4,
     "webp": "you_shang/face2.webp",
-    "svg": "you_shang/face2.svg"
+    "svg": "you_shang/face2.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "侧面兽首，双角耸立，怒目张口"
    },
    {
     "id": "band",
     "score": 4,
-    "webp": "you_shang/band.webp"
+    "webp": "you_shang/band.webp",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "夔龙纹",
+    "desc": "商末周初兽面主纹,带龙纹"
    },
    {
     "id": "band_g",
     "score": 4,
-    "webp": "you_shang/band_g.webp"
+    "webp": "you_shang/band_g.webp",
+    "name": "龙纹",
+    "sub": "",
+    "desc": "多组蜿蜒龙形纹样"
    }
   ]
  },
@@ -588,13 +777,185 @@
     "id": "face0",
     "score": 5,
     "webp": "yu_src/face0.webp",
-    "svg": "yu_src/face0.svg"
+    "svg": "yu_src/face0.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云雷纹",
+    "desc": "中央对称兽面纹，商周典型"
    },
    {
     "id": "face1",
     "score": 5,
     "webp": "yu_src/face1.webp",
-    "svg": "yu_src/face1.svg"
+    "svg": "yu_src/face1.svg",
+    "name": "饕餮纹（兽面纹）",
+    "sub": "云纹",
+    "desc": "商式兽面纹，双角对称，周带云纹"
+   }
+  ]
+ },
+ {
+  "slug": "he_hd",
+  "name": "青铜盉",
+  "zh": "盉",
+  "dynasty": "商末周初",
+  "cards": [
+   {
+    "id": "band",
+    "score": 5,
+    "webp": "he_hd/band.webp",
+    "name": "夔龙纹",
+    "desc": "商末周初青铜器龙形纹",
+    "sub": "云雷纹",
+    "svg": "he_hd/band.svg"
+   },
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "he_hd/face0.webp",
+    "name": "饕餮纹",
+    "desc": "商末周初盉兽面主纹",
+    "sub": "云雷纹",
+    "svg": "he_hd/face0.svg"
+   },
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "he_hd/v3.webp",
+    "name": "饕餮纹（兽面纹）",
+    "desc": "商末周初兽面，对称构图，巨角瞪目",
+    "sub": "云雷纹",
+    "svg": "he_hd/v3.svg"
+   }
+  ]
+ },
+ {
+  "slug": "jue_hd",
+  "name": "青铜爵",
+  "zh": "爵",
+  "dynasty": "商",
+  "cards": [
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "jue_hd/v3.webp",
+    "name": "饕餮纹（兽面纹）",
+    "desc": "对称兽面纹，带角，毛发装饰",
+    "svg": "jue_hd/v3.svg"
+   },
+   {
+    "id": "face0",
+    "score": 4,
+    "webp": "jue_hd/face0.webp",
+    "name": "饕餮纹（兽面纹）",
+    "desc": "商代兽面纹带角獠牙卷云",
+    "svg": "jue_hd/face0.svg"
+   },
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "jue_hd/band.webp",
+    "name": "龙纹",
+    "desc": "商代爵体龙形纹地云雷",
+    "sub": "云雷纹",
+    "svg": "jue_hd/band.svg"
+   }
+  ]
+ },
+ {
+  "slug": "tenghou_ding",
+  "name": "滕侯鼎",
+  "zh": "鼎",
+  "dynasty": "西周",
+  "cards": [
+   {
+    "id": "band",
+    "score": 5,
+    "webp": "tenghou_ding/band.webp",
+    "name": "龙纹",
+    "desc": "西周龙纹带，侧视有鳞",
+    "svg": "tenghou_ding/band.svg"
+   },
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "tenghou_ding/v3.webp",
+    "name": "饕餮纹（兽面纹）",
+    "desc": "对称兽面，双角巨目，卷云纹饰",
+    "svg": "tenghou_ding/v3.svg"
+   }
+  ]
+ },
+ {
+  "slug": "lei_lid",
+  "name": "罍（盖）",
+  "zh": "罍",
+  "dynasty": "西周",
+  "cards": [
+   {
+    "id": "v3",
+    "score": 5,
+    "webp": "lei_lid/v3.webp",
+    "name": "龙纹",
+    "desc": "侧视龙首卷云纹样",
+    "sub": "云雷纹",
+    "svg": "lei_lid/v3.svg"
+   },
+   {
+    "id": "band",
+    "score": 5,
+    "webp": "lei_lid/band.webp",
+    "name": "龙纹",
+    "desc": "带状龙纹，云雷纹衬地",
+    "sub": "云雷纹",
+    "svg": "lei_lid/band.svg"
+   }
+  ]
+ },
+ {
+  "slug": "lei_base",
+  "name": "罍（身）",
+  "zh": "罍",
+  "dynasty": "西周",
+  "cards": [
+   {
+    "id": "band",
+    "score": 4,
+    "webp": "lei_base/band.webp",
+    "name": "龙纹",
+    "desc": "西周龙纹，体态矫健，剪影风格",
+    "svg": "lei_base/band.svg"
+   }
+  ]
+ },
+ {
+  "slug": "rijifangzun",
+  "name": "日己方尊",
+  "zh": "尊",
+  "dynasty": "西周",
+  "cards": [
+   {
+    "id": "face0",
+    "score": 5,
+    "webp": "rijifangzun/face0.webp",
+    "name": "饕餮纹",
+    "desc": "西周日己方尊兽面主纹",
+    "svg": "rijifangzun/face0.svg"
+   }
+  ]
+ },
+ {
+  "slug": "jiubei",
+  "name": "青铜爵",
+  "zh": "爵",
+  "dynasty": "商",
+  "cards": [
+   {
+    "id": "v3",
+    "score": 4,
+    "webp": "jiubei/v3.webp",
+    "name": "饕餮纹（兽面纹）",
+    "desc": "兽面居中，云雷纹衬地",
+    "svg": "jiubei/v3.svg"
    }
   ]
  }
