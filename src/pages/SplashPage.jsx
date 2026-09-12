@@ -64,7 +64,7 @@ export default function SplashPage() {
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas)
     }
 
-    fetch('/shaders/noise_base64.txt')
+    fetch(`${import.meta.env.BASE_URL}shaders/noise_base64.txt`)
       .then(r => r.text())
       .then(b64 => {
         if (disposed) return

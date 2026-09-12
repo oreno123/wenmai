@@ -44,7 +44,7 @@ interface ModelInfo {
 function useModelIndex(): ModelInfo[] {
   const [models, setModels] = useState<ModelInfo[]>([DEFAULT_MODEL])
   useEffect(() => {
-    fetch('/relic/index.json')
+    fetch(`${import.meta.env.BASE_URL}relic/index.json`)
       .then((r) => r.json())
       .then((d: { models: ModelInfo[] }) => {
         if (Array.isArray(d.models) && d.models.length > 0) setModels(d.models)

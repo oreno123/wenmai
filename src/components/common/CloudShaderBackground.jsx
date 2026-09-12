@@ -70,7 +70,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
     }
 
     let tex
-    fetch('/shaders/noise_base64.txt')
+    fetch(`${import.meta.env.BASE_URL}shaders/noise_base64.txt`)
       .then(r => r.text())
       .then(b64 => {
         if (disposed) return

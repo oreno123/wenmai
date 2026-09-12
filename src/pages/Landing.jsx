@@ -131,7 +131,7 @@ function useCloudTrainShader(containerRef) {
       renderer.dispose()
     }
 
-    fetch('/shaders/noise_base64.txt').then(r => r.text()).then(b64 => {
+    fetch(`${import.meta.env.BASE_URL}shaders/noise_base64.txt`).then(r => r.text()).then(b64 => {
       if (disposed) return
       const img = new Image()
       img.onload = () => {

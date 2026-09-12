@@ -10,7 +10,7 @@ export default function AiPatternsPage() {
   const [pick, setPick] = useState(null)
 
   useEffect(() => {
-    fetch('/relic/ai/manifest.json')
+    fetch(`${import.meta.env.BASE_URL}relic/ai/manifest.json`)
       .then(r => r.json())
       .then(d => setData(Array.isArray(d) ? d : []))
       .catch(() => {})
