@@ -14,6 +14,13 @@ export default class ErrorBoundary extends Component {
     console.error('[ErrorBoundary]', error, info)
   }
 
+  // 路由变化时自动复位：一页崩溃（如 WebGL 不可用）不应拖死整个 App
+  componentDidUpdate(prev) {
+    if (this.state.hasError && prev.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null })
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return (

@@ -87,17 +87,24 @@ function Layout() {
   )
 }
 
+function Shell() {
+  const { pathname } = useLocation()
+  return (
+    <ErrorBoundary resetKey={pathname}>
+      <AppProvider>
+        <GoldBackground />
+        <CloudSync />
+        <Layout />
+      </AppProvider>
+    </ErrorBoundary>
+  )
+}
+
 export default function App() {
   return (
-    <ErrorBoundary>
-      <RouterProvider>
-        <AppProvider>
-          <GoldBackground />
-          <CloudSync />
-          <Layout />
-        </AppProvider>
-      </RouterProvider>
-    </ErrorBoundary>
+    <RouterProvider>
+      <Shell />
+    </RouterProvider>
   )
 }
 
