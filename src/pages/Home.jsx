@@ -124,6 +124,13 @@ function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
         <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1" />
       </>
     ),
+    vase: (
+      <>
+        <path d="M9 3h6" />
+        <path d="M10 3c0 2-1 3-2 4-1.5 1.5-2 3.5-2 6 0 3 1.5 5 3 6.5.5.5 1 1 1 1.5h-4" />
+        <path d="M14 3c0 2 1 3 2 4 1.5 1.5 2 3.5 2 6 0 3-1.5 5-3 6.5-.5.5-1 1-1 1.5" />
+      </>
+    ),
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
@@ -276,6 +283,58 @@ export default function Home() {
         </motion.div>
 
         <div style={{ padding: '0 16px' }}>
+          {/* ── 拍照识纹（第一入口）── */}
+          <motion.div variants={stagger} initial="initial" animate="animate">
+            <motion.div variants={fadeUp}
+              onClick={() => navigate('/photo-match')}
+              style={{
+                background: 'linear-gradient(135deg, #241E12 0%, #12100A 100%)',
+                border: '1.5px solid rgba(212,175,106,0.5)',
+                borderRadius: 16, padding: 18, position: 'relative', overflow: 'hidden',
+                boxShadow: '0 0 40px rgba(212,175,106,0.14)', cursor: 'pointer',
+              }}
+            >
+              <div style={{
+                position: 'absolute', top: -30, right: -30, width: 160, height: 160,
+                background: 'radial-gradient(circle, rgba(242,213,138,0.2), transparent)', pointerEvents: 'none',
+              }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontFamily: 'serif', fontSize: 20, color: '#F2D58A', letterSpacing: '0.08em' }}>拍照识纹</span>
+                  <span style={{ fontSize: 12, color: '#8A8A8A', marginTop: 5, lineHeight: 1.7 }}>
+                    逛博物馆拍一张，立刻认出它<br />听讲解 · 看三维 · 做文创
+                  </span>
+                  <motion.button
+                    whileHover={{ filter: 'brightness(1.15)', boxShadow: '0 0 16px rgba(212,175,106,0.4)' }}
+                    style={{
+                      background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8', border: 'none',
+                      borderRadius: 6, padding: '8px 24px', marginTop: 12,
+                      fontSize: 14, letterSpacing: '0.3em', cursor: 'pointer', fontFamily: 'inherit',
+                      alignSelf: 'flex-start',
+                    }}
+                  >
+                    拍 照
+                  </motion.button>
+                </div>
+                <motion.div
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity }}
+                  style={{
+                    width: 72, height: 72, flexShrink: 0,
+                    background: 'linear-gradient(160deg, #2A2418, #1A1610)',
+                    border: '1px solid rgba(212,175,106,0.4)', borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+
           {/* ── 每日抽卡 Banner ── */}
           <motion.div variants={stagger} initial="initial" animate="animate">
             <motion.div variants={fadeUp}
@@ -493,10 +552,10 @@ export default function Home() {
           >
             {[
               { icon: 'camera', label: '找相似', path: '/photo-match' },
-              { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
+              { icon: 'vase', label: '青花总览', path: '/qinghua' },
               { icon: 'hand', label: '手势展示', path: '/showcase' },
               { icon: 'compose', label: '自由拼', path: '/puzzle' },
-              { icon: 'cube', label: '文物提取', path: '/relic' },
+              { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
               { icon: 'ink', label: 'AI 纹样库', path: '/ai-patterns' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}

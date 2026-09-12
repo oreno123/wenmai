@@ -1,11 +1,11 @@
 import { useLocation, useNavigate } from './Router'
 
 const TABS = [
-  { path: '/home', label: '首页', icon: 'home' },
   { path: '/library', label: '图鉴', icon: 'book' },
-  { path: '/puzzle', label: '创作', icon: 'compose', center: true },
+  { path: '/relic', label: '3D', icon: 'cube' },
+  { path: '/photo-match', label: '拍照', icon: 'camera', center: true },
+  { path: '/puzzle', label: '创作', icon: 'compose' },
   { path: '/gallery', label: '广场', icon: 'gallery' },
-  { path: '/qinghua', label: '总览', icon: 'vase' },
 ]
 
 const ICONS = {
@@ -17,6 +17,18 @@ const ICONS = {
   book: (color) => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+    </svg>
+  ),
+  camera: (color) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  ),
+  cube: (color) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+      <path d="M3.27 6.96L12 12.01l8.73-5.05" /><path d="M12 22.08V12" />
     </svg>
   ),
   card: (color) => (
