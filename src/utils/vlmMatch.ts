@@ -176,9 +176,11 @@ export function matchPattern(vlmNames: string[], library: Pattern[]): MatchResul
   }
 }
 
-// 生产=wenmai-api nginx 反代（注入 key），dev=vite server.proxy 转发到同一反代。
-// 前端 bundle 永远不含 api.stepfun.com 域名和 key。
-const VLM_ENDPOINT = '/vlm/chat/completions'
+// 统一走 wenmai-api 绝对 URL（key 只在服务器 nginx 注入，bundle 零 key）：
+// - 鸿蒙虚拟 origin(http://localhost) 下相对路径会被 onInterceptRequest 拦进 rawfile 必失败
+// - 线上 wenmai.ruoziqing.cn 无同域 /vlm/ 路径（SPA fallback 会返回 HTML）
+// - 服务器已配 ACAO，网页/dev 直连跨域可用；vite server.proxy 仅作备用
+const VLM_ENDPOINT = 'https://wenmai-api.ruoziqing.cn/vlm/chat/completions'
 const STEPFUN_MODEL = 'step-3.7-flash'
 
 const VLM_PROMPT = `你是中国传统纹样鉴定专家。只按以下三行格式回答，不要输出其他内容：
