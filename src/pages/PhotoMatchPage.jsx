@@ -56,6 +56,21 @@ export default function PhotoMatchPage() {
     if (file) handleFile(file)
   }, [handleFile])
 
+  // 离线演示/无照片兜底：从包内纹样图随机取一张当"拍摄照片"走完整匹配链路
+  const trySamplePhoto = useCallback(async () => {
+    try {
+      const p = PATTERN_LIBRARY[Math.floor(Math.random() * PATTERN_LIBRARY.length)]
+      const res = await fetch(p.image)
+      const blob = await res.blob()
+      const file = new File([blob], p.image.split('/').pop() || 'sample.webp', {
+        type: blob.type || 'image/webp',
+      })
+      handleFile(file)
+    } catch {
+      setError('示例纹样加载失败，请上传图片')
+    }
+  }, [handleFile])
+
   const handleDrop = useCallback((e) => {
     e.preventDefault()
     const file = e.dataTransfer.files?.[0]
@@ -281,6 +296,15 @@ export default function PhotoMatchPage() {
           </div>
           <div style={{ fontSize: 11, color: '#4A4A4A', marginTop: 8 }}>
             支持 JPG / PNG / WebP
+          </div>
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              trySamplePhoto()
+            }}
+            style={{ fontSize: 12, color: '#C9A23C', marginTop: 14, cursor: 'pointer' }}
+          >
+            没有藏品照片？用内置纹样试试 →
           </div>
           <input
             ref={fileRef}
