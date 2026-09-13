@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹脉 · UI 升级预览 0913</title>
+<style>
+  :root {
+    --gold: #D4AF6A;
+    --gold-bright: #F2D58A;
+    --gold-deep: #BC6B2F;
+    --gold-dim: #8A6A30;
+    --red: #BC1F28;
+    --ink: #0F0F10;
+    --card: #1A1A1C;
+    --text: #F5F1E8;
+    --text-2: #8A8A8A;
+    --serif: 'Noto Serif SC', 'STSong', 'SimSun', Georgia, serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0A0A0B;
+    color: var(--text);
+    font-family: var(--serif);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1080px; margin: 0 auto; padding: 48px 28px 120px; }
+
+  /* ── 页头 ── */
+  header { text-align: center; padding: 40px 0 20px; }
+  header h1 {
+    font-size: 34px; font-weight: 600; letter-spacing: 0.3em;
+    color: var(--gold-bright); text-indent: 0.3em;
+  }
+  header .sub { margin-top: 12px; font-size: 13px; color: var(--gold-dim); letter-spacing: 0.2em; }
+  header .rule {
+    width: 1px; height: 56px; margin: 28px auto 0;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── 区块骨架 ── */
+  section { margin-top: 88px; }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; border-bottom: 1px solid rgba(212,175,106,0.18); padding-bottom: 14px; }
+  .sec-num { font-size: 13px; color: var(--red); letter-spacing: 0.2em; font-weight: 600; }
+  .sec-title { font-size: 24px; font-weight: 600; letter-spacing: 0.15em; color: var(--gold-bright); }
+  .sec-en { font-size: 11px; color: var(--gold-dim); letter-spacing: 0.25em; font-style: italic; font-family: Georgia, serif; }
+  .sec-desc { margin-top: 12px; font-size: 13.5px; line-height: 2; color: var(--text-2); max-width: 720px; }
+  .sec-desc b { color: var(--gold); font-weight: 600; }
+  .src { font-size: 11px; color: #5A544A; margin-top: 6px; letter-spacing: 0.05em; }
+
+  /* 手机演示框 */
+  .phone {
+    width: 392px; margin: 36px auto 0; border-radius: 28px;
+    background: linear-gradient(170deg, #16161A, #0D0D0F);
+    border: 1px solid rgba(212,175,106,0.22);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(212,175,106,0.06);
+    overflow: hidden; position: relative;
+  }
+  .phone .notch {
+    width: 96px; height: 5px; border-radius: 3px; background: #2A2A2E;
+    margin: 12px auto 0;
+  }
+  .phone .screen { padding: 16px 16px 28px; }
+  .demo-row { display: flex; gap: 28px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  .demo-label { text-align: center; font-size: 12px; color: var(--gold-dim); letter-spacing: 0.15em; margin-top: 14px; }
+  .demo-label b { color: var(--gold); font-weight: 600; }
+
+  /* 镂空字透纹样（每日故宫标志性手法） */
+  .hollow {
+    background-image: url('../public/patterns/xiangyun.webp');
+    background-size: cover; background-position: center;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 12px rgba(212,175,106,0.25));
+  }
+  .hollow-dark {
+    background-image: linear-gradient(rgba(10,8,5,0.82), rgba(10,8,5,0.82)), url('../public/patterns/xiangyun.webp');
+    background-size: cover, 260px; background-position: center;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* ════════ A1 拍照识纹 banner ════════ */
+  .a1-card {
+    position: relative; overflow: hidden; cursor: pointer;
+    border: 1.5px solid rgba(212,175,106,0.5); border-radius: 18px;
+    background: linear-gradient(150deg, #221C10 0%, #100D07 100%);
+    padding: 26px 22px 24px;
+    box-shadow: 0 0 46px rgba(212,175,106,0.13);
+  }
+  .a1-card .bg-pattern {
+    position: absolute; inset: 0;
+    background: url('../public/patterns/yunlei.webp') center/300px repeat;
+    opacity: 0.10; pointer-events: none;
+  }
+  .a1-big {
+    font-size: 84px; font-weight: 900; line-height: 1;
+    letter-spacing: 0.06em;
+    display: inline-block;
+  }
+  .a1-title-row { position: relative; display: flex; align-items: flex-end; gap: 14px; }
+  .a1-side { padding-bottom: 10px; }
+  .a1-side .kicker { font-size: 11px; letter-spacing: 0.4em; color: var(--gold-dim); }
+  .a1-side .desc { font-size: 12px; color: var(--text-2); line-height: 1.9; margin-top: 10px; }
+  .a1-actions { position: relative; display: flex; align-items: center; justify-content: space-between; margin-top: 22px; }
+  .a1-btn {
+    background: transparent; color: var(--gold-bright);
+    border: 1px solid rgba(212,175,106,0.55); border-radius: 4px;
+    padding: 10px 34px; font-size: 15px; letter-spacing: 0.5em; text-indent: 0.5em;
+    font-family: var(--serif); cursor: pointer;
+    transition: all .25s;
+  }
+  .a1-btn:hover { background: rgba(212,175,106,0.12); box-shadow: 0 0 22px rgba(212,175,106,0.25); }
+  .a1-lens {
+    width: 54px; height: 54px; border-radius: 50%;
+    border: 1px solid rgba(212,175,106,0.5);
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 35% 30%, rgba(242,213,138,0.16), transparent 65%);
+    animation: breathe 3.6s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: translateY(0); box-shadow: 0 0 0 rgba(212,175,106,0); } 50% { transform: translateY(-5px); box-shadow: 0 8px 26px rgba(212,175,106,0.22); } }
+  .a1-seal {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--red); color: #F5F1E8;
+    font-size: 9px; letter-spacing: 0.22em;
+    padding: 4px 7px; border-radius: 2px; writing-mode: vertical-rl;
+  }
+
+  /* ════════ A2 掀卡 ════════ */
+  .flip-scene { perspective: 1400px; width: 392px; margin: 0 auto; }
+  .flip-card { position: relative; width: 100%; aspect-ratio: 0.72; cursor: pointer; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.22, 0.75, 0.2, 1); }
+  .flip-card.open { transform: rotateX(178deg); }
+  .flip-face {
+    position: absolute; inset: 0; border-radius: 18px; overflow: hidden;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border: 1px solid rgba(212,175,106,0.4);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+  }
+  .flip-front {
+    background:
+      radial-gradient(ellipse at 50% 18%, rgba(242,213,138,0.14), transparent 55%),
+      linear-gradient(165deg, #201A0E 0%, #0E0C06 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .flip-front .month { font-size: 12px; letter-spacing: 0.55em; color: var(--gold-dim); text-indent: 0.55em; }
+  .flip-front .day {
+    font-size: 148px; font-weight: 900; line-height: 1.05; margin: 6px 0 2px;
+  }
+  .flip-front .week { font-size: 12px; letter-spacing: 0.5em; color: var(--text-2); text-indent: 0.5em; }
+  .flip-front .lift-hint {
+    position: absolute; bottom: 20px; font-size: 11px; color: var(--gold-dim);
+    letter-spacing: 0.3em; animation: hintFloat 2.4s ease-in-out infinite;
+  }
+  @keyframes hintFloat { 0%,100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(-4px); opacity: 1; } }
+  .flip-corner {
+    position: absolute; top: 14px; right: 14px; width: 26px; height: 26px;
+    border-top: 1px solid rgba(212,175,106,0.5); border-right: 1px solid rgba(212,175,106,0.5);
+  }
+  .flip-corner.b { top: auto; right: auto; bottom: 14px; left: 14px; border: none; border-bottom: 1px solid rgba(212,175,106,0.5); border-left: 1px solid rgba(212,175,106,0.5); }
+
+  .flip-back {
+    transform: rotateX(180deg);
+    background: linear-gradient(165deg, #1E1910 0%, #0D0B06 100%);
+    display: flex; flex-direction: column; align-items: center; padding: 22px 20px;
+  }
+  .flip-back .rarity {
+    margin-top: 2px; font-size: 10px; letter-spacing: 0.3em; color: var(--gold-bright);
+    padding: 3px 12px; border: 1px solid rgba(242,213,138,0.35); border-radius: 10px;
+    background: rgba(242,213,138,0.08);
+  }
+  .flip-back .pat-img {
+    flex: 1; width: 100%; margin-top: 14px; border-radius: 12px;
+    background: radial-gradient(circle, rgba(242,213,138,0.07), transparent 70%);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .flip-back .pat-img img { max-width: 82%; max-height: 82%; filter: drop-shadow(0 4px 24px rgba(201,162,60,0.3)); }
+  .flip-back .pat-name { font-size: 24px; font-weight: 700; letter-spacing: 0.2em; color: var(--gold-bright); margin-top: 14px; }
+  .flip-back .pat-dyn { font-size: 11px; color: var(--text-2); letter-spacing: 0.25em; margin-top: 6px; }
+  .flip-back .collect {
+    margin-top: 16px; font-size: 12px; color: var(--gold); letter-spacing: 0.35em;
+    border-top: 1px solid rgba(212,175,106,0.25); padding-top: 12px; width: 100%; text-align: center;
+  }
+
+  /* ════════ B 编辑排版 ════════ */
+  .ed-frame {
+    width: 392px; margin: 36px auto 0; border-radius: 28px; overflow: hidden;
+    background: #0C0C0D; border: 1px solid rgba(212,175,106,0.18);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .ed-lead { padding: 30px 0 8px; text-align: center; }
+  .ed-lead .vol { font-size: 10px; letter-spacing: 0.5em; color: var(--gold-dim); }
+  .ed-lead h2 { font-size: 40px; font-weight: 600; letter-spacing: 0.4em; color: var(--text); text-indent: 0.4em; margin-top: 10px; }
+  .ed-lead .en { font-size: 11px; font-style: italic; color: var(--gold-dim); letter-spacing: 0.2em; margin-top: 8px; font-family: Georgia, serif; }
+  .ed-item { padding: 34px 26px 40px; border-top: 1px solid rgba(212,175,106,0.12); position: relative; }
+  .ed-item .no {
+    position: absolute; top: 30px; right: 24px;
+    font-size: 13px; color: var(--red); letter-spacing: 0.1em; font-family: Georgia, serif;
+  }
+  .ed-item .img-wrap {
+    aspect-ratio: 1.28; overflow: hidden; border-radius: 2px;
+    background: radial-gradient(ellipse at 50% 40%, #191510, #0D0B08);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .ed-item .img-wrap img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 6px 30px rgba(0,0,0,0.6)); }
+  .ed-item .img-wrap::after {
+    content: ''; position: absolute; inset: 10px;
+    border: 1px solid rgba(212,175,106,0.14); pointer-events: none;
+  }
+  .ed-item h3 {
+    font-size: 52px; font-weight: 900; letter-spacing: 0.1em; line-height: 1.15;
+    color: var(--gold-bright); margin-top: 26px;
+  }
+  .ed-item .meta {
+    display: flex; gap: 14px; align-items: baseline; margin-top: 10px;
+    font-size: 11px; color: var(--text-2); letter-spacing: 0.18em;
+  }
+  .ed-item .meta .dyn { color: var(--gold); }
+  .ed-item .lede {
+    margin-top: 18px; font-size: 13.5px; line-height: 2.15; color: #B8B2A6;
+    letter-spacing: 0.04em; text-align: justify;
+  }
+  .ed-item .more {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+    font-size: 12px; color: var(--gold); letter-spacing: 0.3em;
+    border-bottom: 1px solid rgba(212,175,106,0.35); padding-bottom: 5px;
+  }
+  .ed-item:nth-child(odd) h3 { color: var(--text); }
+
+  /* ════════ C 叙事详情页 ════════ */
+  .story { padding: 0; }
+  .story-hero { position: relative; height: 440px; overflow: hidden; }
+  .story-hero img.hero-bg {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(0.85) brightness(0.9);
+  }
+  .story-hero .veil {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,9,7,0.25) 0%, rgba(12,11,9,0.05) 40%, #0C0C0D 100%);
+  }
+  .story-hero .v-title {
+    position: absolute; top: 34px; right: 26px;
+    writing-mode: vertical-rl; font-size: 34px; font-weight: 700;
+    letter-spacing: 0.34em; color: var(--gold-bright);
+    text-shadow: 0 2px 18px rgba(0,0,0,0.8);
+  }
+  .story-hero .proto {
+    position: absolute; bottom: 18px; left: 18px;
+    font-size: 10px; color: rgba(245,241,232,0.75); letter-spacing: 0.15em;
+    background: rgba(10,9,7,0.55); padding: 4px 10px; border-radius: 10px;
+    backdrop-filter: blur(4px);
+  }
+  .story-body { padding: 0 24px 30px; }
+  .story-head { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 26px; }
+  .story-head h2 { font-size: 44px; font-weight: 900; letter-spacing: 0.12em; color: var(--text); }
+  .story-head .seal {
+    writing-mode: vertical-rl; background: var(--red); color: #F5F1E8;
+    font-size: 11px; letter-spacing: 0.28em; padding: 8px 5px; border-radius: 2px;
+    margin-top: 8px; box-shadow: 0 2px 12px rgba(188,31,40,0.4);
+  }
+  .story-head .dyn-line { margin-top: 12px; font-size: 12px; color: var(--gold); letter-spacing: 0.22em; }
+  .story-head .dyn-line span { color: var(--text-2); }
+  .story-img {
+    margin-top: 30px; aspect-ratio: 1.05; border-radius: 3px;
+    background: radial-gradient(ellipse at 50% 42%, #1A1710, #0D0B08);
+    display: flex; align-items: center; justify-content: center; position: relative;
+    border: 1px solid rgba(212,175,106,0.16);
+  }
+  .story-img img { max-width: 78%; max-height: 78%; filter: drop-shadow(0 8px 34px rgba(0,0,0,0.7)); }
+  .story-img .frame { position: absolute; inset: 12px; border: 1px solid rgba(212,175,106,0.12); pointer-events: none; }
+  .story-cap { text-align: center; font-size: 11px; color: var(--text-2); letter-spacing: 0.2em; margin-top: 14px; }
+
+  .story-part { margin-top: 46px; }
+  .story-part .part-no {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; color: var(--gold-dim); letter-spacing: 0.35em;
+  }
+  .story-part .part-no::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(212,175,106,0.35), transparent); }
+  .story-part h4 { font-size: 21px; font-weight: 600; letter-spacing: 0.2em; color: var(--gold); margin-top: 12px; }
+  .story-part p {
+    margin-top: 16px; font-size: 14.5px; line-height: 2.3; color: #C6C0B4;
+    text-align: justify; letter-spacing: 0.03em;
+  }
+  .story-part p.drop::first-letter {
+    float: left; font-size: 58px; line-height: 0.9; margin: 6px 10px 0 0;
+    color: var(--gold-bright); font-weight: 900;
+  }
+  .pull-quote { margin: 54px 12px 0; text-align: center; position: relative; padding: 34px 10px; }
+  .pull-quote::before, .pull-quote::after {
+    content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .pull-quote::before { top: 0; } .pull-quote::after { bottom: 0; }
+  .pull-quote .q {
+    font-size: 19px; line-height: 2.1; color: var(--gold-bright);
+    letter-spacing: 0.12em; font-weight: 600;
+  }
+  .pull-quote .from { margin-top: 14px; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.3em; }
+  .anecdote {
+    margin-top: 50px; padding: 22px 20px; border-radius: 4px;
+    background: rgba(212,175,106,0.05); border: 1px solid rgba(212,175,106,0.16);
+    position: relative;
+  }
+  .anecdote .tag {
+    position: absolute; top: -9px; left: 16px; background: #0C0C0D;
+    padding: 0 10px; font-size: 11px; color: var(--gold); letter-spacing: 0.3em;
+  }
+  .anecdote p { font-size: 13px; line-height: 2.1; color: #B8B2A6; }
+  .story-cta {
+    margin-top: 56px; text-align: center; padding: 30px 0 8px;
+    border-top: 1px solid rgba(212,175,106,0.14);
+  }
+  .story-cta .say { font-size: 15px; color: var(--gold-bright); letter-spacing: 0.2em; line-height: 2; }
+  .story-cta .say-en { font-size: 11px; font-style: italic; color: var(--gold-dim); margin-top: 8px; font-family: Georgia, serif; }
+  .story-cta button {
+    margin-top: 24px; background: transparent; border: 1px solid rgba(212,175,106,0.5);
+    color: var(--gold-bright); font-family: var(--serif); font-size: 13px;
+    letter-spacing: 0.4em; text-indent: 0.4em; padding: 12px 42px; border-radius: 3px; cursor: pointer;
+    transition: all .25s;
+  }
+  .story-cta button:hover { background: rgba(212,175,106,0.1); box-shadow: 0 0 24px rgba(212,175,106,0.2); }
+
+  footer { margin-top: 100px; text-align: center; font-size: 11px; color: #4A463E; letter-spacing: 0.25em; line-height: 2.4; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>纹脉 · 形制升级</h1>
+    <div class="sub">三个方向 · 配色不动 · 黑金为底 · 0913 预览稿</div>
+    <div class="rule"></div>
+  </header>
+
+  <!-- ═══════════ A 仪式感 ═══════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">方向一</span>
+      <span class="sec-title">每日故宫式仪式感</span>
+      <span class="sec-en">RITUAL — PEER TO 每日故宫</span>
+    </div>
+    <div class="sec-desc">
+      参考的是<b>手法</b>而非皮肤：镂空大字透出纹样肌理、掀日历式的开卡动作、节气封面式的"今日一纹"。
+      黑金配色本来就是对的——每日故宫拿过豌豆荚设计奖的这套语言，恰好验证我们的底色。以下两个演示都可以直接点。
+    </div>
+    <div class="src">参考：每日故宫（故宫博物院 × Pea Pod Design Award 2015 年度设计）</div>
+
+    <div class="demo-row">
+      <div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="screen">
+            <!-- A1 首页拍照 banner -->
+            <div class="a1-card" id="a1">
+              <div class="bg-pattern"></div>
+              <div class="a1-seal">识 纹 第 一 步</div>
+              <div class="a1-title-row">
+                <span class="a1-big hollow">拍</span>
+                <div class="a1-side">
+                  <div class="kicker">拍 照 识 纹</div>
+                  <div class="desc">逛博物馆时拍一张<br>立刻认出它、听它说话</div>
+                </div>
+              </div>
+              <div class="a1-actions">
+                <button class="a1-btn">拍 照</button>
+                <div class="a1-lens">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-label"><b>A1</b> · 首页第一卡：巨字镂空透云纹</div>
+      </div>
+
+      <div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="screen" style="padding-top:10px">
+            <!-- A2 掀卡 -->
+            <div class="flip-scene">
+              <div class="flip-card" id="flip" onclick="this.classList.toggle('open')">
+                <div class="flip-face flip-front">
+                  <div class="flip-corner"></div><div class="flip-corner b"></div>
+                  <div class="month">九 月</div>
+                  <div class="day hollow-dark">13</div>
+                  <div class="week">星 期 日 · 白 露 二 候</div>
+                  <div class="lift-hint">轻 触 掀 开</div>
+                </div>
+                <div class="flip-face flip-back">
+                  <div class="rarity">稀 有 · SSR</div>
+                  <div class="pat-img"><img src="../public/patterns/taotie_shang.webp" alt="饕餮纹"></div>
+                  <div class="pat-name">饕餮纹</div>
+                  <div class="pat-dyn">商 · 约公元前1600–1046年</div>
+                  <div class="collect">已 收 入 图 鉴</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-label"><b>A2</b> · 每日一纹：掀日历 → 点击试试</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ B 编辑排版 ═══════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">方向二</span>
+      <span class="sec-title">Awwwards 编辑排版</span>
+      <span class="sec-en">EDITORIAL — 图鉴 / 系列</span>
+    </div>
+    <div class="sec-desc">
+      文化类站点拿 Awwwards 的公式：<b>一张大图 + 一个超大衬线标题 + 编号 + 足量留白</b>。
+      搬到图鉴=每期一个系列，像杂志目录一样逐条陈列，纹样自己当主角。工具感退后，杂志感上前。
+    </div>
+    <div class="src">参考：Awwwards 文化/遗产类获奖站共性（大图叙事 + 超大衬线标题 + 编号体例）</div>
+
+    <div class="ed-frame">
+      <div class="ed-lead">
+        <div class="vol">纹 脉 图 鉴 · 第 壹 卷</div>
+        <h2>青 铜 纪</h2>
+        <div class="en">The Bronze Age — Pattern Catalogue Vol.1</div>
+      </div>
+
+      <div class="ed-item">
+        <div class="no">No.01</div>
+        <div class="img-wrap"><img src="../public/patterns/taotie_shang.webp" alt="饕餮纹"></div>
+        <h3>饕餮纹</h3>
+        <div class="meta"><span class="dyn">商</span><span>有首无身</span><span>沟通人神</span></div>
+        <p class="lede">
+          商代青铜器上最具威慑力的主题纹饰。双目圆瞪，阔口獠牙，两侧对称展开躯干与利爪——在殷墟重器最醒目的位置上，它是王权与神权共同的凝视。
+        </p>
+        <div class="more">展 开 全 文 →</div>
+      </div>
+
+      <div class="ed-item">
+        <div class="no">No.02</div>
+        <div class="img-wrap"><img src="../public/patterns/fengniao_corner.webp" alt="凤鸟纹"></div>
+        <h3>凤鸟纹</h3>
+        <div class="meta"><span class="dyn">商 周</span><span>翎羽回卷</span><span>祥瑞之始</span></div>
+        <p class="lede">
+          长冠垂尾，翎羽回卷成流动的曲线。凤鸟自商代起便栖在青铜的肩颈之上，此后三千年，一直是这片土地上最持久的吉祥物。
+        </p>
+        <div class="more">展 开 全 文 →</div>
+      </div>
+
+      <div class="ed-item">
+        <div class="no">No.03</div>
+        <div class="img-wrap"><img src="../public/patterns/yunlei.webp" alt="云雷纹"></div>
+        <h3>云雷纹</h3>
+        <div class="meta"><span class="dyn">商 周</span><span>回旋连续</span><span>地纹之王</span></div>
+        <p class="lede">
+          方折为雷，圆转为云。作为衬地的它以细密回旋铺满器身，托起主纹的威严——所有伟大主角身后，都站着这样一片沉默的背景。
+        </p>
+        <div class="more">展 开 全 文 →</div>
+      </div>
+    </div>
+    <div class="demo-label">B · 图鉴系列页：杂志式条目（No.01/02/03 · 大图 · 超大标题 · 留白）</div>
+  </section>
+
+  <!-- ═══════════ C 叙事详情页 ═══════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">方向三</span>
+      <span class="sec-title">纹样叙事详情页</span>
+      <span class="sec-en">NARRATIVE — PatternDetail 重构</span>
+    </div>
+    <div class="sec-desc">
+      现在的详情页是<b>字段罗列</b>（朝代/历史/寓意/用途/趣闻五段贴标签）。改成<b>长滚动叙事</b>：
+      文物照片全屏开场 → 竖排大题 → 首字下沉讲来历 → 寓意做成居中金句 → 趣闻做成"掌故"小卡 → 收在"接续这条纹脉"。
+      以下用<b>真实数据</b>渲染（商代饕餮纹 · 后母戊鼎原型 · 现有文案一字未改）。
+    </div>
+    <div class="src">参考：香港故宫文化博物馆「纹」以载道 — 纹样作为叙事主体</div>
+
+    <div class="ed-frame story">
+      <div class="story-hero">
+        <img class="hero-bg" src="../public/artifacts/shang_houmuwu.jpg" alt="后母戊鼎">
+        <div class="veil"></div>
+        <div class="v-title">饕餮纹</div>
+        <div class="proto">原型 · 后母戊鼎 商代</div>
+      </div>
+
+      <div class="story-body">
+        <div class="story-head">
+          <div>
+            <h2>饕餮纹</h2>
+            <div class="dyn-line">商代 <span>· 约公元前1600–1046年 · SSR</span></div>
+          </div>
+          <div class="seal">青 铜 纪</div>
+        </div>
+
+        <div class="story-img">
+          <div class="frame"></div>
+          <img src="../public/patterns/taotie_shang.webp" alt="饕餮纹">
+        </div>
+        <div class="story-cap">正 面 兽 面 · 双 目 圆 瞪</div>
+
+        <div class="story-part">
+          <div class="part-no">壹 · 来 历</div>
+          <h4>沟通人神的凝视</h4>
+          <p class="drop">
+            饕餮纹是商代青铜器上最具威慑力的主题纹饰，以正面兽面为核心，双目圆瞪，阔口獠牙，两侧对称展开躯干与利爪。商代社会笼罩在浓厚的鬼神崇拜之中，饕餮纹被认为是沟通人神、震慑妖邪的视觉符号。在殷墟出土的司母戊鼎等重器上，饕餮纹占据了器物最醒目的位置。
+          </p>
+        </div>
+
+        <div class="pull-quote">
+          <div class="q">王权的至高无上<br>神权的不可僭越</div>
+          <div class="from">— 它 的 寓 意</div>
+        </div>
+
+        <div class="story-part">
+          <div class="part-no">贰 · 寓 意</div>
+          <h4>狰狞之下的敬畏</h4>
+          <p>
+            饕餮纹象征着王权的至高无上与神权的不可僭越，其狰狞的面容是对天地神灵敬畏之心的视觉表达。它也是中华文明"礼"文化的早期物质载体。
+          </p>
+        </div>
+
+        <div class="story-part">
+          <div class="part-no">叁 · 所 在</div>
+          <h4>铸在重器最醒目处</h4>
+          <p>
+            铸刻于商代青铜礼器的腹部、把手、足部等最突出的位置，尤以鼎、簋、觥、斝等重器最为常见。
+          </p>
+        </div>
+
+        <div class="anecdote">
+          <div class="tag">掌 故</div>
+          <p>
+            《吕氏春秋》记载饕餮"有首无身，食人未咽"，但现代考古发现商代早期的饕餮纹其实是有完整身体的。
+          </p>
+        </div>
+
+        <div class="story-cta">
+          <div class="say">这道纹样，是某个商代工匠的呼吸</div>
+          <div class="say-en">A craftsman's breath, three thousand years ago</div>
+          <button>接 续 这 条 纹 脉</button>
+        </div>
+      </div>
+    </div>
+    <div class="demo-label">C · 详情页：全屏文物开场 → 竖排题 → 首字下沉 → 金句 → 掌故 → CTA</div>
+  </section>
+
+  <footer>
+    预览稿 · 纹脉 UI 找参考升级 · 2026.09.13<br>
+    全部基于现有黑金色板与真实数据渲染 · 满意哪块直接说编号
+  </footer>
+</div>
+
+<script>
+  // A2 掀卡 3 秒后自动掀一次，演示动效
+  setTimeout(() => {
+    const f = document.getElementById('flip')
+    f.classList.add('open')
+    setTimeout(() => f.classList.remove('open'), 2600)
+  }, 1600)
+</script>
+</body>
+</html>

@@ -2,7 +2,8 @@ import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import { getPatternById, getAllSeries, getPatternImage } from '../store/patternData'
+import { getPatternById, getAllSeries, getPatternImage, getRarityLabel } from '../store/patternData'
+import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
 import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
 
@@ -61,19 +62,104 @@ const STORY_CHAPTERS = [
   },
 ]
 
-/* 云雷纹简化 SVG */
-function CloudPattern({ size = 44, opacity = 0.85 }) {
+/* ── 每日一纹 · 掀卡 ──
+   掀日历式仪式：正面今日日期（镂空数字），点击 3D 掀开见今日纹样。
+   今日纹样按"年内第几天"从抽卡池确定性轮换，每天一个、人人相同。 */
+const CN_MONTHS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二']
+const CN_WEEKS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+
+function DailyFlipCard({ navigate, freePulls }) {
+  const [open, setOpen] = useState(false)
+  const now = new Date()
+  const month = `${CN_MONTHS[now.getMonth()]} 月`
+  const week = CN_WEEKS[now.getDay()]
+
+  // 年内第几天 → 池内确定性取一件（ai 系列是免费素材不在抽卡池，排除）
+  const pool = getAllSeries().filter(s => s.id !== 'ai').flatMap(s => s.patterns)
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000)
+  const today = pool[dayOfYear % pool.length]
+  const desc = today ? PATTERN_DESCRIPTIONS[today.id] : undefined
+  const dynasty = desc?.dynasty || today?.tags.find(t => t.endsWith('代'))
+
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" style={{ opacity }}>
-      <circle cx="24" cy="24" r="18" stroke="#D4AF6A" strokeWidth="0.8" />
-      <circle cx="24" cy="24" r="11" stroke="#D4AF6A" strokeWidth="0.5" />
-      <path d="M24 6 L24 42 M6 24 L42 24 M11.5 11.5 L36.5 36.5 M36.5 11.5 L11.5 36.5" stroke="#D4AF6A" strokeWidth="0.3" />
-      {[0,45,90,135,180,225,270,315].map(a => {
-        const r = a * Math.PI / 180
-        return <circle key={a} cx={24 + Math.cos(r) * 15} cy={24 + Math.sin(r) * 15} r="1.5" fill="#D4AF6A" opacity="0.6" />
-      })}
-      <circle cx="24" cy="24" r="4" stroke="#F2D58A" strokeWidth="0.5" />
-    </svg>
+    <div className="wm-flip-scene">
+      <div
+        className={`wm-flip-card${open ? ' wm-open' : ''}`}
+        style={{ height: 356, cursor: 'pointer' }}
+        onClick={() => setOpen(o => !o)}
+      >
+        {/* 正面：今日日期 */}
+        <div className="wm-flip-face" style={{
+          background: 'radial-gradient(ellipse at 50% 18%, rgba(242,213,138,0.14), transparent 55%), linear-gradient(165deg, #201A0E 0%, #0E0C06 100%)',
+          border: '1px solid rgba(212,175,106,0.4)',
+          boxShadow: '0 18px 60px rgba(0,0,0,0.55)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{ position: 'absolute', top: 14, right: 14, width: 26, height: 26, borderTop: '1px solid rgba(212,175,106,0.5)', borderRight: '1px solid rgba(212,175,106,0.5)' }} />
+          <div style={{ position: 'absolute', bottom: 14, left: 14, width: 26, height: 26, borderBottom: '1px solid rgba(212,175,106,0.5)', borderLeft: '1px solid rgba(212,175,106,0.5)' }} />
+          <div style={{ fontSize: 12, letterSpacing: '0.55em', textIndent: '0.55em', color: '#8A6A30' }}>{month}</div>
+          <div
+            className="wm-hollow-dark"
+            style={{ '--wm-tex': `url(${today ? getPatternImage(today) : ''})`, fontSize: 128, fontWeight: 900, lineHeight: 1.1, margin: '4px 0 2px' }}
+          >{now.getDate()}</div>
+          <div style={{ fontSize: 12, letterSpacing: '0.5em', textIndent: '0.5em', color: '#8A8A8A' }}>{week} · 今 日 一 纹</div>
+          <motion.div
+            animate={{ y: [0, -4, 0], opacity: [0.55, 1, 0.55] }}
+            transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity }}
+            style={{ marginTop: 16, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em', textIndent: '0.3em' }}
+          >轻 触 掀 开</motion.div>
+        </div>
+
+        {/* 背面：今日纹样（底部留出底部导航凸起相机的侵入区） */}
+        <div className="wm-flip-face wm-flip-back" style={{
+          background: 'linear-gradient(165deg, #1E1910 0%, #0D0B06 100%)',
+          border: '1px solid rgba(212,175,106,0.4)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 18px 88px',
+        }}>
+          <div style={{
+            marginTop: 2, fontSize: 10, letterSpacing: '0.3em', color: '#F2D58A',
+            padding: '3px 12px', border: '1px solid rgba(242,213,138,0.35)', borderRadius: 10,
+            background: 'rgba(242,213,138,0.08)',
+          }}>{today ? getRarityLabel(today.rarity) : ''}</div>
+          <div style={{
+            flex: 1, width: '100%', marginTop: 12, borderRadius: 12,
+            minHeight: 0, overflow: 'hidden',
+            background: 'radial-gradient(circle, rgba(242,213,138,0.07), transparent 70%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <PatternImage
+              src={today ? getPatternImage(today) : ''}
+              alt={today?.name}
+              fallbackSize={48}
+              style={{ maxWidth: '80%', maxHeight: '80%', objectFit: 'contain', filter: 'drop-shadow(0 4px 24px rgba(201,162,60,0.3))' }}
+            />
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.2em', color: '#F2D58A', marginTop: 12 }}>
+            {today?.name}
+          </div>
+          <div style={{ fontSize: 11, color: '#8A8A8A', letterSpacing: '0.25em', marginTop: 5 }}>
+            {dynasty || today?.type}
+          </div>
+          <div style={{
+            width: '100%', marginTop: 14, paddingTop: 10, textAlign: 'center',
+            borderTop: '1px solid rgba(212,175,106,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16,
+          }}>
+            <span style={{ fontSize: 11, color: '#8A6A30', letterSpacing: '0.15em' }}>
+              今日免费 {freePulls > 0 ? freePulls : 0} 次
+            </span>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate('/gacha') }}
+              style={{
+                background: '#BC1F28', color: '#F5F1E8', border: 'none', borderRadius: 4,
+                padding: '8px 22px', fontSize: 13, letterSpacing: '0.35em', textIndent: '0.35em',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >去 抽 卡</button>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -283,50 +369,68 @@ export default function Home() {
         </motion.div>
 
         <div style={{ padding: '0 16px' }}>
-          {/* ── 拍照识纹（第一入口）── */}
+          {/* ── 拍照识纹（第一入口）· 巨字镂空透云纹 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate">
             <motion.div variants={fadeUp}
               onClick={() => navigate('/photo-match')}
               style={{
-                background: 'linear-gradient(135deg, #241E12 0%, #12100A 100%)',
+                background: 'linear-gradient(150deg, #221C10 0%, #100D07 100%)',
                 border: '1.5px solid rgba(212,175,106,0.5)',
-                borderRadius: 16, padding: 18, position: 'relative', overflow: 'hidden',
-                boxShadow: '0 0 40px rgba(212,175,106,0.14)', cursor: 'pointer',
+                borderRadius: 18, padding: '24px 20px 22px', position: 'relative', overflow: 'hidden',
+                boxShadow: '0 0 46px rgba(212,175,106,0.13)', cursor: 'pointer',
               }}
             >
+              {/* 底纹：云雷纹 10% 平铺 */}
               <div style={{
-                position: 'absolute', top: -30, right: -30, width: 160, height: 160,
-                background: 'radial-gradient(circle, rgba(242,213,138,0.2), transparent)', pointerEvents: 'none',
+                position: 'absolute', inset: 0,
+                backgroundImage: 'url(/patterns/yunlei.webp)',
+                backgroundSize: 300, backgroundRepeat: 'repeat',
+                opacity: 0.10, pointerEvents: 'none',
               }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontFamily: 'serif', fontSize: 20, color: '#F2D58A', letterSpacing: '0.08em' }}>拍照识纹</span>
-                  <span style={{ fontSize: 12, color: '#8A8A8A', marginTop: 5, lineHeight: 1.7 }}>
-                    逛博物馆拍一张，立刻认出它<br />听讲解 · 看三维 · 做文创
-                  </span>
-                  <motion.button
-                    whileHover={{ filter: 'brightness(1.15)', boxShadow: '0 0 16px rgba(212,175,106,0.4)' }}
-                    style={{
-                      background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8', border: 'none',
-                      borderRadius: 6, padding: '8px 24px', marginTop: 12,
-                      fontSize: 14, letterSpacing: '0.3em', cursor: 'pointer', fontFamily: 'inherit',
-                      alignSelf: 'flex-start',
-                    }}
-                  >
-                    拍 照
-                  </motion.button>
+              {/* 红章：识纹第一步 */}
+              <div style={{
+                position: 'absolute', top: 14, right: 14,
+                background: '#BC1F28', color: '#F5F1E8',
+                fontSize: 9, letterSpacing: '0.22em',
+                padding: '4px 7px', borderRadius: 2, writingMode: 'vertical-rl',
+                zIndex: 1,
+              }}>识 纹 第 一 步</div>
+
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 14 }}>
+                <span
+                  className="wm-hollow"
+                  style={{ '--wm-tex': 'url(/patterns/xiangyun.webp)', fontSize: 84, fontWeight: 900, lineHeight: 1, letterSpacing: '0.06em', display: 'inline-block' }}
+                >拍</span>
+                <div style={{ paddingBottom: 10 }}>
+                  <div style={{ fontSize: 11, letterSpacing: '0.4em', color: '#8A6A30' }}>拍 照 识 纹</div>
+                  <div style={{ fontSize: 12, color: '#8A8A8A', lineHeight: 1.9, marginTop: 10 }}>
+                    逛博物馆时拍一张<br />立刻认出它、听它说话
+                  </div>
                 </div>
+              </div>
+
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 22 }}>
+                <motion.button
+                  whileHover={{ filter: 'brightness(1.15)', boxShadow: '0 0 16px rgba(212,175,106,0.4)' }}
+                  style={{
+                    background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8', border: 'none',
+                    borderRadius: 4, padding: '10px 34px',
+                    fontSize: 15, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                >
+                  拍 照
+                </motion.button>
                 <motion.div
                   animate={{ y: [-4, 4, -4] }}
                   transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity }}
                   style={{
-                    width: 72, height: 72, flexShrink: 0,
-                    background: 'linear-gradient(160deg, #2A2418, #1A1610)',
-                    border: '1px solid rgba(212,175,106,0.4)', borderRadius: '50%',
+                    width: 54, height: 54, flexShrink: 0, borderRadius: '50%',
+                    border: '1px solid rgba(212,175,106,0.5)',
+                    background: 'radial-gradient(circle at 35% 30%, rgba(242,213,138,0.16), transparent 65%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
                     <circle cx="12" cy="13" r="4" />
                   </svg>
@@ -335,57 +439,10 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* ── 每日抽卡 Banner ── */}
-          <motion.div variants={stagger} initial="initial" animate="animate">
-            <motion.div variants={fadeUp}
-              onClick={() => navigate('/gacha')}
-              style={{
-                background: 'linear-gradient(135deg, #1C1A14 0%, #0F0E0A 100%)',
-                border: '1px solid rgba(212,175,106,0.25)',
-                borderRadius: 16, padding: 18, position: 'relative', overflow: 'hidden',
-                boxShadow: '0 0 40px rgba(212,175,106,0.08)', cursor: 'pointer',
-              }}
-            >
-              {/* 右上角光晕 */}
-              <div style={{
-                position: 'absolute', top: -20, right: -20, width: 120, height: 120,
-                background: 'radial-gradient(circle, rgba(242,213,138,0.15), transparent)', pointerEvents: 'none',
-              }} />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-                {/* 左侧内容 */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontFamily: 'serif', fontSize: 18, color: '#F2D58A' }}>每日抽卡</span>
-                  <span style={{ fontSize: 12, color: '#8A8A8A', marginTop: 4 }}>
-                    今日剩余 {data.freePulls > 0 ? data.freePulls : 0} 次
-                  </span>
-                  <span style={{ fontSize: 11, color: '#BC6B2F', marginTop: 2 }}>首抽免费</span>
-                  <motion.button
-                    whileHover={{ filter: 'brightness(1.15)', boxShadow: '0 0 16px rgba(188,31,40,0.4)' }}
-                    style={{
-                      background: '#BC1F28', color: '#F5F1E8', border: 'none',
-                      borderRadius: 6, padding: '8px 24px', marginTop: 12,
-                      fontSize: 14, letterSpacing: '0.3em', cursor: 'pointer', fontFamily: 'inherit',
-                    }}
-                  >
-                    抽 卡
-                  </motion.button>
-                </div>
-
-                {/* 右侧卡牌缩略图 */}
-                <motion.div
-                  animate={{ rotate: [-3, 3, -3] }}
-                  transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity }}
-                  style={{
-                    width: 72, height: 96, flexShrink: 0,
-                    background: 'linear-gradient(160deg, #2A2418, #1A1610)',
-                    border: '1px solid rgba(212,175,106,0.35)', borderRadius: 8,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <CloudPattern size={36} opacity={0.7} />
-                </motion.div>
-              </div>
+          {/* ── 每日一纹 · 掀卡（点击掀开见今日纹样）── */}
+          <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 16 }}>
+            <motion.div variants={fadeUp}>
+              <DailyFlipCard navigate={navigate} freePulls={data.freePulls} />
             </motion.div>
           </motion.div>
 

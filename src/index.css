@@ -35,6 +35,57 @@ body {
 ::-webkit-scrollbar { width: 2px; }
 ::-webkit-scrollbar-thumb { background: var(--color-gold-dim); border-radius: 2px; }
 
+/* ── 镂空字透纹样（每日故宫式手法）──────────────────
+   巨字笔画里透出纹样肌理：纹理图 clip 到文字形状。
+   wm-hollow 亮版（纹理直接可见），wm-hollow-dark 暗版（纹理压暗当衬） */
+.wm-hollow {
+  background-image: var(--wm-tex);
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(212, 175, 106, 0.25));
+}
+.wm-hollow-dark {
+  background-image: linear-gradient(rgba(10, 8, 5, 0.82), rgba(10, 8, 5, 0.82)), var(--wm-tex);
+  background-size: cover, 260px;
+  background-position: center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── 掀卡（每日一纹）──────────────────────────────
+   3D 掀日历：外层给 perspective，inner 双面 backface 隐藏 */
+.wm-flip-scene { perspective: 1400px; }
+.wm-flip-card {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.22, 0.75, 0.2, 1);
+}
+.wm-flip-card.wm-open { transform: rotateX(178deg); }
+.wm-flip-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.wm-flip-back { transform: rotateX(180deg); }
+
+/* ── 叙事详情页：首字下沉 ── */
+.wm-drop::first-letter {
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.95;
+  margin: 0.06em 0.14em 0 0;
+  color: var(--color-gold-bright);
+  font-weight: 900;
+}
+
 /* Range slider — golden style */
 input[type="range"] {
   -webkit-appearance: none;

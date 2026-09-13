@@ -10,30 +10,22 @@ const GOLD_MAIN = '#D4AF6A'
 const GOLD_BRIGHT = '#F2D58A'
 const TEXT_PRIMARY = '#F5F1E8'
 const TEXT_SECONDARY = '#8A8A8A'
-const TEXT_DIM = '#4A4A4A'
 
-const RARITY_STYLES = {
-  ssr: {
-    label: '#F2D58A',
-    badgeBg: 'rgba(242,213,138,0.15)',
-    badgeBorder: 'rgba(242,213,138,0.3)',
-    glow: '0 0 40px rgba(201,162,60,0.25), 0 0 80px rgba(201,162,60,0.1)',
-    glowBg: 'radial-gradient(ellipse at 50% 50%, rgba(201,162,60,0.08) 0%, transparent 70%)',
-  },
-  rare: {
-    label: '#D4AF6A',
-    badgeBg: 'rgba(212,175,106,0.1)',
-    badgeBorder: 'rgba(212,175,106,0.2)',
-    glow: '0 0 20px rgba(212,175,106,0.12)',
-    glowBg: 'radial-gradient(ellipse at 50% 50%, rgba(212,175,106,0.04) 0%, transparent 70%)',
-  },
-  common: {
-    label: '#8A8A8A',
-    badgeBg: 'rgba(138,138,138,0.08)',
-    badgeBorder: 'rgba(138,138,138,0.15)',
-    glow: 'none',
-    glowBg: 'none',
-  },
+/* 章节小标：编号 + 题 + 渐隐线 */
+function Part({ no, title, children }) {
+  return (
+    <div style={{ marginTop: 46 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        fontSize: 11, color: '#8A6A30', letterSpacing: '0.35em',
+      }}>
+        <span>{no}</span>
+        <span>{title}</span>
+        <span style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(212,175,106,0.35), transparent)' }} />
+      </div>
+      {children}
+    </div>
+  )
 }
 
 export default function PatternDetailPage() {
@@ -52,7 +44,6 @@ export default function PatternDetailPage() {
   const seriesInfo = pattern ? getSeriesInfo(pattern.series) : undefined
   const imgSrc = pattern ? getPatternImage(pattern) : ''
   const isOwned = pattern ? data.library.includes(pattern.id) : false
-  const rarityStyle = pattern ? RARITY_STYLES[pattern.rarity] : RARITY_STYLES.common
   const artifacts = patternId ? getArtifactsForPattern(patternId) : []
   const bgArtifact = artifacts[0]
 
@@ -72,7 +63,7 @@ export default function PatternDetailPage() {
         </button>
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', minHeight: '60vh', color: TEXT_DIM,
+          justifyContent: 'center', minHeight: '60vh', color: '#4A4A4A',
         }}>
           <span style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>&#9788;</span>
           <span style={{ fontSize: '16px', color: TEXT_SECONDARY }}>纹样未找到</span>
@@ -81,248 +72,193 @@ export default function PatternDetailPage() {
     )
   }
 
-  // ── Section helper ──
-  const Section = ({ icon, label, children }) => (
-    <div>
-      <div style={{
-        height: '1px',
-        background: 'linear-gradient(90deg, transparent, rgba(212,175,106,0.15), transparent)',
-        marginBottom: '12px',
-      }} />
-      <div style={{ display: 'flex', gap: '6px', alignItems: 'baseline', marginBottom: '6px' }}>
-        <span style={{ fontSize: '13px' }}>{icon}</span>
-        <span style={{ fontSize: '12px', fontWeight: 600, color: GOLD_MAIN, letterSpacing: '1px' }}>{label}</span>
-      </div>
-      <div style={{ fontSize: '13px', lineHeight: '1.8', color: TEXT_SECONDARY }}>
-        {children}
-      </div>
-    </div>
-  )
+  const dynastyLine = [description?.dynasty, description?.period].filter(Boolean).join(' · ')
+  const caption = [...new Set([pattern.type, ...pattern.tags.slice(0, 2)])].join(' · ')
 
   return (
-    <div style={{
-      position: 'relative',
-      minHeight: '100vh',
-      paddingBottom: '80px',
-      overflow: 'hidden',
-    }}>
+    <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '80px' }}>
 
-      {/* ── Artifact background card ── */}
-      {bgArtifact && (
-        <>
+      {/* ── 全屏文物开场 ── */}
+      <div style={{ position: 'relative', height: 420, overflow: 'hidden' }}>
+        {bgArtifact ? (
           <div style={{
             position: 'absolute', inset: 0,
             backgroundImage: `url(${ARTIFACT_DIR}${bgArtifact.img})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.38,
-            filter: 'blur(0.5px) saturate(0.9)',
-            zIndex: 0,
-            pointerEvents: 'none',
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'saturate(0.85) brightness(0.9)',
           }} />
+        ) : (
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'linear-gradient(180deg, rgba(15,15,16,0.68) 0%, rgba(15,15,16,0.55) 40%, rgba(15,15,16,0.62) 100%)',
-            zIndex: 0,
-            pointerEvents: 'none',
+            backgroundImage: `url(${imgSrc})`,
+            backgroundSize: '280px', backgroundRepeat: 'repeat',
+            opacity: 0.12, filter: 'saturate(0.8)',
           }} />
+        )}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(180deg, rgba(10,9,7,0.3) 0%, rgba(12,11,9,0.08) 40%, #0F0F10 100%)',
+        }} />
+
+        {/* 返回 */}
+        <button
+          onClick={() => navigate('/library')}
+          style={{
+            position: 'absolute', top: 14, left: 14, zIndex: 2,
+            background: 'rgba(10,9,7,0.55)', border: 'none', color: GOLD_MAIN,
+            fontSize: 13, cursor: 'pointer', padding: '7px 14px',
+            fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '4px',
+            borderRadius: 16, backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+          }}
+        >
+          <span style={{ fontSize: '15px' }}>&#8592;</span> 图鉴
+        </button>
+
+        {/* 竖排大题 */}
+        <div style={{
+          position: 'absolute', top: 34, right: 24, zIndex: 1,
+          writingMode: 'vertical-rl', fontSize: 32, fontWeight: 700,
+          letterSpacing: '0.34em', color: GOLD_BRIGHT, maxHeight: 360,
+          textShadow: '0 2px 18px rgba(0,0,0,0.85)',
+        }}>
+          {pattern.name}
+        </div>
+
+        {bgArtifact && (
           <div style={{
-            position: 'absolute', top: '12px', right: '16px',
-            zIndex: 1,
-            fontSize: '10px', color: GOLD_MAIN, opacity: 0.6,
-            letterSpacing: '1px', textIndent: '1px',
-            background: 'rgba(15,15,16,0.5)',
-            padding: '3px 8px', borderRadius: '10px',
-            border: '1px solid rgba(212,175,106,0.15)',
-            pointerEvents: 'none',
+            position: 'absolute', bottom: 16, left: 16, zIndex: 1,
+            fontSize: 10, color: 'rgba(245,241,232,0.78)', letterSpacing: '0.15em',
+            background: 'rgba(10,9,7,0.55)', padding: '4px 10px', borderRadius: 10,
+            backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
           }}>
             原型 · {bgArtifact.name}
           </div>
-        </>
-      )}
-
-      <div style={{ position: 'relative', zIndex: 1, padding: '16px' }}>
-
-      {/* ── Back button ── */}
-      <button
-        onClick={() => navigate('/library')}
-        style={{
-          background: 'none', border: 'none', color: GOLD_MAIN,
-          fontSize: '14px', cursor: 'pointer', padding: '8px 0',
-          fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '4px',
-          marginBottom: '8px',
-        }}
-      >
-        <span style={{ fontSize: '16px' }}>&#8592;</span> 返回图鉴
-      </button>
-
-      {/* ── Pattern image ── */}
-      <div style={{
-        position: 'relative',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '240px',
-        marginBottom: '20px',
-      }}>
-        {/* Rarity glow background */}
-        {pattern.rarity !== 'common' && (
-          <div style={{
-            position: 'absolute',
-            width: '200px', height: '200px',
-            borderRadius: '50%',
-            background: rarityStyle.glowBg,
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            pointerEvents: 'none',
-          }} />
         )}
+      </div>
 
+      <div style={{ padding: '0 24px 30px', position: 'relative' }}>
+        {/* ── 题名块 ── */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 24 }}>
+          <div>
+            <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: '0.12em', color: TEXT_PRIMARY, lineHeight: 1.25 }}>
+              {pattern.name}
+            </h2>
+            <div style={{ marginTop: 12, fontSize: 12, color: GOLD_MAIN, letterSpacing: '0.22em' }}>
+              {dynastyLine || pattern.type}
+              <span style={{ color: TEXT_SECONDARY }}> · {getRarityLabel(pattern.rarity)}</span>
+            </div>
+          </div>
+          {/* 系列红章 */}
+          <div style={{
+            writingMode: 'vertical-rl', background: '#BC1F28', color: '#F5F1E8',
+            fontSize: 11, letterSpacing: '0.28em', padding: '8px 5px', borderRadius: 2,
+            marginTop: 8, boxShadow: '0 2px 12px rgba(188,31,40,0.4)', flexShrink: 0,
+          }}>
+            {seriesInfo?.name || '纹脉'}
+          </div>
+        </div>
+
+        {/* ── 纹样本体 ── */}
         <div style={{
-          width: '180px', height: '180px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative',
+          marginTop: 28, aspectRatio: '1.05', borderRadius: 3,
+          background: 'radial-gradient(ellipse at 50% 42%, #1A1710, #0D0B08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
+          border: '1px solid rgba(212,175,106,0.16)',
         }}>
-          {/* Decorative circle for SSR */}
-          {pattern.rarity === 'ssr' && (
-            <svg style={{ position: 'absolute', inset: '-10px', opacity: 0.12 }} viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A23C" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#C9A23C" strokeWidth="0.3" />
-              {[0, 45, 90, 135, 180, 225, 270, 315].map(a => {
-                const r = a * Math.PI / 180
-                return (
-                  <line key={a}
-                    x1={100 + Math.cos(r) * 70} y1={100 + Math.sin(r) * 70}
-                    x2={100 + Math.cos(r) * 90} y2={100 + Math.sin(r) * 90}
-                    stroke="#C9A23C" strokeWidth="0.3"
-                  />
-                )
-              })}
-            </svg>
-          )}
-
+          <div style={{ position: 'absolute', inset: 12, border: '1px solid rgba(212,175,106,0.12)', pointerEvents: 'none' }} />
           <PatternImage
             src={imgSrc}
             alt={pattern.name}
             fallbackSize={48}
             style={{
-              maxWidth: '90%', maxHeight: '90%', objectFit: 'contain',
+              maxWidth: '78%', maxHeight: '78%', objectFit: 'contain',
               filter: pattern.rarity === 'ssr'
-                ? 'drop-shadow(0 0 16px rgba(201,162,60,0.35))'
-                : pattern.rarity === 'rare'
-                  ? 'drop-shadow(0 0 8px rgba(201,162,60,0.15))'
-                  : 'none',
+                ? 'drop-shadow(0 8px 34px rgba(201,162,60,0.35))'
+                : 'drop-shadow(0 8px 34px rgba(0,0,0,0.7))',
             }}
           />
+          {!isOwned && (
+            <div style={{
+              position: 'absolute', top: 12, right: 12,
+              fontSize: 10, color: GOLD_MAIN, letterSpacing: '0.2em',
+              background: 'rgba(15,15,16,0.7)', border: '1px solid rgba(212,175,106,0.25)',
+              padding: '3px 10px', borderRadius: 10,
+            }}>未 收 藏</div>
+          )}
+        </div>
+        <div style={{ textAlign: 'center', fontSize: 11, color: TEXT_SECONDARY, letterSpacing: '0.2em', marginTop: 14 }}>
+          {caption}
         </div>
 
-        {/* Ownership lock overlay */}
-        {!isOwned && (
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(15,15,16,0.4)',
-            borderRadius: '16px',
-          }}>
-            <span style={{ fontSize: '40px', opacity: 0.6 }}>&#128274;</span>
+        {/* ── 壹 · 来历（首字下沉）── */}
+        {description?.history && (
+          <Part no="壹" title="来 历">
+            <p className="wm-drop" style={{
+              marginTop: 16, fontSize: 14.5, lineHeight: 2.3, color: '#C6C0B4',
+              textAlign: 'justify', letterSpacing: '0.03em',
+            }}>
+              {description.history}
+            </p>
+          </Part>
+        )}
+
+        {/* ── 寓意金句（居中）── */}
+        {description?.significance && (
+          <div style={{ margin: '52px 12px 0', textAlign: 'center', position: 'relative', padding: '32px 10px' }}>
+            <div style={{
+              position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
+            }} />
+            <div style={{
+              fontSize: 18, lineHeight: 2.1, color: GOLD_BRIGHT,
+              letterSpacing: '0.12em', fontWeight: 600,
+            }}>
+              {description.significance}
+            </div>
+            <div style={{ marginTop: 14, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em' }}>— 它 的 寓 意</div>
+            <div style={{
+              position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
+            }} />
           </div>
         )}
-      </div>
 
-      {/* ── Name + Rarity badge ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '8px',
-        marginBottom: '8px', flexWrap: 'wrap',
-      }}>
-        <h1 style={{
-          fontSize: '22px', fontWeight: 700, letterSpacing: '1px',
-          color: pattern.rarity === 'ssr' ? GOLD_BRIGHT : TEXT_PRIMARY,
-          fontFamily: 'inherit', lineHeight: 1.3,
-        }}>
-          {pattern.name}
-        </h1>
-        <span style={{
-          fontSize: '11px', fontWeight: 500,
-          padding: '2px 8px', borderRadius: '10px',
-          background: rarityStyle.badgeBg,
-          border: `1px solid ${rarityStyle.badgeBorder}`,
-          color: rarityStyle.label,
-          whiteSpace: 'nowrap',
-        }}>
-          {getRarityLabel(pattern.rarity)}
-        </span>
-      </div>
-
-      {/* ── Series tag ── */}
-      {seriesInfo && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '5px',
-          padding: '3px 10px', borderRadius: '12px',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          marginBottom: '20px',
-        }}>
-          <span style={{
-            width: '6px', height: '6px', borderRadius: '50%',
-            background: seriesInfo.color,
-            flexShrink: 0,
-          }} />
-          <span style={{ fontSize: '12px', color: TEXT_SECONDARY }}>{seriesInfo.name}</span>
-        </div>
-      )}
-
-      {/* ── Info sections ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-        {/* Dynasty */}
-        {description && (description.dynasty || description.period) && (
-          <Section icon="&#128220;" label="朝代">
-            <span style={{ color: TEXT_PRIMARY }}>
-              {[description.dynasty, description.period].filter(Boolean).join(' · ')}
-            </span>
-          </Section>
-        )}
-
-        {/* History */}
-        {description?.history && (
-          <Section icon="&#128214;" label="历史">
-            {description.history}
-          </Section>
-        )}
-
-        {/* Significance */}
-        {description?.significance && (
-          <Section icon="&#10022;" label="寓意">
-            {description.significance}
-          </Section>
-        )}
-
-        {/* Usage */}
+        {/* ── 贰 · 所在 ── */}
         {description?.usage && (
-          <Section icon="&#128296;" label="用途">
-            {description.usage}
-          </Section>
+          <Part no="贰" title="所 在">
+            <p style={{
+              marginTop: 16, fontSize: 14.5, lineHeight: 2.3, color: '#C6C0B4',
+              textAlign: 'justify', letterSpacing: '0.03em',
+            }}>
+              {description.usage}
+            </p>
+          </Part>
         )}
 
-        {/* Fun fact */}
+        {/* ── 掌故 ── */}
         {description?.funFact && (
-          <Section icon="&#128161;" label="趣闻">
-            {description.funFact}
-          </Section>
-        )}
-      </div>
-
-      {/* ── Tags ── */}
-      {pattern.tags && pattern.tags.length > 0 && (
-        <div style={{ marginTop: '24px' }}>
           <div style={{
-            height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(212,175,106,0.12), transparent)',
-            marginBottom: '14px',
-          }} />
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            marginTop: 48, padding: '22px 20px', borderRadius: 4,
+            background: 'rgba(212,175,106,0.05)', border: '1px solid rgba(212,175,106,0.16)',
+            position: 'relative',
+          }}>
+            <span style={{
+              position: 'absolute', top: -9, left: 16, background: '#0F0F10',
+              padding: '0 10px', fontSize: 11, color: GOLD_MAIN, letterSpacing: '0.3em',
+            }}>掌 故</span>
+            <p style={{ fontSize: 13, lineHeight: 2.1, color: '#B8B2A6' }}>
+              {description.funFact}
+            </p>
+          </div>
+        )}
+
+        {/* ── 标签 ── */}
+        {pattern.tags && pattern.tags.length > 0 && (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 40 }}>
             {pattern.tags.map(tag => (
               <span key={tag} style={{
-                fontSize: '11px',
-                padding: '3px 10px', borderRadius: '12px',
+                fontSize: 11,
+                padding: '3px 10px', borderRadius: 12,
                 background: 'rgba(212,175,106,0.08)',
                 border: '1px solid rgba(212,175,106,0.12)',
                 color: GOLD_MAIN,
@@ -332,8 +268,27 @@ export default function PatternDetailPage() {
               </span>
             ))}
           </div>
+        )}
+
+        {/* ── 收束 CTA ── */}
+        <div style={{ marginTop: 52, textAlign: 'center', paddingTop: 28, borderTop: '1px solid rgba(212,175,106,0.14)' }}>
+          <div style={{ fontSize: 15, color: GOLD_BRIGHT, letterSpacing: '0.2em', lineHeight: 2 }}>
+            {isOwned ? '这道纹样，是某个古人的呼吸' : '这道纹样，还在等你收下'}
+          </div>
+          <div style={{ fontSize: 11, fontStyle: 'italic', color: '#8A6A30', marginTop: 8, fontFamily: 'Georgia, serif' }}>
+            {isOwned ? 'A craftsman\'s breath, thousands of years ago' : 'Collect it, then keep it alive'}
+          </div>
+          <button
+            onClick={() => navigate(isOwned ? '/puzzle' : '/gacha')}
+            style={{
+              marginTop: 22, background: 'transparent', border: '1px solid rgba(212,175,106,0.5)',
+              color: GOLD_BRIGHT, fontFamily: 'inherit', fontSize: 13,
+              letterSpacing: '0.4em', textIndent: '0.4em', padding: '12px 42px', borderRadius: 3, cursor: 'pointer',
+            }}
+          >
+            {isOwned ? '接 续 这 条 纹 脉' : '去 抽 卡 收 它'}
+          </button>
         </div>
-      )}
       </div>
     </div>
   )
