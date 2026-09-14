@@ -79,8 +79,8 @@ export default function BottomNav() {
               className="bg-transparent border-none cursor-pointer flex flex-col items-center relative bottom-2 font-serif">
               <div className="w-12 h-12 rounded-full flex items-center justify-center"
                 style={{
-                  background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)',
-                  boxShadow: '0 0 20px rgba(188,107,47,0.4)',
+                  background: 'linear-gradient(145deg, var(--color-accent-transient), var(--color-accent-transient-deep))',
+                  boxShadow: '0 0 24px rgba(212,129,58,0.45)',
                 }}>
                 {ICONS[tab.icon]('#F5F1E8')}
               </div>

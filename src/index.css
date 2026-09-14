@@ -17,6 +17,11 @@
   --color-bg-glass: rgba(18, 18, 22, 0.72);
   --color-bg-glass-strong: rgba(18, 18, 24, 0.85);
   --color-red-accent: #BC1F28;
+  /* 双橙语义化：persistent=常驻铜橙（卡片内按钮），transient=瞬时亮橙（FAB/强调 CTA） */
+  --color-accent-persistent: #BC6B2F;
+  --color-accent-persistent-deep: #8A4A20;
+  --color-accent-transient: #D4813A;
+  --color-accent-transient-deep: #96521F;
   --color-border-gold: rgba(212, 175, 106, 0.18);
   --color-border-glass: rgba(255, 255, 255, 0.06);
   --font-serif: 'Noto Serif SC', 'STSong', Georgia, serif;
