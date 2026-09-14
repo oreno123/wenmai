@@ -75,6 +75,9 @@ body {
   background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.25) 100%);
 }
 
+/* ── 竖排里的「·」保持端正姿态，不随竖排旋转 ── */
+.wm-vdot { text-orientation: upright; }
+
 /* ── 掀卡（每日一纹）──────────────────────────────
    3D 掀日历：外层给 perspective，inner 双面 backface 隐藏 */
 .wm-flip-scene { perspective: 1400px; }

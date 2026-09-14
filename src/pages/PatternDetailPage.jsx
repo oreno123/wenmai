@@ -5,6 +5,7 @@ import { getPatternById, getPatternImage, getRarityLabel, getSeriesInfo } from '
 import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
 import { getArtifactsForPattern, ARTIFACT_DIR } from '../data/artifactMap'
 import PatternImage from '../components/common/PatternImage'
+import SealStamp from '../components/common/SealStamp'
 
 const GOLD_MAIN = '#D4AF6A'
 const GOLD_BRIGHT = '#F2D58A'
@@ -14,7 +15,7 @@ const TEXT_SECONDARY = 'var(--color-text-secondary)'
 /* 章节小标：编号 + 题 + 渐隐线 */
 function Part({ no, title, children }) {
   return (
-    <div style={{ marginTop: 46 }}>
+    <div style={{ marginTop: 48 }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
         fontSize: 11, color: '#8A6A30', letterSpacing: '0.35em',
@@ -114,14 +115,15 @@ export default function PatternDetailPage() {
           <span style={{ fontSize: '15px' }}>&#8592;</span> 图鉴
         </button>
 
-        {/* 竖排大题 */}
+        {/* 竖排大题（「·」保持端正姿态不随竖排旋转） */}
         <div style={{
           position: 'absolute', top: 34, right: 24, zIndex: 1,
           writingMode: 'vertical-rl', fontSize: 32, fontWeight: 700,
           letterSpacing: '0.34em', color: GOLD_BRIGHT, maxHeight: 360,
           textShadow: '0 2px 18px rgba(0,0,0,0.85)',
         }}>
-          {pattern.name}
+          {[...pattern.name].map((ch, i) =>
+            ch === '·' ? <span key={i} className="wm-vdot">·</span> : ch)}
         </div>
 
         {bgArtifact && (
@@ -143,24 +145,20 @@ export default function PatternDetailPage() {
             <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: '0.12em', color: TEXT_PRIMARY, lineHeight: 1.25 }}>
               {pattern.name}
             </h2>
-            <div style={{ marginTop: 12, fontSize: 12, color: GOLD_MAIN, letterSpacing: '0.22em' }}>
-              {dynastyLine || pattern.type}
-              <span style={{ color: TEXT_SECONDARY }}> · {getRarityLabel(pattern.rarity)}</span>
+            {/* 史实字段一行（品级已拆去图卡角标）；年代连字符统一全角 */}
+            <div style={{ marginTop: 16, fontSize: 12, color: GOLD_MAIN, letterSpacing: '0.22em' }}>
+              {(dynastyLine || pattern.type).replace(/(\d)\s*-\s*(\d)/g, '$1—$2')}
             </div>
           </div>
-          {/* 系列红章 */}
-          <div style={{
-            writingMode: 'vertical-rl', background: '#BC1F28', color: '#F5F1E8',
-            fontSize: 11, letterSpacing: '0.28em', padding: '8px 5px', borderRadius: 2,
-            marginTop: 8, boxShadow: '0 2px 12px rgba(188,31,40,0.4)', flexShrink: 0,
-          }}>
-            {seriesInfo?.name || '纹脉'}
+          {/* 系列红章（手工钤印质感） */}
+          <div style={{ marginTop: 8, flexShrink: 0 }}>
+            <SealStamp text={seriesInfo?.name || '纹脉'} fontSize={11} />
           </div>
         </div>
 
         {/* ── 纹样本体 ── */}
         <div style={{
-          marginTop: 28, aspectRatio: '1.05', borderRadius: 3,
+          marginTop: 32, aspectRatio: '1.05', borderRadius: 3,
           background: 'radial-gradient(ellipse at 50% 42%, #1A1710, #0D0B08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
           border: '1px solid rgba(212,175,106,0.16)',
@@ -177,16 +175,21 @@ export default function PatternDetailPage() {
                 : 'drop-shadow(0 8px 34px rgba(0,0,0,0.7))',
             }}
           />
-          {!isOwned && (
-            <div style={{
-              position: 'absolute', top: 12, right: 12,
-              fontSize: 10, color: GOLD_MAIN, letterSpacing: '0.2em',
-              background: 'rgba(15,15,16,0.7)', border: '1px solid rgba(212,175,106,0.25)',
-              padding: '3px 10px', borderRadius: 10,
-            }}>未 收 藏</div>
-          )}
+          {/* 品级角标：游戏化字段独立于史实行 */}
+          <div style={{
+            position: 'absolute', top: 12, left: 12,
+            fontSize: 10, color: GOLD_BRIGHT, letterSpacing: '0.2em',
+            background: 'rgba(15,15,16,0.7)', border: '1px solid rgba(212,175,106,0.35)',
+            padding: '3px 10px', borderRadius: 10,
+          }}>{getRarityLabel(pattern.rarity)}</div>
+          {/* 收藏钤印：未藏=空心剪影，已藏=落章动效实心 */}
+          <div style={{ position: 'absolute', top: 10, right: 12 }}>
+            {isOwned
+              ? <SealStamp text="已藏" variant="solid" fontSize={10} stamp />
+              : <SealStamp text="未藏" variant="hollow" fontSize={10} />}
+          </div>
         </div>
-        <div style={{ textAlign: 'center', fontSize: 11, color: TEXT_SECONDARY, letterSpacing: '0.2em', marginTop: 14 }}>
+        <div style={{ textAlign: 'center', fontSize: 11, color: TEXT_SECONDARY, letterSpacing: '0.2em', marginTop: 16 }}>
           {caption}
         </div>
 
@@ -204,7 +207,7 @@ export default function PatternDetailPage() {
 
         {/* ── 寓意金句（居中）── */}
         {description?.significance && (
-          <div style={{ margin: '52px 12px 0', textAlign: 'center', position: 'relative', padding: '32px 10px' }}>
+          <div style={{ margin: '48px 12px 0', textAlign: 'center', position: 'relative', padding: '32px 10px' }}>
             <div style={{
               position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
               width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
@@ -215,7 +218,7 @@ export default function PatternDetailPage() {
             }}>
               {description.significance}
             </div>
-            <div style={{ marginTop: 14, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em' }}>— 它 的 寓 意</div>
+            <div style={{ marginTop: 16, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em' }}>— 它 的 寓 意</div>
             <div style={{
               position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
               width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
@@ -238,7 +241,7 @@ export default function PatternDetailPage() {
         {/* ── 掌故 ── */}
         {description?.funFact && (
           <div style={{
-            marginTop: 48, padding: '22px 20px', borderRadius: 4,
+            marginTop: 48, padding: '24px 20px', borderRadius: 4,
             background: 'rgba(212,175,106,0.05)', border: '1px solid rgba(212,175,106,0.16)',
             position: 'relative',
           }}>
@@ -271,7 +274,7 @@ export default function PatternDetailPage() {
         )}
 
         {/* ── 收束 CTA ── */}
-        <div style={{ marginTop: 52, textAlign: 'center', paddingTop: 28, borderTop: '1px solid rgba(212,175,106,0.14)' }}>
+        <div style={{ marginTop: 48, textAlign: 'center', paddingTop: 32, borderTop: '1px solid rgba(212,175,106,0.14)' }}>
           <div style={{ fontSize: 15, color: GOLD_BRIGHT, letterSpacing: '0.2em', lineHeight: 2 }}>
             {isOwned ? '这道纹样，是某个古人的呼吸' : '这道纹样，还在等你收下'}
           </div>
@@ -281,7 +284,7 @@ export default function PatternDetailPage() {
           <button
             onClick={() => navigate(isOwned ? '/puzzle' : '/gacha')}
             style={{
-              marginTop: 22, background: 'transparent', border: '1px solid rgba(212,175,106,0.5)',
+              marginTop: 24, background: 'transparent', border: '1px solid rgba(212,175,106,0.5)',
               color: GOLD_BRIGHT, fontFamily: 'inherit', fontSize: 13,
               letterSpacing: '0.4em', textIndent: '0.4em', padding: '12px 42px', borderRadius: 3, cursor: 'pointer',
             }}
