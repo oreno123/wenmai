@@ -15,7 +15,7 @@ const ICONS = {
     </svg>
   ),
   book: (color, active) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} fillOpacity="0.92" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fillOpacity="0.92">
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
     </svg>
   ),
@@ -26,7 +26,7 @@ const ICONS = {
     </svg>
   ),
   cube: (color, active) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} fillOpacity="0.92" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fillOpacity="0.92">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
       <path d="M3.27 6.96L12 12.01l8.73-5.05" /><path d="M12 22.08V12" />
     </svg>
@@ -37,7 +37,7 @@ const ICONS = {
     </svg>
   ),
   gallery: (color, active) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} fillOpacity="0.92" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fillOpacity="0.92">
       <rect x="3" y="3" width="8" height="8" rx="1.5" />
       <rect x="13" y="3" width="8" height="8" rx="1.5" />
       <rect x="3" y="13" width="8" height="8" rx="1.5" />
@@ -45,7 +45,7 @@ const ICONS = {
     </svg>
   ),
   compose: (color, active) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} fillOpacity="0.92" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? color : 'none'} stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fillOpacity="0.92">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   ),

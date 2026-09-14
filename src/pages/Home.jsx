@@ -374,7 +374,7 @@ export default function Home() {
                 boxShadow: '0 0 46px rgba(212,175,106,0.13)', cursor: 'pointer',
               }}
             >
-              {/* 底纹：云雷纹 10% 平铺 */}
+              {/* 底纹：云雷纹 5% 平铺（降低浓度，避免与镂空字叠纹） */}
               <div style={{
                 position: 'absolute', inset: 0,
                 backgroundImage: 'url(/patterns/yunlei.webp)',
