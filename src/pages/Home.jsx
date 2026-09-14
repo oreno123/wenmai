@@ -413,32 +413,23 @@ export default function Home() {
                 </div>
               </div>
 
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 22 }}>
+              {/* 相机入口收口：唯一的相机图形符号在底部 FAB，卡内只留文字 CTA */}
+              <div style={{ position: 'relative', marginTop: 22 }}>
                 <motion.button
-                  whileHover={{ filter: 'brightness(1.15)', boxShadow: '0 0 16px rgba(212,175,106,0.4)' }}
+                  whileHover={{ filter: 'brightness(1.15)' }}
                   style={{
-                    background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8', border: 'none',
-                    borderRadius: 4, padding: '10px 34px',
-                    fontSize: 15, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
+                    background: 'transparent', color: '#F2D58A',
+                    border: '1px solid rgba(212,175,106,0.5)',
+                    borderRadius: 3, padding: '9px 26px',
+                    fontSize: 14, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
                   }}
                 >
                   拍 照
-                </motion.button>
-                <motion.div
-                  animate={{ y: [-4, 4, -4] }}
-                  transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity }}
-                  style={{
-                    width: 54, height: 54, flexShrink: 0, borderRadius: '50%',
-                    border: '1px solid rgba(212,175,106,0.5)',
-                    background: 'radial-gradient(circle at 35% 30%, rgba(242,213,138,0.16), transparent 65%)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                    <circle cx="12" cy="13" r="4" />
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M13 5l7 7-7 7" />
                   </svg>
-                </motion.div>
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
