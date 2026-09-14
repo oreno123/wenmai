@@ -6,6 +6,7 @@ import { getPatternById, getAllSeries, getPatternImage, getRarityLabel } from '.
 import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
 import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
+import SealStamp from '../components/common/SealStamp'
 
 const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
 const fadeUp = {
@@ -234,6 +235,11 @@ export default function Home() {
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const creationsRef = useRef(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  // 红章首访逻辑：第一次见完整「识纹第一步」，之后降级为小角章
+  const [sealSeen] = useState(() => {
+    try { return localStorage.getItem('wm.seal.seen') === '1' } catch { return false }
+  })
+  useEffect(() => { try { localStorage.setItem('wm.seal.seen', '1') } catch {} }, [])
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0]
 
   const scrollToCreations = () => {
@@ -387,14 +393,12 @@ export default function Home() {
                 backgroundSize: 300, backgroundRepeat: 'repeat',
                 opacity: 0.10, pointerEvents: 'none',
               }} />
-              {/* 红章：识纹第一步 */}
-              <div style={{
-                position: 'absolute', top: 14, right: 14,
-                background: '#BC1F28', color: '#F5F1E8',
-                fontSize: 9, letterSpacing: '0.22em',
-                padding: '4px 7px', borderRadius: 2, writingMode: 'vertical-rl',
-                zIndex: 1,
-              }}>识 纹 第 一 步</div>
+              {/* 红章：首访完整钤印，之后降级小角章 */}
+              <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 1 }}>
+                {sealSeen
+                  ? <SealStamp text="识纹" fontSize={8} style={{ padding: '6px 4px' }} />
+                  : <SealStamp text="识纹第一步" fontSize={9} />}
+              </div>
 
               <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 14 }}>
                 <span
