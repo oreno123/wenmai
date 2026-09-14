@@ -276,20 +276,20 @@ export default function Home() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '6px 12px', borderRadius: 18,
-                background: 'rgba(212,175,106,0.08)',
-                border: '1px solid rgba(212,175,106,0.22)',
+                background: 'rgba(212,175,106,0.04)',
+                border: '1px solid rgba(212,175,106,0.12)',
                 color: '#F2D58A', fontSize: 12, cursor: 'pointer',
                 fontFamily: 'inherit', fontWeight: 500,
                 letterSpacing: '0.08em',
                 transition: 'all 0.2s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(212,175,106,0.15)'
-                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
+                e.currentTarget.style.background = 'rgba(212,175,106,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.35)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(212,175,106,0.08)'
-                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
+                e.currentTarget.style.background = 'rgba(212,175,106,0.04)'
+                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.12)'
               }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -309,41 +309,34 @@ export default function Home() {
               )}
             </button>
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 6,
+              display: 'flex', alignItems: 'baseline', gap: 4,
               padding: '6px 12px', borderRadius: 18,
-              background: 'rgba(212,175,106,0.04)',
-              border: '1px solid rgba(212,175,106,0.12)',
+              background: 'rgba(212,175,106,0.08)',
+              border: '1px solid rgba(212,175,106,0.22)',
             }}>
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="8" stroke="#D4AF6A" strokeWidth="1" />
-                <path d="M10 5 L10 15 M5 10 L15 10" stroke="#D4AF6A" strokeWidth="0.6" />
-              </svg>
               <span style={{
                 color: '#F2D58A', fontSize: 13, fontWeight: 600,
                 fontFamily: 'Noto Serif SC, serif',
               }}>
                 {data.points}
               </span>
+              <span style={{ fontSize: 10, color: '#F2D58A', opacity: 0.7 }}>积分</span>
             </div>
-            {/* Account button — shows avatar chip when logged in, "登录" otherwise */}
+            {/* Account button — shows avatar chip when logged in, plain text "登录" otherwise */}
             <button
               onClick={() => navigate('/auth')}
               title={user ? displayName : '登录账号'}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: user ? '4px 6px 4px 4px' : '6px 14px',
-                borderRadius: 18,
-                background: user
-                  ? 'linear-gradient(145deg, rgba(201,148,58,0.18), rgba(201,148,58,0.06))'
-                  : 'rgba(212,175,106,0.08)',
-                border: user
-                  ? '1px solid rgba(201,148,58,0.4)'
-                  : '1px solid rgba(212,175,106,0.22)',
-                color: '#F2D58A', fontSize: 12, cursor: 'pointer',
-                fontFamily: 'inherit', fontWeight: 500,
+                padding: user ? '4px 6px 4px 4px' : '4px 2px',
+                background: 'transparent',
+                border: 'none',
+                color: user ? '#F2D58A' : 'var(--color-text-secondary)', fontSize: user ? 12 : 12,
+                cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 400,
                 letterSpacing: '0.08em',
-                transition: 'all 0.2s',
-                boxShadow: user ? '0 0 12px rgba(201,148,58,0.15)' : 'none',
+                transition: 'color 0.2s',
+                boxShadow: 'none',
               }}
             >
               {user ? (
@@ -362,13 +355,7 @@ export default function Home() {
                   </span>
                 </>
               ) : (
-                <>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <span>登录</span>
-                </>
+                <span style={{ borderBottom: '1px solid rgba(138,138,138,0.4)', paddingBottom: 1 }}>登录</span>
               )}
             </button>
           </div>
