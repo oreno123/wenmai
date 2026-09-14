@@ -60,6 +60,10 @@ body {
   background-clip: text;
   color: transparent;
 }
+/* 镂空数字：在 wm-hollow 基础上加金色描边，任意深浅纹样底图都可辨 */
+.wm-hollow-num {
+  -webkit-text-stroke: 1.5px rgba(212, 175, 106, 0.6);
+}
 
 /* ── 掀卡（每日一纹）──────────────────────────────
    3D 掀日历：外层给 perspective，inner 双面 backface 隐藏 */

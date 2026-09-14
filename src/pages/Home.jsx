@@ -96,18 +96,19 @@ function DailyFlipCard({ navigate, freePulls }) {
           boxShadow: '0 18px 60px rgba(0,0,0,0.55)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}>
-          <div style={{ position: 'absolute', top: 14, right: 14, width: 26, height: 26, borderTop: '1px solid rgba(212,175,106,0.5)', borderRight: '1px solid rgba(212,175,106,0.5)' }} />
-          <div style={{ position: 'absolute', bottom: 14, left: 14, width: 26, height: 26, borderBottom: '1px solid rgba(212,175,106,0.5)', borderLeft: '1px solid rgba(212,175,106,0.5)' }} />
+          {/* 角线：右上为主装饰（最长最粗），左下短细呼应，左上/右下留白 */}
+          <div style={{ position: 'absolute', top: 14, right: 14, width: 34, height: 34, borderTop: '1.5px solid rgba(212,175,106,0.55)', borderRight: '1.5px solid rgba(212,175,106,0.55)' }} />
+          <div style={{ position: 'absolute', bottom: 14, left: 14, width: 20, height: 20, borderBottom: '0.75px solid rgba(212,175,106,0.35)', borderLeft: '0.75px solid rgba(212,175,106,0.35)' }} />
           <div style={{ fontSize: 12, letterSpacing: '0.55em', textIndent: '0.55em', color: '#8A6A30' }}>{month}</div>
           <div
-            className="wm-hollow-dark"
+            className="wm-hollow wm-hollow-num"
             style={{ '--wm-tex': `url(${today ? getPatternImage(today) : ''})`, fontSize: 128, fontWeight: 900, lineHeight: 1.1, margin: '4px 0 2px' }}
           >{now.getDate()}</div>
-          <div style={{ fontSize: 12, letterSpacing: '0.5em', textIndent: '0.5em', color: '#8A8A8A' }}>{week} · 今 日 一 纹</div>
+          <div style={{ fontSize: 12, letterSpacing: '0.5em', textIndent: '0.5em', color: 'var(--color-text-secondary)' }}>{week} · 今 日 一 纹</div>
           <motion.div
-            animate={{ y: [0, -4, 0], opacity: [0.55, 1, 0.55] }}
+            animate={{ y: [0, -4, 0], opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity }}
-            style={{ marginTop: 16, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em', textIndent: '0.3em' }}
+            style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: '#D4AF6A', letterSpacing: '0.3em', textIndent: '0.3em' }}
           >轻 触 掀 开</motion.div>
         </div>
 
