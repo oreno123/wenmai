@@ -9,7 +9,7 @@ import PatternImage from '../components/common/PatternImage'
 const GOLD_MAIN = '#D4AF6A'
 const GOLD_BRIGHT = '#F2D58A'
 const TEXT_PRIMARY = '#F5F1E8'
-const TEXT_SECONDARY = '#8A8A8A'
+const TEXT_SECONDARY = 'var(--color-text-secondary)'
 
 /* 章节小标：编号 + 题 + 渐隐线 */
 function Part({ no, title, children }) {
@@ -76,7 +76,7 @@ export default function PatternDetailPage() {
   const caption = [...new Set([pattern.type, ...pattern.tags.slice(0, 2)])].join(' · ')
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '80px' }}>
+    <div className="wm-vignette" style={{ position: 'relative', minHeight: '100vh', paddingBottom: '80px' }}>
 
       {/* ── 全屏文物开场 ── */}
       <div style={{ position: 'relative', height: 420, overflow: 'hidden' }}>
@@ -92,7 +92,7 @@ export default function PatternDetailPage() {
             position: 'absolute', inset: 0,
             backgroundImage: `url(${imgSrc})`,
             backgroundSize: '280px', backgroundRepeat: 'repeat',
-            opacity: 0.12, filter: 'saturate(0.8)',
+            opacity: 0.05, filter: 'saturate(0.8)',
           }} />
         )}
         <div style={{

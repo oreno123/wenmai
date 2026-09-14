@@ -139,7 +139,7 @@ function DailyFlipCard({ navigate, freePulls }) {
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.2em', color: '#F2D58A', marginTop: 12 }}>
             {today?.name}
           </div>
-          <div style={{ fontSize: 11, color: '#8A8A8A', letterSpacing: '0.25em', marginTop: 5 }}>
+          <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', letterSpacing: '0.25em', marginTop: 5 }}>
             {dynasty || today?.type}
           </div>
           <div style={{
@@ -248,7 +248,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ background: 'transparent', minHeight: '100vh', paddingBottom: '80px', position: 'relative' }}>
+    <div className="wm-vignette" style={{ background: 'transparent', minHeight: '100vh', paddingBottom: '80px', position: 'relative' }}>
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* ── 顶栏 ── */}
         <motion.div style={{
@@ -379,7 +379,7 @@ export default function Home() {
                 position: 'absolute', inset: 0,
                 backgroundImage: 'url(/patterns/yunlei.webp)',
                 backgroundSize: 300, backgroundRepeat: 'repeat',
-                opacity: 0.10, pointerEvents: 'none',
+                opacity: 0.05, pointerEvents: 'none',
               }} />
               {/* 红章：首访完整钤印，之后降级小角章 */}
               <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 1 }}>
@@ -395,7 +395,7 @@ export default function Home() {
                 >拍</span>
                 <div style={{ paddingBottom: 10 }}>
                   <div style={{ fontSize: 11, letterSpacing: '0.4em', color: '#8A6A30' }}>拍 照 识 纹</div>
-                  <div style={{ fontSize: 12, color: '#8A8A8A', lineHeight: 1.9, marginTop: 10 }}>
+                  <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.9, marginTop: 10 }}>
                     逛博物馆时拍一张<br />立刻认出它、听它说话
                   </div>
                 </div>
@@ -514,7 +514,7 @@ export default function Home() {
                   {/* 描述 */}
                   <div style={{
                     fontFamily: 'Noto Serif SC, serif',
-                    fontSize: 10, color: '#8A8A8A',
+                    fontSize: 10, color: 'var(--color-text-secondary)',
                     lineHeight: 1.7, marginBottom: 10,
                     fontWeight: 300,
                   }}>{ch.desc}</div>
@@ -620,7 +620,7 @@ export default function Home() {
                   <FeatureIcon name={item.icon} size={18} color="#A09682" />
                 </div>
                 <span style={{
-                  fontSize: 10, color: '#7A7060', marginTop: 6,
+                  fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 6,
                   fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
                 }}>
                   {item.label}
@@ -659,7 +659,7 @@ export default function Home() {
                 </span>
               )}
             </motion.div>
-            <motion.div variants={fadeUp} style={{ fontSize: 11, color: '#6A6A6A', marginBottom: 12 }}>
+            <motion.div variants={fadeUp} style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 12 }}>
               {data.creations && data.creations.length > 0
                 ? '点击作品进入手势展示'
                 : '完成创作后保存，作品会出现在这里'}
@@ -772,7 +772,7 @@ export default function Home() {
                     删除这幅作品？
                   </div>
                   <div style={{
-                    fontSize: 12, color: '#7A7060', lineHeight: 1.6, marginBottom: 18,
+                    fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: 18,
                   }}>
                     删除后无法恢复<br />云端账号会同步删除
                   </div>
@@ -829,7 +829,7 @@ export default function Home() {
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <span style={{ fontFamily: 'serif', fontSize: 14, color: '#F2D58A' }}>{s.name}</span>
-                      <span style={{ fontSize: 12, color: '#8A8A8A' }}>{collected}/{total}</span>
+                      <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{collected}/{total}</span>
                     </div>
                     <div style={{ height: 3, background: '#2A2A2A', borderRadius: 2, marginTop: 8, overflow: 'hidden' }}>
                       <div style={{
@@ -889,7 +889,7 @@ function SeriesCarousel({ series, navigate }) {
           {series.name}
         </span>
         <span style={{
-          fontSize: 11, color: '#7A7060',
+          fontSize: 11, color: 'var(--color-text-secondary)',
           fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
         }}>
           {series.patterns.length} 款
@@ -937,7 +937,7 @@ function SeriesCarousel({ series, navigate }) {
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <div style={{
-                fontSize: 10, color: '#999', marginTop: 5,
+                fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 5,
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 fontFamily: 'Noto Serif SC, serif',
               }}>

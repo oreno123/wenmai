@@ -71,7 +71,8 @@ export default function BottomNav() {
       }}>
       {TABS.map(tab => {
         const active = pathname === tab.path
-        const color = active ? '#F2D58A' : '#4A4A4A'
+        // 非选中也从纯装饰灰提到次级文字灰，Tab 标签满足 AA 对比度
+        const color = active ? '#F2D58A' : 'var(--color-text-secondary)'
 
         if (tab.center) {
           return (
@@ -84,7 +85,7 @@ export default function BottomNav() {
                 }}>
                 {ICONS[tab.icon]('#F5F1E8')}
               </div>
-              <span className={`text-[10px] mt-0.5 ${active ? 'text-gold-bright' : 'text-text-dim'}`}>
+              <span className={`text-[10px] mt-0.5 ${active ? 'text-gold-bright' : 'text-text-secondary'}`}>
                 {tab.label}
               </span>
             </button>
