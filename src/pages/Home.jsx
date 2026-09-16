@@ -7,6 +7,7 @@ import { PATTERN_DESCRIPTIONS } from '../data/patternDescriptions'
 import { useAuth } from '../lib/auth'
 import PatternImage from '../components/common/PatternImage'
 import SealStamp from '../components/common/SealStamp'
+import HomeHero3D from '../components/common/HomeHero3D'
 
 const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
 const fadeUp = {
@@ -365,60 +366,67 @@ export default function Home() {
         <div style={{ padding: '0 16px' }}>
           {/* ── 拍照识纹（第一入口）· 巨字镂空透云纹 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate">
-            <motion.div variants={fadeUp}
-              onClick={() => navigate('/photo-match')}
-              style={{
-                background: 'linear-gradient(150deg, #221C10 0%, #100D07 100%)',
-                border: '1.5px solid rgba(212,175,106,0.5)',
-                borderRadius: 18, padding: '24px 20px 22px', position: 'relative', overflow: 'hidden',
-                boxShadow: '0 0 46px rgba(212,175,106,0.13)', cursor: 'pointer',
-              }}
-            >
-              {/* 底纹：云雷纹 5% 平铺（降低浓度，避免与镂空字叠纹） */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                backgroundImage: 'url(/patterns/yunlei.webp)',
-                backgroundSize: 300, backgroundRepeat: 'repeat',
-                opacity: 0.05, pointerEvents: 'none',
-              }} />
-              {/* 红章：首访完整钤印，之后降级小角章 */}
-              <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 1 }}>
-                {sealSeen
-                  ? <SealStamp text="识纹" fontSize={8} style={{ padding: '6px 4px' }} />
-                  : <SealStamp text="识纹第一步" fontSize={9} />}
-              </div>
+            <motion.div variants={fadeUp}>
+              <HomeHero3D
+                navigate={navigate}
+                fallback={
+                  <motion.div
+                    onClick={() => navigate('/photo-match')}
+                    style={{
+                      background: 'linear-gradient(150deg, #221C10 0%, #100D07 100%)',
+                      border: '1.5px solid rgba(212,175,106,0.5)',
+                      borderRadius: 18, padding: '24px 20px 22px', position: 'relative', overflow: 'hidden',
+                      boxShadow: '0 0 46px rgba(212,175,106,0.13)', cursor: 'pointer',
+                    }}
+                  >
+                    {/* 底纹：云雷纹 5% 平铺（降低浓度，避免与镂空字叠纹） */}
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      backgroundImage: 'url(/patterns/yunlei.webp)',
+                      backgroundSize: 300, backgroundRepeat: 'repeat',
+                      opacity: 0.05, pointerEvents: 'none',
+                    }} />
+                    {/* 红章：首访完整钤印，之后降级小角章 */}
+                    <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 1 }}>
+                      {sealSeen
+                        ? <SealStamp text="识纹" fontSize={8} style={{ padding: '6px 4px' }} />
+                        : <SealStamp text="识纹第一步" fontSize={9} />}
+                    </div>
 
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 14 }}>
-                <span
-                  className="wm-hollow"
-                  style={{ '--wm-tex': 'url(/patterns/xiangyun.webp)', fontSize: 84, fontWeight: 900, lineHeight: 1, letterSpacing: '0.06em', display: 'inline-block' }}
-                >拍</span>
-                <div style={{ paddingBottom: 10 }}>
-                  <div style={{ fontSize: 11, letterSpacing: '0.4em', color: '#8A6A30' }}>拍 照 识 纹</div>
-                  <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.9, marginTop: 10 }}>
-                    逛博物馆时拍一张<br />立刻认出它、听它说话
-                  </div>
-                </div>
-              </div>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 14 }}>
+                      <span
+                        className="wm-hollow"
+                        style={{ '--wm-tex': 'url(/patterns/xiangyun.webp)', fontSize: 84, fontWeight: 900, lineHeight: 1, letterSpacing: '0.06em', display: 'inline-block' }}
+                      >拍</span>
+                      <div style={{ paddingBottom: 10 }}>
+                        <div style={{ fontSize: 11, letterSpacing: '0.4em', color: '#8A6A30' }}>拍 照 识 纹</div>
+                        <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.9, marginTop: 10 }}>
+                          逛博物馆时拍一张<br />立刻认出它、听它说话
+                        </div>
+                      </div>
+                    </div>
 
-              {/* 相机入口收口：唯一的相机图形符号在底部 FAB，卡内只留文字 CTA */}
-              <div style={{ position: 'relative', marginTop: 22 }}>
-                <motion.button
-                  whileHover={{ filter: 'brightness(1.15)' }}
-                  style={{
-                    background: 'transparent', color: '#F2D58A',
-                    border: '1px solid rgba(212,175,106,0.5)',
-                    borderRadius: 3, padding: '9px 26px',
-                    fontSize: 14, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                  }}
-                >
-                  拍 照
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M13 5l7 7-7 7" />
-                  </svg>
-                </motion.button>
-              </div>
+                    {/* 相机入口收口：唯一的相机图形符号在底部 FAB，卡内只留文字 CTA */}
+                    <div style={{ position: 'relative', marginTop: 22 }}>
+                      <motion.button
+                        whileHover={{ filter: 'brightness(1.15)' }}
+                        style={{
+                          background: 'transparent', color: '#F2D58A',
+                          border: '1px solid rgba(212,175,106,0.5)',
+                          borderRadius: 3, padding: '9px 26px',
+                          fontSize: 14, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
+                          display: 'inline-flex', alignItems: 'center', gap: 10,
+                        }}
+                      >
+                        拍 照
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14M13 5l7 7-7 7" />
+                        </svg>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                }
+              />
             </motion.div>
           </motion.div>
 
