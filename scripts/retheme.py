@@ -28,7 +28,12 @@ WEBGL_OR_GLSL_PATHS = {
     Path('pages/RelicPage.tsx'),
     Path('pages/Landing.jsx'),
     Path('pages/SplashPage.jsx'),
+    Path('showcase/constants.js'),
     Path('showcase/GossamerThread.jsx'),
+    Path('showcase/ShatterScene.jsx'),
+    Path('engine/proceduralPatterns.ts'),
+    Path('engine/componentLibrary.ts'),
+    Path('pages/QinghuaBrowser.jsx'),
     Path('shaders/cloudTrain.js'),
     Path('shaders/fluowingFluid.js'),
 }

@@ -4,7 +4,7 @@ import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/pattern
 import { QINGHUA_CATEGORIES } from '../data/qinghuaPatterns'
 
 const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
-const RARITY_COLOR = { ssr: 'var(--color-gold-main)', rare: 'var(--color-gold-main)', common: 'var(--color-text-secondary)' }
+const RARITY_COLOR = { ssr: '#C9A24B', rare: '#C9A24B', common: '#A89C88' }
 
 export default function QinghuaBrowser() {
   const navigate = useNavigate()

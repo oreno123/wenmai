@@ -62,7 +62,7 @@ function createSVG(size: number, bgColor: string = 'transparent'): SVGSVGElement
 function addPath(
   svg: SVGElement,
   d: string,
-  stroke: string = 'var(--color-gold-main)',
+  stroke: string = '#C9A24B',
   strokeWidth: number = 2,
   fill: string = 'none',
 ): SVGElement {
@@ -123,7 +123,7 @@ export function generateHuiwen(size: number = 512, unit: number = 40, turns: num
       const x = col * gap + gap / 2 - unit / 2
       const y = row * gap + gap / 2 - unit / 2
       const d = spiralHuiwenPath(x, y, unit, turns)
-      addPath(svg, d, 'var(--color-gold-main)', Math.max(1, unit / 20))
+      addPath(svg, d, '#C9A24B', Math.max(1, unit / 20))
     }
   }
 
@@ -178,7 +178,7 @@ export function generateWanzi(size: number = 512, unit: number = 80): SVGSVGElem
       const cx = col * gap + gap / 2
       const cy = row * gap + gap / 2
       const d = wanziPath(cx, cy, unit / 2)
-      addPath(svg, d, 'var(--color-gold-main)', Math.max(1, unit / 25))
+      addPath(svg, d, '#C9A24B', Math.max(1, unit / 25))
     }
   }
 
@@ -231,7 +231,7 @@ export function generateBinglie(size: number = 512, density: number = 40): SVGSV
       if (j > i) { // 避免重复线段
         const p1 = points[i]
         const p2 = points[j]
-        addPath(svg, `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`, 'var(--color-gold-main)', 1 + Math.random() * 1.5)
+        addPath(svg, `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`, '#C9A24B', 1 + Math.random() * 1.5)
       }
     }
   }
@@ -274,7 +274,7 @@ export function generateLeiwen(size: number = 512, turns: number = 8): SVGSVGEle
     }
   }
 
-  addPath(svg, d, 'var(--color-gold-main)', Math.max(1.5, size / 200))
+  addPath(svg, d, '#C9A24B', Math.max(1.5, size / 200))
   return svg
 }
 
@@ -301,7 +301,7 @@ export function generateShengwen(size: number = 512, strands: number = 2): SVGSV
       d += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`
     }
 
-    addPath(svg, d, 'var(--color-gold-main)', Math.max(2, size / 150))
+    addPath(svg, d, '#C9A24B', Math.max(2, size / 150))
   }
 
   return svg

@@ -1,8 +1,8 @@
 export const FRAGMENT_COUNT = 28
 export const BREAK_DISTANCE = 2.5
 export const SHATTER_SPREAD = 3.0
-export const GOLD_COLOR = 'var(--color-gold-bright)'
-export const GOLD_DIM = 'var(--color-gold-main)'
+export const GOLD_COLOR = '#E3C079'
+export const GOLD_DIM = '#C9A24B'
 export const BG_COLOR = '#0A0A0B'
 export const GESTURE_OPEN_THRESHOLD = 1.8
 export const GESTURE_CLOSE_THRESHOLD = 1.3
