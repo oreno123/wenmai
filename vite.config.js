@@ -41,6 +41,7 @@ function writeFilePlugin() {
 }
 
 export default defineConfig({
+  assetsInclude: ['**/*.glb'],
   plugins: [
     react(),
     tailwindcss(),
@@ -60,3 +61,5 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**', '**/cypress/**', '**/.{idea,git,cache,output,temp}/**'],
   },
 })
+
+

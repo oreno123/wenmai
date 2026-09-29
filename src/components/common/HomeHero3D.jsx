@@ -167,12 +167,9 @@ function EnvRig() {
 }
 
 /* 默认错金银鼎的首屏扫描：不等 GLB，先用 Canvas 2D 点云占住舞台。 */
-function DingPointCloudIntro({ modelReady, onComplete }) {
+function DingPointCloudIntro({ onComplete }) {
   const canvasRef = useRef(null)
-  const modelReadyRef = useRef(modelReady)
   const completeRef = useRef(onComplete)
-
-  useEffect(() => { modelReadyRef.current = modelReady }, [modelReady])
   useEffect(() => { completeRef.current = onComplete }, [onComplete])
 
   useEffect(() => {
@@ -219,7 +216,7 @@ function DingPointCloudIntro({ modelReady, onComplete }) {
       const elapsed = now - start
       const t = Math.min(elapsed / 650, 1)
       const ease = 1 - Math.pow(1 - t, 3)
-      const fade = modelReadyRef.current && t === 1 ? Math.min((elapsed - 650) / 240, 1) : 0
+      const fade = t === 1 ? Math.min((elapsed - 650) / 240, 1) : 0
       ctx.clearRect(0, 0, width, height)
       ctx.fillStyle = `rgba(10, 7, 3, ${0.24 * (1 - fade)})`
       ctx.fillRect(0, 0, width, height)
@@ -347,7 +344,7 @@ export default function HomeHero3D({ navigate, fallback }) {
 
       {/* 换鼎过渡时才显示 thumb 占位；首屏走空舞台揭幕，不放图 */}
       <AnimatePresence>
-        {!loaded && !firstLoadRef.current && (
+        {!loaded && (!firstLoadRef.current || introComplete) && (
           <motion.div
             key={ding.id + '-thumb'}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.45 } }}
@@ -390,7 +387,7 @@ export default function HomeHero3D({ navigate, fallback }) {
         <EnvRig />
       </Canvas>
       {idx === 0 && !introComplete && (
-        <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
+        <DingPointCloudIntro onComplete={() => setIntroComplete(true)} />
       )}
 
       {/* 顶部衔接遮罩 */}
@@ -491,3 +488,6 @@ export default function HomeHero3D({ navigate, fallback }) {
     </div>
   )
 }
+
+
+
