@@ -156,7 +156,7 @@ export default function GalleryPage() {
 
 function GalleryHero({ worksCount, onCreate }) {
   return (
-    <section style={heroStyle}>
+    <section className="wm-enter" style={heroStyle}>
       <div style={sealTagStyle}>广 场</div>
       <h1 style={h1Style}>千人千纹<br/>看见<em style={emStyle}>同好</em></h1>
       <p style={ledeStyle}>
