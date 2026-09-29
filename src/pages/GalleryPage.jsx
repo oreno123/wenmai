@@ -104,7 +104,7 @@ export default function GalleryPage() {
 
   return (
     <div style={pageStyle}>
-      <GalleryHero worksCount={works.length} />
+      <GalleryHero worksCount={works.length} onCreate={() => user ? navigate('/puzzle') : navigate('/auth')} />
       <FilterBar
         sort={sort} setSort={setSort}
         series={series} setSeries={setSeries}
@@ -154,7 +154,7 @@ export default function GalleryPage() {
 // 子组件
 // ──────────────────────────────────────────────────────────
 
-function GalleryHero({ worksCount }) {
+function GalleryHero({ worksCount, onCreate }) {
   return (
     <section style={heroStyle}>
       <div style={sealTagStyle}>广 场</div>
@@ -168,6 +168,7 @@ function GalleryHero({ worksCount }) {
         <MetaCell num={386} label="Creators" />
         <MetaCell num={9402} label="Reuse Count" />
       </div>
+      <button onClick={onCreate} style={{ ...curatedActionStyle, marginTop: 28 }}>用纹样创作</button>
     </section>
   )
 }

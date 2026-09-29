@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from './Router'
 
 const TABS = [
+  { path: '/home', label: '首页', icon: 'home' },
   { path: '/library', label: '图鉴', icon: 'book' },
-  { path: '/relic', label: '立体', icon: 'cube' },
   { path: '/photo-match', label: '拍照', icon: 'camera', center: true },
   { path: '/puzzle', label: '创作', icon: 'compose' },
   { path: '/gallery', label: '广场', icon: 'gallery' },

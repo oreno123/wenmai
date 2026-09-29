@@ -468,6 +468,12 @@ export default function PhotoMatchPage() {
 
           {/* Actions */}
           <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
+            {matches[0] && (
+              <button onClick={() => navigate(`/pattern/${matches[0].patternId}`)} style={{
+                padding: '10px 16px', borderRadius: 10, fontSize: 13,
+                background: 'rgba(201,162,75,0.12)', color: 'var(--color-gold-bright)', border: '1px solid rgba(201,162,75,0.24)', cursor: 'pointer', fontFamily: 'inherit',
+              }}>查看纹样</button>
+            )}
             <button onClick={() => setMatchState('crop')} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
               background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
@@ -484,6 +490,10 @@ export default function PhotoMatchPage() {
             }}>
               换一张
             </button>
+            <button onClick={() => navigate('/puzzle')} style={{
+              padding: '10px 16px', borderRadius: 10, fontSize: 13,
+              background: 'transparent', color: 'var(--color-gold-main)', border: '1px solid rgba(201,162,75,0.24)', cursor: 'pointer', fontFamily: 'inherit',
+            }}>开始创作</button>
           </div>
 
           {error && (
@@ -526,6 +536,10 @@ export default function PhotoMatchPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
+            <button onClick={() => navigate('/library')} style={{
+              padding: '10px 16px', borderRadius: 10, fontSize: 13,
+              background: 'rgba(201,162,75,0.12)', color: 'var(--color-gold-bright)', border: '1px solid rgba(201,162,75,0.24)', cursor: 'pointer', fontFamily: 'inherit',
+            }}>看看图鉴</button>
             <button onClick={() => setMatchState('crop')} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
               background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
@@ -542,6 +556,10 @@ export default function PhotoMatchPage() {
             }}>
               换一张
             </button>
+            <button onClick={() => navigate('/puzzle')} style={{
+              padding: '10px 16px', borderRadius: 10, fontSize: 13,
+              background: 'transparent', color: 'var(--color-gold-main)', border: '1px solid rgba(201,162,75,0.24)', cursor: 'pointer', fontFamily: 'inherit',
+            }}>开始自由创作</button>
           </div>
         </div>
       )}
@@ -582,6 +600,10 @@ export default function PhotoMatchPage() {
               >
                 查看百科 →
               </button>
+              <button
+                onClick={() => navigate('/puzzle')}
+                style={{ marginLeft: 8, padding: '10px 18px', borderRadius: 10, fontSize: 13, background: 'transparent', color: 'var(--color-gold-bright)', border: '1px solid rgba(201,162,75,0.35)', cursor: 'pointer', fontFamily: 'inherit' }}
+              >用它创作</button>
             </div>
           ) : matchResult.source === 'fuzzy' ? (
             <div>
@@ -672,6 +694,10 @@ export default function PhotoMatchPage() {
             }}>
               换一张
             </button>
+            <button onClick={() => navigate('/puzzle')} style={{
+              padding: '10px 16px', borderRadius: 10, fontSize: 13,
+              background: 'transparent', color: 'var(--color-gold-main)', border: '1px solid rgba(201,162,75,0.24)', cursor: 'pointer', fontFamily: 'inherit',
+            }}>用它创作</button>
           </div>
         </div>
       )}

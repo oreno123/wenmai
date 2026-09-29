@@ -357,6 +357,17 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
           鼎 然 入 场
         </motion.div>
       )}
+      {!loaded && (
+        <button
+          onClick={() => navigate('/photo-match')}
+          style={{
+            position: 'absolute', top: '58%', left: '50%', transform: 'translateX(-50%)', zIndex: 4,
+            background: 'rgba(23,21,19,0.72)', color: '#E3C079',
+            border: '1px solid rgba(201,162,75,0.45)', borderRadius: 3, padding: '9px 17px',
+            fontSize: 11, letterSpacing: '0.24em', cursor: 'pointer', fontFamily: 'inherit',
+          }}
+        >先去识纹</button>
+      )}
 
       <Canvas
         camera={{ position: [0, 0.5, 3.6], fov: 40 }}

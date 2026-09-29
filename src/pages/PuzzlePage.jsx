@@ -832,6 +832,16 @@ export default function PuzzlePage() {
         </div>
       </div>
 
+      {!forkSource && placements.length === 0 && (
+        <div style={{ margin: '12px 16px 0', padding: '12px 14px', borderRadius: 10, background: 'rgba(201,162,75,0.06)', border: '1px solid rgba(201,162,75,0.16)' }}>
+          <div style={{ fontSize: 12, color: 'var(--color-gold-bright)', letterSpacing: '0.1em', marginBottom: 8 }}>第一次创作，从一种方式开始</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setShowTemplateModal(true)} style={{ ...navBtnStyle, flex: 1, justifyContent: 'center' }}>自由拼一张</button>
+            <button onClick={() => navigate('/jigsaw')} style={{ ...navBtnStyle, flex: 1, justifyContent: 'center' }}>经典拼图</button>
+          </div>
+        </div>
+      )}
+
       {/* Canvas */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 16px' }}>
         <div style={{

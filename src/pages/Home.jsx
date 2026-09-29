@@ -432,6 +432,33 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
+          <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 16 }}>
+            <motion.section variants={fadeUp} aria-label="从这里开始" style={{
+              padding: '16px', borderRadius: 14, background: 'linear-gradient(135deg, rgba(201,162,75,0.10), rgba(36,30,25,0.9))',
+              border: '1px solid rgba(201,162,75,0.24)',
+            }}>
+              <div style={{ fontSize: 11, letterSpacing: '0.28em', color: 'var(--color-gold-dim)', marginBottom: 5 }}>从 这 里 开 始</div>
+              <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 18, color: 'var(--color-gold-bright)', letterSpacing: '0.12em', marginBottom: 14 }}>看见一纹，接续一纹</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.25fr 1fr 1fr', gap: 8 }}>
+                {[
+                  { label: '拍照识纹', hint: '拍下器物上的纹样', path: '/photo-match', primary: true },
+                  { label: '浏览图鉴', hint: '认识已有纹样', path: '/library' },
+                  { label: '开始创作', hint: '拼出你的纹样', path: '/puzzle' },
+                ].map(action => (
+                  <button key={action.path} onClick={() => navigate(action.path)} style={{
+                    minHeight: 72, padding: '10px 8px', textAlign: 'left', borderRadius: 9, cursor: 'pointer', fontFamily: 'inherit',
+                    background: action.primary ? 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))' : 'rgba(23,21,19,0.52)',
+                    border: action.primary ? '1px solid rgba(227,192,121,0.55)' : '1px solid rgba(201,162,75,0.15)',
+                    color: action.primary ? 'var(--color-bg-base)' : 'var(--color-gold-bright)',
+                  }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.08em' }}>{action.label}</div>
+                    <div style={{ fontSize: 9, lineHeight: 1.5, color: action.primary ? 'rgba(23,21,19,0.78)' : 'var(--color-text-secondary)', marginTop: 5 }}>{action.hint}</div>
+                  </button>
+                ))}
+              </div>
+            </motion.section>
+          </motion.div>
+
           {/* ── 每日一纹 · 掀卡（点击掀开见今日纹样）── */}
           <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 16 }}>
             <motion.div variants={fadeUp}>

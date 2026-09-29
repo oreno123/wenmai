@@ -30,6 +30,14 @@ export default function Library() {
 
   const collected = data.library.length
   const total = PATTERN_LIBRARY.length
+  const nextSeries = seriesList
+    .map(series => {
+      const inSeries = PATTERN_LIBRARY.filter(pattern => pattern.series === series.id)
+      const owned = inSeries.filter(pattern => data.library.includes(pattern.id)).length
+      return { ...series, owned, total: inSeries.length, rate: inSeries.length ? owned / inSeries.length : 1 }
+    })
+    .filter(series => series.owned < series.total)
+    .sort((a, b) => a.rate - b.rate)[0]
 
   return (
     <div style={{ padding: '16px', paddingBottom: '80px' }}>
@@ -96,6 +104,13 @@ export default function Library() {
           }}>
             {collected} / {total}
           </span>
+        </div>
+        <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, background: 'rgba(201,162,75,0.06)', border: '1px solid rgba(201,162,75,0.14)' }}>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--color-gold-bright)', letterSpacing: '0.08em' }}>下一段收集：{nextSeries ? nextSeries.name : '图鉴已齐'}</div>
+            <div style={{ fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 3 }}>{nextSeries ? `${nextSeries.owned} / ${nextSeries.total}，补齐它让系列完整` : '继续用照片发现新的纹样'}</div>
+          </div>
+          <button onClick={() => navigate('/gacha')} style={{ flexShrink: 0, padding: '7px 10px', borderRadius: 7, border: '1px solid rgba(201,162,75,0.35)', background: 'transparent', color: 'var(--color-gold-bright)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11 }}>继续收集</button>
         </div>
       </div>
 
