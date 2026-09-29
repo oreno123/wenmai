@@ -258,8 +258,22 @@ export default function HomeHero3D({ navigate, fallback }) {
   const [idx, setIdx] = useState(0)
   const [loaded, setLoaded] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
+  const [showHeroPreview, setShowHeroPreview] = useState(false)
   const firstLoadRef = useRef(true)
   const ding = DINGS[idx]
+
+  // 首次进入不因缓存命中而跳过缩略图：点云结束后始终先落到同一张鼎图，
+  // 再在 GLB 首帧准备好后交给 3D 场景，避免冷、热缓存呈现两套入场。
+  useEffect(() => {
+    if (idx !== 0 || !introComplete) return
+    setShowHeroPreview(true)
+  }, [idx, introComplete])
+
+  useEffect(() => {
+    if (idx !== 0 || !introComplete || !loaded) return
+    const timer = window.setTimeout(() => setShowHeroPreview(false), 360)
+    return () => window.clearTimeout(timer)
+  }, [idx, introComplete, loaded])
 
   // 后台预载下一尊：等首件就绪后再启动，不与首载抢主线程
   useEffect(() => {
@@ -344,7 +358,7 @@ export default function HomeHero3D({ navigate, fallback }) {
 
       {/* 换鼎过渡时才显示 thumb 占位；首屏走空舞台揭幕，不放图 */}
       <AnimatePresence>
-        {!loaded && (!firstLoadRef.current || introComplete) && (
+        {((!loaded && (!firstLoadRef.current || introComplete)) || showHeroPreview) && (
           <motion.div
             key={ding.id + '-thumb'}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.45 } }}
