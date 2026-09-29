@@ -16,6 +16,7 @@ import PreviewScaleModal from '../components/PreviewScaleModal'
 import PublishModal from '../components/gallery/PublishModal'
 import { useAuth } from '../lib/auth'
 import { getWork } from '../lib/galleryApi'
+import ResonanceEffect from '../components/common/ResonanceEffect'
 
 const CANVAS_SIZE = 1024
 const DISPLAY_SIZE = 380
@@ -51,6 +52,8 @@ export default function PuzzlePage() {
   const [forkSource, setForkSource] = useState(null)        // { id, title, author }
   const [showPublish, setShowPublish] = useState(false)
   const [publishCoverBlob, setPublishCoverBlob] = useState(null)
+  const [publishedResonance, setPublishedResonance] = useState(false)
+  const publishedTimeoutRef = useRef(null)
   const [extraPatterns, setExtraPatterns] = useState([])    // fork 引入的 pattern（绕过 library 过滤）
 
   // 用户已收集的纹样（library + fork 引入的 extras），不含 AI 元素
@@ -80,6 +83,8 @@ export default function PuzzlePage() {
     }
     return libPatterns.filter(p => p.series === seriesFilter)
   }, [seriesFilter, aiPurposeFilter, libPatterns, aiPatterns])
+
+  useEffect(() => () => { clearTimeout(publishedTimeoutRef.current) }, [])
 
   // ── Fork entry: read ?fork=workId and preload source placements ──
   useEffect(() => {
@@ -1025,9 +1030,17 @@ export default function PuzzlePage() {
         defaultTemplate={forkSource ? '复用' : '自由创作'}
         onPublished={() => {
           setShowPublish(false)
-          navigate('/gallery')
+          setPublishedResonance(true)
+          clearTimeout(publishedTimeoutRef.current)
+          publishedTimeoutRef.current = setTimeout(() => navigate('/gallery'), 420)
         }}
       />
+
+      {publishedResonance && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 120, pointerEvents: 'none' }}>
+          <ResonanceEffect active />
+        </div>
+      )}
 
       {forkSource && (
         <div style={{

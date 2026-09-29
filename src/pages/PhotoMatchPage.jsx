@@ -5,6 +5,7 @@ import { PATTERN_LIBRARY, getPatternById, getPatternImage, getRarityLabel } from
 import { extractHashFromFileWithCrop, findTopMatches, buildLibraryHashes } from '../utils/imageComparison'
 import { callStepFunVision, matchPattern, fileToCompressedBase64 } from '../utils/vlmMatch'
 import PatternImage from '../components/common/PatternImage'
+import ResonanceEffect from '../components/common/ResonanceEffect'
 
 function similarityLabel(score) {
   if (score >= 0.85) return { label: '很像', color: 'var(--color-gold-bright)' }
@@ -578,7 +579,8 @@ export default function PhotoMatchPage() {
           </div>
 
           {matchResult.source === 'exact' && matchResult.primaryMatch ? (
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ position: 'relative', textAlign: 'center', marginBottom: 24, overflow: 'hidden' }}>
+              <ResonanceEffect active />
               <div style={{ fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: 3, marginBottom: 8 }}>AI 识别为</div>
               <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 4 }}>
                 {matchResult.primaryMatch.name}
