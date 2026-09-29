@@ -188,7 +188,7 @@ function DingPointCloudIntro({ modelReady, onComplete }) {
       seed = (seed * 1664525 + 1013904223) >>> 0
       return seed / 0xffffffff
     }
-    const points = Array.from({ length: 720 }, (_, index) => {
+    const points = Array.from({ length: 320 }, (_, index) => {
       const y = random()
       const half = y < 0.13 ? 0.13
         : y < 0.24 ? 0.25
@@ -217,9 +217,9 @@ function DingPointCloudIntro({ modelReady, onComplete }) {
     const start = performance.now()
     const draw = (now) => {
       const elapsed = now - start
-      const t = Math.min(elapsed / 1800, 1)
+      const t = Math.min(elapsed / 650, 1)
       const ease = 1 - Math.pow(1 - t, 3)
-      const fade = modelReadyRef.current && t === 1 ? Math.min((elapsed - 1800) / 550, 1) : 0
+      const fade = modelReadyRef.current && t === 1 ? Math.min((elapsed - 650) / 240, 1) : 0
       ctx.clearRect(0, 0, width, height)
       ctx.fillStyle = `rgba(10, 7, 3, ${0.24 * (1 - fade)})`
       ctx.fillRect(0, 0, width, height)
