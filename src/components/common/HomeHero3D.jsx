@@ -325,7 +325,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
 
   return (
     <div
-      style={{ position: 'relative', height: '62vh', minHeight: 420, touchAction: 'pan-y', userSelect: 'none' }}
+      style={{ position: 'relative', height: '52vh', minHeight: 360, touchAction: 'pan-y', userSelect: 'none' }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={(e) => finish(e, false)}
