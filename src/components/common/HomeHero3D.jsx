@@ -39,7 +39,7 @@ function hasWebGL() {
 /* 手势状态桥：DOM 层手势写，Canvas 内自转帧读 */
 const gesture = { active: false, dragRotY: 0, tilt: 0 }
 
-function Ding({ glb, tune, onReady, onTap }) {
+function Ding({ glb, tune, onReady, onTap, visible = true }) {
   const { scene } = useGLTF(glb)
   const groupRef = useRef(null)
   const autoRef = useRef(0)
@@ -99,7 +99,7 @@ function Ding({ glb, tune, onReady, onTap }) {
 
   useFrame((_, dt) => {
     const g = groupRef.current
-    if (!g) return
+    if (!g || !visible) return
     // 入场：前 0.8s 从微下方 easeOut 升到位（揭幕感）
     if (bornRef.current < 1) {
       bornRef.current = Math.min(1, bornRef.current + dt / 0.8)
@@ -116,7 +116,7 @@ function Ding({ glb, tune, onReady, onTap }) {
   })
 
   return (
-    <group ref={groupRef} position={[0, obj.halfH - 1.05, 0]}>
+    <group ref={groupRef} visible={visible} position={[0, obj.halfH - 1.05, 0]}>
       <primitive
         object={obj.root}
         onPointerUp={(e) => {
@@ -166,9 +166,101 @@ function EnvRig() {
   )
 }
 
+/* 默认错金银鼎的首屏扫描：不等 GLB，先用 Canvas 2D 点云占住舞台。 */
+function DingPointCloudIntro({ modelReady, onComplete }) {
+  const canvasRef = useRef(null)
+  const modelReadyRef = useRef(modelReady)
+  const completeRef = useRef(onComplete)
+
+  useEffect(() => { modelReadyRef.current = modelReady }, [modelReady])
+  useEffect(() => { completeRef.current = onComplete }, [onComplete])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+    let width = 0
+    let height = 0
+    let frame = 0
+    let done = false
+    let seed = 0x8d1c4e
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0
+      return seed / 0xffffffff
+    }
+    const points = Array.from({ length: 720 }, (_, index) => {
+      const y = random()
+      const half = y < 0.13 ? 0.13
+        : y < 0.24 ? 0.25
+          : y < 0.72 ? 0.44 - Math.abs(y - 0.48) * 0.15
+            : 0.3 - (y - 0.72) * 0.5
+      return {
+        x: 0.5 + (random() * 2 - 1) * Math.max(half, 0.07),
+        y: 0.12 + y * 0.76,
+        startX: random() * 1.45 - 0.22,
+        startY: random() * 1.25 - 0.1,
+        r: index % 9 === 0 ? 1.65 : 0.65 + random() * 0.85,
+        phase: random() * Math.PI * 2,
+      }
+    })
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect()
+      const ratio = Math.min(window.devicePixelRatio || 1, 2)
+      width = rect.width
+      height = rect.height
+      canvas.width = Math.max(1, Math.floor(width * ratio))
+      canvas.height = Math.max(1, Math.floor(height * ratio))
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    const start = performance.now()
+    const draw = (now) => {
+      const elapsed = now - start
+      const t = Math.min(elapsed / 1800, 1)
+      const ease = 1 - Math.pow(1 - t, 3)
+      const fade = modelReadyRef.current && t === 1 ? Math.min((elapsed - 1800) / 550, 1) : 0
+      ctx.clearRect(0, 0, width, height)
+      ctx.fillStyle = `rgba(10, 7, 3, ${0.24 * (1 - fade)})`
+      ctx.fillRect(0, 0, width, height)
+      points.forEach((point) => {
+        const drift = Math.sin(elapsed / 480 + point.phase) * 0.002 * (1 - ease)
+        const x = (point.startX + (point.x - point.startX) * ease + drift) * width
+        const y = (point.startY + (point.y - point.startY) * ease) * height
+        const alpha = (0.62 + Math.sin(elapsed / 250 + point.phase) * 0.22) * (1 - fade)
+        ctx.fillStyle = `rgba(242, 204, 112, ${alpha})`
+        ctx.beginPath()
+        ctx.arc(x, y, point.r, 0, Math.PI * 2)
+        ctx.fill()
+      })
+      const scanY = (0.18 + ((elapsed % 2200) / 2200) * 0.66) * height
+      const scan = ctx.createLinearGradient(0, scanY - 14, 0, scanY + 14)
+      scan.addColorStop(0, 'rgba(236,190,82,0)')
+      scan.addColorStop(0.5, `rgba(255,224,145,${0.78 * (1 - fade)})`)
+      scan.addColorStop(1, 'rgba(236,190,82,0)')
+      ctx.fillStyle = scan
+      ctx.fillRect(width * 0.16, scanY - 14, width * 0.68, 28)
+      if (fade >= 1 && !done) {
+        done = true
+        completeRef.current()
+        return
+      }
+      frame = requestAnimationFrame(draw)
+    }
+    frame = requestAnimationFrame(draw)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
+}
+
 export default function HomeHero3D({ navigate, fallback }) {
   const [idx, setIdx] = useState(0)
   const [loaded, setLoaded] = useState(false)
+  const [introComplete, setIntroComplete] = useState(false)
   const firstLoadRef = useRef(true)
   const ding = DINGS[idx]
 
@@ -229,6 +321,7 @@ export default function HomeHero3D({ navigate, fallback }) {
   const go = (delta) => {
     gesture.dragRotY = 0
     setLoaded(false)
+    setIntroComplete(true)
     setIdx(i => (i + delta + DINGS.length) % DINGS.length)
   }
 
@@ -291,11 +384,14 @@ export default function HomeHero3D({ navigate, fallback }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={() => navigate('/relic')} />
+          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={() => navigate('/relic')} visible={idx !== 0 || introComplete} />
         </Suspense>
         <EnvLight />
         <EnvRig />
       </Canvas>
+      {idx === 0 && !introComplete && (
+        <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
+      )}
 
       {/* 顶部衔接遮罩 */}
       <div style={{
