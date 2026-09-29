@@ -260,6 +260,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
   const [idx, setIdx] = useState(0)
   const [loaded, setLoaded] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
+  const [showArtifactInfo, setShowArtifactInfo] = useState(false)
   const ding = DINGS[idx]
 
   // 后台预载下一尊：等首件就绪后再启动，不与首载抢主线程
@@ -376,7 +377,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={() => navigate('/relic')} visible={idx !== 0 || introComplete} />
+          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={() => setShowArtifactInfo(true)} visible={idx !== 0 || introComplete} />
         </Suspense>
         <EnvLight />
         <EnvRig />
@@ -384,6 +385,18 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
       {idx === 0 && !introComplete && (
         <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
       )}
+
+      <AnimatePresence>
+        {showArtifactInfo && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}
+            style={{ position: 'absolute', left: 20, right: 20, bottom: 18, zIndex: 6, padding: '14px 16px', borderRadius: 10, background: 'rgba(23,21,19,0.94)', border: '1px solid rgba(201,162,75,0.38)', boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}>
+            <button onClick={() => setShowArtifactInfo(false)} aria-label="关闭器物说明" style={{ position: 'absolute', top: 8, right: 10, background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: 16 }}>×</button>
+            <div style={{ color: '#E3C079', fontFamily: 'Noto Serif SC, serif', fontSize: 17, letterSpacing: '0.12em' }}>{ding.name}</div>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: 11, marginTop: 5, lineHeight: 1.7 }}>{ding.dynasty} · 轻触器身，旋转观看纹饰与器形</div>
+            <button onClick={() => navigate('/relic')} style={{ marginTop: 10, padding: '8px 13px', borderRadius: 5, background: 'var(--color-gold-main)', color: 'var(--color-bg-base)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, letterSpacing: '0.12em' }}>查看器物详览</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 顶部衔接遮罩 */}
       <div style={{

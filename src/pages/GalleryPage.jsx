@@ -165,8 +165,6 @@ function GalleryHero({ worksCount, onCreate }) {
       </p>
       <div style={metaRowStyle}>
         <MetaCell num={worksCount || 0} label="Works Live" />
-        <MetaCell num={386} label="Creators" />
-        <MetaCell num={9402} label="Reuse Count" />
       </div>
       <button onClick={onCreate} style={{ ...curatedActionStyle, marginTop: 28 }}>用纹样创作</button>
     </section>

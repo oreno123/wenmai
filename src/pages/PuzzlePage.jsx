@@ -753,22 +753,22 @@ export default function PuzzlePage() {
                 background: activeTemplateId ? 'rgba(201,162,75,0.1)' : 'rgba(255,255,255,0.02)',
               }}
             >模板{activeTemplateId ? ` · ${getTemplateById(activeTemplateId)?.name}` : ''}</button>
-            <button onClick={clearCanvas} style={ghostBtnStyle}>清空</button>
-            <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
+            {placements.length > 0 && <button onClick={clearCanvas} style={ghostBtnStyle}>清空</button>}
+            {placements.length > 0 && <button onClick={saveToLibrary} disabled={saved} style={{
               ...ghostBtnStyle,
               background: saved ? 'rgba(100,180,100,0.12)' : placements.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(201,162,75,0.1)',
               color: saved ? '#8BC387' : placements.length === 0 ? 'var(--color-text-dim)' : 'var(--color-gold-bright)',
               border: saved ? '1px solid rgba(100,180,100,0.25)' : placements.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(201,162,75,0.25)',
               opacity: placements.length === 0 ? 0.6 : 1,
-            }}>{saved ? '已保存' : '保存'}</button>
-            <button
+            }}>{saved ? '已保存' : '保存'}</button>}
+            {placements.length > 0 && <button
               onClick={() => {
                 setExportSize(recommendedExportSize)
                 setShowExportModal(true)
               }}
               style={ghostBtnStyle}
-            >导出</button>
-            <button
+            >导出</button>}
+            {placements.length > 0 && <button
               onClick={finishCreation}
               disabled={placements.length === 0}
               style={{
@@ -786,8 +786,8 @@ export default function PuzzlePage() {
                 boxShadow: placements.length === 0 ? 'none' : '0 2px 12px rgba(201,162,75,0.18)',
                 transition: 'all 0.2s',
               }}
-            >完成创作</button>
-            <button
+            >完成创作</button>}
+            {placements.length > 0 && <button
               onClick={handlePublishClick}
               disabled={placements.length === 0}
               style={{
@@ -805,7 +805,7 @@ export default function PuzzlePage() {
                 boxShadow: placements.length === 0 ? 'none' : '0 2px 10px rgba(201,162,75,0.2)',
                 transition: 'all 0.2s',
               }}
-            >发 布 到 广 场</button>
+            >发 布 到 广 场</button>}
           </div>
         </div>
 

@@ -6,11 +6,18 @@ export default function GoldBackground() {
   useEffect(() => {
     const cv = cvRef.current;
     if (!cv) return;
-    const W = cv.offsetWidth, H = cv.offsetHeight;
-    cv.width = W * devicePixelRatio;
-    cv.height = H * devicePixelRatio;
+    let W = 0, H = 0;
+    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = cv.getContext("2d");
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+    const resize = () => {
+      W = cv.offsetWidth;
+      H = cv.offsetHeight;
+      cv.width = Math.max(1, Math.floor(W * ratio));
+      cv.height = Math.max(1, Math.floor(H * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+    resize();
 
     // Toned down from 16 rays / 80 particles — too much motion was competing
     // with foreground cards. Half the density, half the alpha = atmospheric
@@ -103,8 +110,20 @@ export default function GoldBackground() {
       raf = requestAnimationFrame(draw);
     }
 
+    const handleResize = () => {
+      resize();
+      if (reducedMotion) {
+        draw();
+        cancelAnimationFrame(raf);
+      }
+    };
     draw();
-    return () => cancelAnimationFrame(raf);
+    if (reducedMotion) cancelAnimationFrame(raf);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (

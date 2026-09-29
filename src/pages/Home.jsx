@@ -238,6 +238,7 @@ export default function Home() {
   const creationsRef = useRef(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showSeries, setShowSeries] = useState(false)
+  const [showExplore, setShowExplore] = useState(false)
   // 红章首访逻辑：第一次见完整「识纹第一步」，之后降级为小角章
   const [sealSeen] = useState(() => {
     try { return localStorage.getItem('wm.seal.seen') === '1' } catch { return false }
@@ -623,6 +624,13 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
+          <button onClick={() => setShowExplore(value => !value)} style={{
+            width: '100%', marginTop: 16, padding: '12px 16px', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit',
+            background: 'rgba(201,162,75,0.05)', color: 'var(--color-gold-bright)', border: '1px solid rgba(201,162,75,0.18)',
+            fontSize: 12, letterSpacing: '0.16em',
+          }}>{showExplore ? '收 起 探 索' : '探 索 更 多 纹 样 与 工 具'}</button>
+
+          {showExplore && <>
           {/* ── 更多工具（折叠的次要入口）── */}
           <motion.div variants={stagger} initial="initial" animate="animate"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, marginTop: 14 }}
@@ -670,6 +678,7 @@ export default function Home() {
           {showSeries && series.map(s => (
             <SeriesCarousel key={s.id} series={s} navigate={navigate} />
           ))}
+          </>}
 
           {/* ── 我的作品集 ── */}
           <motion.div ref={creationsRef} variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28, scrollMarginTop: 70 }}>
