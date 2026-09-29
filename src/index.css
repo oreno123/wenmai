@@ -42,6 +42,36 @@ body {
   overflow-x: hidden;
 }
 
+/* ── 青铜共鸣：一次性光环与纹样点，不创建独立渲染循环 ── */
+.wm-resonance { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
+.wm-resonance__ring { position: absolute; left: 50%; top: 52%; width: 88px; height: 28px; border: 1px solid rgba(227, 192, 121, 0.85); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 18px rgba(201, 162, 75, 0.36); animation: wm-resonance-ring 0.82s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.wm-resonance__ring--late { border-color: rgba(103, 168, 134, 0.72); animation-delay: 0.12s; }
+.wm-resonance__dot { --wm-angle: 0deg; --wm-distance: 80px; position: absolute; left: 50%; top: 52%; width: 3px; height: 3px; border-radius: 50%; background: var(--color-gold-bright); box-shadow: 0 0 8px rgba(227, 192, 121, 0.9); transform: translate(-50%, -50%) rotate(var(--wm-angle)) translateY(-8px); animation: wm-resonance-dot 0.72s ease-out forwards; }
+.wm-resonance__dot:nth-child(3n) { background: #73ad8d; }
+.wm-resonance__dot:nth-child(3) { --wm-angle: 5deg; --wm-distance: 74px; animation-delay: .01s; }
+.wm-resonance__dot:nth-child(4) { --wm-angle: 29deg; --wm-distance: 103px; animation-delay: .05s; }
+.wm-resonance__dot:nth-child(5) { --wm-angle: 54deg; --wm-distance: 86px; animation-delay: .09s; }
+.wm-resonance__dot:nth-child(6) { --wm-angle: 78deg; --wm-distance: 112px; animation-delay: .03s; }
+.wm-resonance__dot:nth-child(7) { --wm-angle: 101deg; --wm-distance: 78px; animation-delay: .12s; }
+.wm-resonance__dot:nth-child(8) { --wm-angle: 126deg; --wm-distance: 98px; animation-delay: .06s; }
+.wm-resonance__dot:nth-child(9) { --wm-angle: 149deg; --wm-distance: 82px; animation-delay: .02s; }
+.wm-resonance__dot:nth-child(10) { --wm-angle: 173deg; --wm-distance: 108px; animation-delay: .10s; }
+.wm-resonance__dot:nth-child(11) { --wm-angle: 197deg; --wm-distance: 73px; animation-delay: .04s; }
+.wm-resonance__dot:nth-child(12) { --wm-angle: 221deg; --wm-distance: 101px; animation-delay: .11s; }
+.wm-resonance__dot:nth-child(13) { --wm-angle: 244deg; --wm-distance: 84px; animation-delay: .07s; }
+.wm-resonance__dot:nth-child(14) { --wm-angle: 269deg; --wm-distance: 109px; animation-delay: .02s; }
+.wm-resonance__dot:nth-child(15) { --wm-angle: 292deg; --wm-distance: 79px; animation-delay: .08s; }
+.wm-resonance__dot:nth-child(16) { --wm-angle: 318deg; --wm-distance: 100px; animation-delay: .04s; }
+.wm-resonance__dot:nth-child(17) { --wm-angle: 341deg; --wm-distance: 84px; animation-delay: .12s; }
+.wm-resonance__dot:nth-child(18) { --wm-angle: 18deg; --wm-distance: 118px; animation-delay: .07s; }
+.wm-resonance__dot:nth-child(19) { --wm-angle: 64deg; --wm-distance: 119px; animation-delay: .12s; }
+.wm-resonance__dot:nth-child(20) { --wm-angle: 242deg; --wm-distance: 116px; animation-delay: .1s; }
+.wm-enter { animation: wm-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes wm-resonance-ring { from { opacity: .9; transform: translate(-50%, -50%) scale(.6); } to { opacity: 0; transform: translate(-50%, -50%) scale(5); } }
+@keyframes wm-resonance-dot { from { opacity: .92; transform: translate(-50%, -50%) rotate(var(--wm-angle)) translateY(-8px) scale(1); } to { opacity: 0; transform: translate(-50%, -50%) rotate(var(--wm-angle)) translateY(calc(var(--wm-distance) * -1)) scale(.25); } }
+@keyframes wm-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .wm-resonance *, .wm-enter { animation: none !important; } }
+
 ::-webkit-scrollbar { width: 2px; }
 ::-webkit-scrollbar-thumb { background: var(--color-gold-dim); border-radius: 2px; }
 
