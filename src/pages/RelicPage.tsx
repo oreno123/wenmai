@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { ContactShadows, OrbitControls, useGLTF } from '@react-three/drei'
@@ -91,6 +91,7 @@ interface VesselProps {
   hovered: number | null
   onPick: (id: number) => void
   onHover: (id: number | null) => void
+  onReady?: () => void
 }
 
 function pickElem(
@@ -119,7 +120,7 @@ function pickElem(
   return null
 }
 
-function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
+function Vessel({ glb, elems, picked, hovered, onPick, onHover, onReady }: VesselProps) {
   const { scene } = useGLTF(glb)
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.ShaderMaterial | null>(null)
@@ -138,6 +139,10 @@ function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
     root.updateMatrixWorld(true)
     return { root, halfH: (size.y * s) / 2 }
   }, [scene])
+
+  useEffect(() => {
+    onReady?.()
+  }, [onReady, glb])
 
   const bodyMesh = useMemo(() => {
     let found: THREE.Mesh | null = null
@@ -358,6 +363,119 @@ function Rig() {
 }
 
 /* ------------------------------------------------------------------ */
+/* 默认青铜簋点云进入试作                                                */
+/* ------------------------------------------------------------------ */
+
+interface PointCloudIntroProps {
+  modelReady: boolean
+  onComplete: () => void
+}
+
+function PointCloudIntro({ modelReady, onComplete }: PointCloudIntroProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const modelReadyRef = useRef(modelReady)
+  const completeRef = useRef(onComplete)
+
+  useEffect(() => {
+    modelReadyRef.current = modelReady
+  }, [modelReady])
+
+  useEffect(() => {
+    completeRef.current = onComplete
+  }, [onComplete])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let width = 0
+    let height = 0
+    let frame = 0
+    let finished = false
+    let seed = 0x5eedd1
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0
+      return seed / 0xffffffff
+    }
+    const points = Array.from({ length: 680 }, (_, index) => {
+      const y = random()
+      const halfWidth = y < 0.12 ? 0.12
+        : y < 0.23 ? 0.24
+          : y < 0.72 ? 0.45 - Math.abs(y - 0.48) * 0.13
+            : 0.3 - (y - 0.72) * 0.5
+      return {
+        x: 0.5 + (random() * 2 - 1) * Math.max(halfWidth, 0.08),
+        y: 0.12 + y * 0.76,
+        startX: random() * 1.5 - 0.25,
+        startY: random() * 1.35 - 0.16,
+        size: index % 7 === 0 ? 1.5 : 0.8 + random() * 0.8,
+        phase: random() * Math.PI * 2,
+      }
+    })
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect()
+      const ratio = Math.min(window.devicePixelRatio || 1, 2)
+      width = rect.width
+      height = rect.height
+      canvas.width = Math.max(1, Math.floor(width * ratio))
+      canvas.height = Math.max(1, Math.floor(height * ratio))
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    const start = performance.now()
+
+    const draw = (now: number) => {
+      const elapsed = now - start
+      const settle = Math.min(elapsed / 1800, 1)
+      const ease = 1 - Math.pow(1 - settle, 3)
+      const fade = modelReadyRef.current && settle === 1
+        ? Math.min((elapsed - 1800) / 550, 1)
+        : 0
+      ctx.clearRect(0, 0, width, height)
+      ctx.fillStyle = `rgba(9, 7, 3, ${0.42 * (1 - fade)})`
+      ctx.fillRect(0, 0, width, height)
+
+      points.forEach((point) => {
+        const drift = Math.sin(elapsed / 480 + point.phase) * 0.0018 * (1 - ease)
+        const x = (point.startX + (point.x - point.startX) * ease + drift) * width
+        const y = (point.startY + (point.y - point.startY) * ease) * height
+        const pulse = 0.65 + Math.sin(elapsed / 260 + point.phase) * 0.22
+        ctx.fillStyle = `rgba(242, 204, 112, ${pulse * (1 - fade)})`
+        ctx.beginPath()
+        ctx.arc(x, y, point.size, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      const scanY = (0.2 + ((elapsed % 2100) / 2100) * 0.62) * height
+      const scan = ctx.createLinearGradient(0, scanY - 12, 0, scanY + 12)
+      scan.addColorStop(0, 'rgba(230,182,73,0)')
+      scan.addColorStop(0.48, `rgba(255,224,145,${0.72 * (1 - fade)})`)
+      scan.addColorStop(1, 'rgba(230,182,73,0)')
+      ctx.fillStyle = scan
+      ctx.fillRect(width * 0.18, scanY - 12, width * 0.64, 24)
+
+      if (fade >= 1 && !finished) {
+        finished = true
+        completeRef.current()
+        return
+      }
+      frame = requestAnimationFrame(draw)
+    }
+    frame = requestAnimationFrame(draw)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 4, pointerEvents: 'none' }} />
+}
+
+/* ------------------------------------------------------------------ */
 /* 页面                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -378,6 +496,9 @@ export default function RelicPage() {
   const [hovered, setHovered] = useState<number | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
   const [switcherOpen, setSwitcherOpen] = useState(false)
+  const [modelReady, setModelReady] = useState(false)
+  const [showPointIntro, setShowPointIntro] = useState(true)
+  const markModelReady = useCallback(() => setModelReady(true), [])
 
   const switchModel = (id: string) => {
     if (id === modelId) {
@@ -390,6 +511,8 @@ export default function RelicPage() {
     setHovered(null)
     setFlash(null)
     setSwitcherOpen(false)
+    setModelReady(false)
+    setShowPointIntro(id === DEFAULT_MODEL.id)
   }
 
   const handlePick = (id: number) => {
@@ -485,11 +608,15 @@ export default function RelicPage() {
                 hovered={hovered}
                 onPick={handlePick}
                 onHover={setHovered}
+                onReady={markModelReady}
               />
             </Suspense>
             <EnvLight />
             <Rig />
           </Canvas>
+          {showPointIntro && model.id === DEFAULT_MODEL.id && (
+            <PointCloudIntro modelReady={modelReady} onComplete={() => setShowPointIntro(false)} />
+          )}
 
           {/* 器物切换器 */}
           {models.length > 1 && (
