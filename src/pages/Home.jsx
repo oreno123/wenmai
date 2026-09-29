@@ -434,7 +434,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 16 }}>
-            <motion.section variants={fadeUp} aria-label="从这里开始" style={{
+            <motion.section className="wm-enter" variants={fadeUp} aria-label="从这里开始" style={{
               padding: '16px', borderRadius: 14, background: 'linear-gradient(135deg, rgba(201,162,75,0.10), rgba(36,30,25,0.9))',
               border: '1px solid rgba(201,162,75,0.24)',
             }}>

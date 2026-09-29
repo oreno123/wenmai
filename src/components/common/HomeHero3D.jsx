@@ -4,6 +4,7 @@ import { ContactShadows, useGLTF } from '@react-three/drei'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
+import ResonanceEffect from './ResonanceEffect'
 
 /* ── 镇馆五鼎（全本地 rawfile，秒开）── */
 /* tune：摄影测量 GLB 材质缺 metal/rough（glTF 默认 1.0/1.0=全金属全粗糙→贴图变黑绿），
@@ -261,6 +262,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
   const [loaded, setLoaded] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
   const [showArtifactInfo, setShowArtifactInfo] = useState(false)
+  const [resonanceKey, setResonanceKey] = useState(0)
   const ding = DINGS[idx]
 
   // 后台预载下一尊：等首件就绪后再启动，不与首载抢主线程
@@ -324,6 +326,11 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
     setIdx(i => (i + delta + DINGS.length) % DINGS.length)
   }
 
+  const revealArtifactInfo = () => {
+    setResonanceKey(key => key + 1)
+    setShowArtifactInfo(true)
+  }
+
   return (
     <div
       style={{ position: 'relative', height: '52vh', minHeight: 360, touchAction: 'pan-y', userSelect: 'none' }}
@@ -377,7 +384,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={() => setShowArtifactInfo(true)} visible={idx !== 0 || introComplete} />
+          <Ding key={ding.id} glb={ding.glb} tune={ding.tune} onReady={markLoaded} onTap={revealArtifactInfo} visible={idx !== 0 || introComplete} />
         </Suspense>
         <EnvLight />
         <EnvRig />
@@ -385,6 +392,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
       {idx === 0 && !introComplete && (
         <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
       )}
+      {resonanceKey > 0 && <ResonanceEffect key={resonanceKey} active />}
 
       <AnimatePresence>
         {showArtifactInfo && (
