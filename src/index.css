@@ -3,27 +3,32 @@
 @import "./styles/gacha-animations.css";
 
 @theme {
-  --color-gold-main: #D4AF6A;
-  --color-gold-bright: #F2D58A;
-  --color-gold-deep: #BC6B2F;
-  --color-gold-dim: #8A6A30;
-  --color-gold-light: #F5E6C8;
-  --color-text-primary: #F5F1E8;
-  --color-text-secondary: #8A8A8A;
-  --color-text-dim: #4A4A4A;
-  --color-bg-base: #0F0F10;
-  --color-bg-card: #1A1A1C;
-  --color-bg-card-hover: #222220;
-  --color-bg-glass: rgba(18, 18, 22, 0.72);
-  --color-bg-glass-strong: rgba(18, 18, 24, 0.85);
-  --color-red-accent: #BC1F28;
-  /* 双橙语义化：persistent=常驻铜橙（卡片内按钮），transient=瞬时亮橙（FAB/强调 CTA） */
-  --color-accent-persistent: #BC6B2F;
-  --color-accent-persistent-deep: #8A4A20;
-  --color-accent-transient: #D4813A;
-  --color-accent-transient-deep: #96521F;
-  --color-border-gold: rgba(212, 175, 106, 0.18);
-  --color-border-glass: rgba(255, 255, 255, 0.06);
+  /* 底 —— 3 档 */
+  --color-bg-base: #171513;
+  --color-bg-card: #241E19;
+  --color-bg-raised: #2E2721;
+  --color-bg-glass: rgba(23, 21, 19, 0.72);
+  --color-bg-glass-strong: rgba(23, 21, 19, 0.85);
+
+  /* 金 —— 4 档 */
+  --color-gold-bright: #E3C079;
+  --color-gold-main: #C9A24B;
+  --color-gold-dim: #8A6F35;
+  --color-gold-deep: #5A4620;
+  --color-gold-light: #E3C079;
+
+  /* 米白 —— 3 档 */
+  --color-text-primary: #D8CDBA;
+  --color-text-secondary: #A89C88;
+  --color-text-dim: #6E655A;
+
+  /* 朱 —— 2 档 */
+  --color-red-accent: #9E3530;
+  --color-red-deep: #7A2622;
+
+  /* 线 */
+  --color-border-gold: rgba(201, 162, 75, 0.18);
+  --color-border-glass: rgba(216, 205, 186, 0.06);
   --font-serif: 'Noto Serif SC', 'STSong', Georgia, serif;
 }
 
@@ -50,7 +55,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 12px rgba(212, 175, 106, 0.25));
+  filter: drop-shadow(0 2px 12px rgba(201,162,75, 0.25));
 }
 .wm-hollow-dark {
   background-image: linear-gradient(rgba(10, 8, 5, 0.82), rgba(10, 8, 5, 0.82)), var(--wm-tex);
@@ -62,7 +67,7 @@ body {
 }
 /* 镂空数字：在 wm-hollow 基础上加金色描边，任意深浅纹样底图都可辨 */
 .wm-hollow-num {
-  -webkit-text-stroke: 1.5px rgba(212, 175, 106, 0.6);
+  -webkit-text-stroke: 1.5px rgba(201,162,75, 0.6);
 }
 
 /* ── 掀卡（每日一纹）──────────────────────────────
@@ -118,7 +123,7 @@ input[type="range"] {
 }
 input[type="range"]::-webkit-slider-runnable-track {
   height: 3px;
-  background: rgba(180,155,100,0.15);
+  background: rgba(138,111,53,0.15);
   border-radius: 2px;
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -127,19 +132,19 @@ input[type="range"]::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #F2D58A, #C9943A);
+  background: linear-gradient(145deg, var(--color-gold-bright), var(--color-gold-main));
   border: 2px solid rgba(255,255,255,0.15);
-  box-shadow: 0 0 10px rgba(201,148,58,0.4);
+  box-shadow: 0 0 10px rgba(201,162,75,0.4);
   margin-top: -8px;
   transition: box-shadow 0.2s, transform 0.15s;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 18px rgba(201,148,58,0.6);
+  box-shadow: 0 0 18px rgba(201,162,75,0.6);
   transform: scale(1.15);
 }
 input[type="range"]::-moz-range-track {
   height: 3px;
-  background: rgba(180,155,100,0.15);
+  background: rgba(138,111,53,0.15);
   border-radius: 2px;
   border: none;
 }
@@ -147,11 +152,11 @@ input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #F2D58A, #C9943A);
+  background: linear-gradient(145deg, var(--color-gold-bright), var(--color-gold-main));
   border: 2px solid rgba(255,255,255,0.15);
-  box-shadow: 0 0 10px rgba(201,148,58,0.4);
+  box-shadow: 0 0 10px rgba(201,162,75,0.4);
 }
 input[type="range"]:focus { outline: none; }
 input[type="range"]:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px rgba(201,148,58,0.3), 0 0 10px rgba(201,148,58,0.4);
+  box-shadow: 0 0 0 3px rgba(201,162,75,0.3), 0 0 10px rgba(201,162,75,0.4);
 }
