@@ -167,9 +167,11 @@ function EnvRig() {
 }
 
 /* 默认错金银鼎的首屏扫描：不等 GLB，先用 Canvas 2D 点云占住舞台。 */
-function DingPointCloudIntro({ onComplete }) {
+function DingPointCloudIntro({ modelReady, onComplete }) {
   const canvasRef = useRef(null)
+  const modelReadyRef = useRef(modelReady)
   const completeRef = useRef(onComplete)
+  useEffect(() => { modelReadyRef.current = modelReady }, [modelReady])
   useEffect(() => { completeRef.current = onComplete }, [onComplete])
 
   useEffect(() => {
@@ -216,7 +218,7 @@ function DingPointCloudIntro({ onComplete }) {
       const elapsed = now - start
       const t = Math.min(elapsed / 650, 1)
       const ease = 1 - Math.pow(1 - t, 3)
-      const fade = t === 1 ? Math.min((elapsed - 650) / 240, 1) : 0
+      const fade = modelReadyRef.current && t === 1 ? Math.min((elapsed - 650) / 240, 1) : 0
       ctx.clearRect(0, 0, width, height)
       ctx.fillStyle = `rgba(10, 7, 3, ${0.24 * (1 - fade)})`
       ctx.fillRect(0, 0, width, height)
@@ -254,26 +256,11 @@ function DingPointCloudIntro({ onComplete }) {
   return <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
 }
 
-export default function HomeHero3D({ navigate, fallback }) {
+export default function HomeHero3D({ navigate, fallback, onModelReady }) {
   const [idx, setIdx] = useState(0)
   const [loaded, setLoaded] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
-  const [showHeroPreview, setShowHeroPreview] = useState(false)
-  const firstLoadRef = useRef(true)
   const ding = DINGS[idx]
-
-  // 首次进入不因缓存命中而跳过缩略图：点云结束后始终先落到同一张鼎图，
-  // 再在 GLB 首帧准备好后交给 3D 场景，避免冷、热缓存呈现两套入场。
-  useEffect(() => {
-    if (idx !== 0 || !introComplete) return
-    setShowHeroPreview(true)
-  }, [idx, introComplete])
-
-  useEffect(() => {
-    if (idx !== 0 || !introComplete || !loaded) return
-    const timer = window.setTimeout(() => setShowHeroPreview(false), 360)
-    return () => window.clearTimeout(timer)
-  }, [idx, introComplete, loaded])
 
   // 后台预载下一尊：等首件就绪后再启动，不与首载抢主线程
   useEffect(() => {
@@ -281,11 +268,11 @@ export default function HomeHero3D({ navigate, fallback }) {
     useGLTF.preload(DINGS[(idx + 1) % DINGS.length].glb)
   }, [idx, loaded])
 
-  // 首载完成后再允许换鼎时用 thumb 过渡；首屏自己不显示 thumb（空舞台揭幕）
+  // 每次 GLB 完成首帧渲染后，解除点云或加载状态。
   const markLoaded = useCallback(() => {
-    firstLoadRef.current = false
     setLoaded(true)
-  }, [])
+    onModelReady?.()
+  }, [onModelReady])
 
   if (!hasWebGL()) return fallback
 
@@ -356,23 +343,6 @@ export default function HomeHero3D({ navigate, fallback }) {
         opacity: 0.05, pointerEvents: 'none',
       }} />
 
-      {/* 换鼎过渡时才显示 thumb 占位；首屏走空舞台揭幕，不放图 */}
-      <AnimatePresence>
-        {((!loaded && (!firstLoadRef.current || introComplete)) || showHeroPreview) && (
-          <motion.div
-            key={ding.id + '-thumb'}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.45 } }}
-            style={{
-              position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              pointerEvents: 'none',
-            }}
-          >
-            <img src={ding.thumb} alt={ding.name}
-              style={{ height: '58%', objectFit: 'contain', filter: 'brightness(0.8) saturate(0.9)' }} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* 加载指示：空舞台/换鼎时呼吸字 */}
       {!loaded && (
         <motion.div
@@ -401,7 +371,7 @@ export default function HomeHero3D({ navigate, fallback }) {
         <EnvRig />
       </Canvas>
       {idx === 0 && !introComplete && (
-        <DingPointCloudIntro onComplete={() => setIntroComplete(true)} />
+        <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
       )}
 
       {/* 顶部衔接遮罩 */}

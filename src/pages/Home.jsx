@@ -237,6 +237,7 @@ export default function Home() {
   const myPatterns = data.library.map(id => getPatternById(id)).filter(Boolean)
   const creationsRef = useRef(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [showSeries, setShowSeries] = useState(false)
   // 红章首访逻辑：第一次见完整「识纹第一步」，之后降级为小角章
   const [sealSeen] = useState(() => {
     try { return localStorage.getItem('wm.seal.seen') === '1' } catch { return false }
@@ -369,6 +370,7 @@ export default function Home() {
             <motion.div variants={fadeUp}>
               <HomeHero3D
                 navigate={navigate}
+                onModelReady={() => setShowSeries(true)}
                 fallback={
                   <motion.div
                     onClick={() => navigate('/photo-match')}
@@ -638,7 +640,7 @@ export default function Home() {
           </motion.div>
 
           {/* ── 按系列轮播 ── */}
-          {series.map(s => (
+          {showSeries && series.map(s => (
             <SeriesCarousel key={s.id} series={s} navigate={navigate} />
           ))}
 
