@@ -8,12 +8,42 @@ export default function AiPatternsPage() {
   const navigate = useNavigate()
   const [data, setData] = useState([])
   const [pick, setPick] = useState(null)
+  const [status, setStatus] = useState('loading')
+
+  const fetchLibrary = (signal) =>
+    fetch(`${import.meta.env.BASE_URL}relic/ai/manifest.json`, { signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`manifest request failed: ${r.status}`)
+        return r.json()
+      })
+      .then(d => {
+        const hasCards = Array.isArray(d) && d.some(v => Array.isArray(v.cards) && v.cards.length > 0)
+        if (!hasCards) throw new Error('manifest has no cards')
+        return d
+      })
+
+  const loadLibrary = () => {
+    setStatus('loading')
+    setData([])
+    fetchLibrary()
+      .then(d => {
+        setData(d)
+        setStatus('ready')
+      })
+      .catch(() => setStatus('error'))
+  }
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}relic/ai/manifest.json`)
-      .then(r => r.json())
-      .then(d => setData(Array.isArray(d) ? d : []))
-      .catch(() => {})
+    const controller = new AbortController()
+    fetchLibrary(controller.signal)
+      .then(d => {
+        setData(d)
+        setStatus('ready')
+      })
+      .catch(error => {
+        if (error.name !== 'AbortError') setStatus('error')
+      })
+    return () => controller.abort()
   }, [])
 
   const vessels = useMemo(
@@ -32,10 +62,29 @@ export default function AiPatternsPage() {
         }}>AI 纹样库</h1>
       </div>
       <p style={{ color: '#7A7060', fontSize: 12, margin: '0 0 22px', letterSpacing: '0.05em' }}>
-        {vessels.length} 件青铜器 · {vessels.reduce((s, v) => s + v.cards.length, 0)} 张精选纹样 · 博物馆 3D 扫描提取精修
+        {status === 'ready'
+          ? `${vessels.length} 件青铜器 · ${vessels.reduce((s, v) => s + v.cards.length, 0)} 张精选纹样 · 博物馆 3D 扫描提取精修`
+          : '博物馆 3D 扫描提取精修'}
       </p>
 
-      {vessels.map(v => (
+      {status === 'loading' && (
+        <div style={{ padding: '42px 20px', textAlign: 'center', color: '#A09682', fontSize: 13 }}>
+          正在载入 AI 纹样库…
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div style={{ padding: '42px 20px', textAlign: 'center', border: '1px solid rgba(212,175,106,0.2)', borderRadius: 12 }}>
+          <div style={{ color: '#E8D9B0', fontSize: 14, marginBottom: 8 }}>未能加载 AI 纹样库</div>
+          <div style={{ color: '#7A7060', fontSize: 12, marginBottom: 16 }}>请检查网络连接后重试</div>
+          <button type="button" onClick={loadLibrary} style={{
+            border: '1px solid rgba(212,175,106,0.45)', borderRadius: 6, padding: '7px 14px',
+            color: '#F2D58A', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
+          }}>重新加载</button>
+        </div>
+      )}
+
+      {status === 'ready' && vessels.map(v => (
         <section key={v.slug} style={{ marginBottom: 30 }}>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: 8,

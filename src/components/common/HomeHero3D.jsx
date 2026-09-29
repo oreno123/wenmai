@@ -8,14 +8,21 @@ import { motion, AnimatePresence } from 'framer-motion'
 /* ── 镇馆五鼎（全本地 rawfile，秒开）── */
 /* tune：摄影测量 GLB 材质缺 metal/rough（glTF 默认 1.0/1.0=全金属全粗糙→贴图变黑绿），
    必须显式覆盖。绿锈=矿物非金属，低 metal 让贴图漫反射出来；错金银鼎保金属度让金银纹闪 */
-/* 重资产走 CDN（服务器出口 ~3Mbps，7MB GLB 同源冷载 20s+）；本地预览与鸿蒙 rawfile 走同源 */
-const CDN_BASE = location.hostname === 'wenmai.ruoziqing.cn' ? 'https://wmstatic.ruoziqing.cn' : ''
+/* 鸿蒙只内置兽纹鼎；其余模型必须走可访问的线上静态站，不能落到 rawfile。 */
+const HARMONY_ORIGIN = location.hostname === 'localhost'
+const CLOUD_BASE = 'https://wenmai.ruoziqing.cn'
+const modelUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
+  ? `/relic/m/${id}/model.glb`
+  : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/model.glb`
+const thumbUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
+  ? `/relic/m/${id}/thumb.png`
+  : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/thumb.png`
 const DINGS = [
-  { id: 'ding_warring', name: '错金银鼎', dynasty: '战国 · 前5世纪', glb: `${CDN_BASE}/relic/m/ding_warring/model.glb`, thumb: `${CDN_BASE}/relic/m/ding_warring/thumb.png`, tune: { metal: 0.55, rough: 0.5 } },
-  { id: 'ding_shang', name: '兽纹鼎', dynasty: '商 · 前12世纪', glb: `${CDN_BASE}/relic/m/ding_shang/model.glb`, thumb: `${CDN_BASE}/relic/m/ding_shang/thumb.png`, tune: { metal: 0.3, rough: 0.62 } },
-  { id: 'ding_west_zhou', name: '大克鼎', dynasty: '西周中期 · 孝王时期', glb: `${CDN_BASE}/relic/m/ding_west_zhou/model.glb`, thumb: `${CDN_BASE}/relic/m/ding_west_zhou/thumb.png`, tune: { metal: 0.3, rough: 0.62 } },
-  { id: 'liding', name: '大盂鼎', dynasty: '西周早期 · 康王时期', glb: `${CDN_BASE}/relic/m/liding/model.glb`, thumb: `${CDN_BASE}/relic/m/liding/thumb.png`, tune: { metal: 0.25, rough: 0.65 } },
-  { id: 'shengding', name: '升鼎', dynasty: '春秋 · 约前575年', glb: `${CDN_BASE}/relic/m/shengding/model.glb`, thumb: `${CDN_BASE}/relic/m/shengding/thumb.png`, tune: { metal: 0.3, rough: 0.62 } },
+  { id: 'ding_warring', name: '错金银鼎', dynasty: '战国 · 前5世纪', glb: modelUrl('ding_warring'), thumb: thumbUrl('ding_warring'), tune: { metal: 0.55, rough: 0.5 } },
+  { id: 'ding_shang', name: '兽纹鼎', dynasty: '商 · 前12世纪', glb: modelUrl('ding_shang'), thumb: thumbUrl('ding_shang'), tune: { metal: 0.3, rough: 0.62 } },
+  { id: 'ding_west_zhou', name: '大克鼎', dynasty: '西周中期 · 孝王时期', glb: modelUrl('ding_west_zhou'), thumb: thumbUrl('ding_west_zhou'), tune: { metal: 0.3, rough: 0.62 } },
+  { id: 'liding', name: '大盂鼎', dynasty: '西周早期 · 康王时期', glb: modelUrl('liding'), thumb: thumbUrl('liding'), tune: { metal: 0.25, rough: 0.65 } },
+  { id: 'shengding', name: '升鼎', dynasty: '春秋 · 约前575年', glb: modelUrl('shengding'), thumb: thumbUrl('shengding'), tune: { metal: 0.3, rough: 0.62 } },
 ]
 
 /* WebGL 一次性检测：模拟器/无 GPU 环境走降级静态卡 */
