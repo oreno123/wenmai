@@ -164,7 +164,7 @@ export default function PublishModal({
               <span style={agreeTextStyle}>
                 我授权纹脉平台其他用户复用此作品（基于纹脉素材库的再创作），<br/>
                 并确认所用素材均为纹脉提供或我有权使用。<br/>
-                <span style={{ color: '#6B5C45', fontSize: 12 }}>
+                <span style={{ color: 'var(--color-text-dim)', fontSize: 12 }}>
                   商用印刷权仍归原作者所有。
                 </span>
               </span>
@@ -217,7 +217,7 @@ function DoneView({ work, onClose }) {
 const overlayStyle = {
   position: 'fixed',
   inset: 0,
-  background: 'rgba(10,8,6,0.88)',
+  background: 'rgba(23,21,19,0.88)',
   backdropFilter: 'blur(8px)',
   WebkitBackdropFilter: 'blur(8px)',
   zIndex: 200,
@@ -230,13 +230,13 @@ const overlayStyle = {
 const modalStyle = {
   position: 'relative',
   background: 'linear-gradient(135deg, #14100A 0%, #1F1812 100%)',
-  border: '1px solid rgba(212,175,55,0.4)',
+  border: '1px solid rgba(201,162,75,0.4)',
   padding: 40,
   maxWidth: 560,
   width: '100%',
   maxHeight: '90vh',
   overflowY: 'auto',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Sans SC', sans-serif",
   boxShadow: '0 30px 80px rgba(0,0,0,0.7)',
 }
@@ -247,7 +247,7 @@ const closeBtnStyle = {
   width: 32, height: 32,
   background: 'transparent',
   border: 'none',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   fontSize: 24,
   cursor: 'pointer',
   lineHeight: 1,
@@ -262,7 +262,7 @@ const headerStyle = {
 const sealStyle = {
   display: 'inline-block',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 500,
   padding: '4px 12px',
@@ -275,7 +275,7 @@ const h2Style = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 26,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   margin: '0 0 12px',
   letterSpacing: '0.05em',
 }
@@ -283,7 +283,7 @@ const h2Style = {
 const subTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   lineHeight: 1.85,
   fontWeight: 300,
 }
@@ -306,15 +306,15 @@ const labelStyle = {
   fontSize: 11,
   letterSpacing: '0.2em',
   textTransform: 'uppercase',
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   marginBottom: 8,
 }
 
 const inputStyle = {
   width: '100%',
-  background: 'rgba(10,8,6,0.5)',
-  border: '1px solid rgba(212,175,55,0.25)',
-  color: '#F2EBDB',
+  background: 'rgba(23,21,19,0.5)',
+  border: '1px solid rgba(201,162,75,0.25)',
+  color: 'var(--color-text-primary)',
   padding: '12px 14px',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 15,
@@ -335,7 +335,7 @@ const selectStyle = {
 const hintStyle = {
   textAlign: 'right',
   fontSize: 11,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 4,
   fontFamily: "'Outfit', sans-serif",
 }
@@ -346,7 +346,7 @@ const forkNoteStyle = {
   border: '1px solid rgba(196,30,58,0.3)',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   lineHeight: 1.8,
   marginBottom: 20,
 }
@@ -356,8 +356,8 @@ const agreeRowStyle = {
   gap: 12,
   alignItems: 'flex-start',
   padding: 16,
-  background: 'rgba(212,175,55,0.05)',
-  border: '1px solid rgba(212,175,55,0.2)',
+  background: 'rgba(201,162,75,0.05)',
+  border: '1px solid rgba(201,162,75,0.2)',
   marginBottom: 24,
   cursor: 'pointer',
 }
@@ -366,14 +366,14 @@ const checkboxStyle = {
   marginTop: 4,
   width: 16,
   height: 16,
-  accentColor: '#D4AF37',
+  accentColor: 'var(--color-gold-main)',
   cursor: 'pointer',
 }
 
 const agreeTextStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   lineHeight: 1.8,
   flex: 1,
 }
@@ -399,8 +399,8 @@ const cancelBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   background: 'transparent',
-  color: '#A89580',
-  border: '1px solid rgba(212,175,55,0.18)',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid rgba(201,162,75,0.18)',
   padding: '14px 24px',
   cursor: 'pointer',
   letterSpacing: '0.2em',
@@ -411,9 +411,9 @@ const submitBtnStyle = (disabled) => ({
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   background: disabled
-    ? 'rgba(212,175,55,0.2)'
-    : 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: disabled ? '#6B5C45' : '#0A0806',
+    ? 'rgba(201,162,75,0.2)'
+    : 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: disabled ? 'var(--color-text-dim)' : 'var(--color-bg-base)',
   border: 'none',
   padding: '14px 24px',
   cursor: disabled ? 'not-allowed' : 'pointer',
@@ -430,8 +430,8 @@ const doneStyle = {
 
 const doneSealStyle = {
   display: 'inline-block',
-  background: '#D4AF37',
-  color: '#0A0806',
+  background: 'var(--color-gold-main)',
+  color: 'var(--color-bg-base)',
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 500,
   padding: '6px 16px',
@@ -444,14 +444,14 @@ const doneTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 24,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   marginBottom: 16,
 }
 
 const doneDescStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   lineHeight: 2,
   marginBottom: 32,
 }
@@ -459,8 +459,8 @@ const doneDescStyle = {
 const doneBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   border: 'none',
   padding: '14px 48px',
   cursor: 'pointer',

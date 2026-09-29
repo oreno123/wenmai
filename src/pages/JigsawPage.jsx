@@ -308,12 +308,12 @@ export default function JigsawPage() {
     return (
       <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>
         <div style={{ padding: '12px 16px' }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>纹样拼图</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 1 }}>纹样拼图</span>
         </div>
 
         {/* Grid size */}
         <div style={{ padding: '8px 16px' }}>
-          <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>难度</div>
+          <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>难度</div>
           <div style={{ display: 'flex', gap: 8 }}>
             {GRID_OPTIONS.map((g, i) => (
               <button
@@ -321,9 +321,9 @@ export default function JigsawPage() {
                 onClick={() => setGridIdx(i)}
                 style={{
                   padding: '8px 16px', borderRadius: 10, fontSize: 13, fontFamily: 'inherit',
-                  background: gridIdx === i ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.04)',
-                  color: gridIdx === i ? '#F2D58A' : '#6A6A6A',
-                  border: gridIdx === i ? '1px solid rgba(212,175,106,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                  background: gridIdx === i ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.04)',
+                  color: gridIdx === i ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+                  border: gridIdx === i ? '1px solid rgba(201,162,75,0.3)' : '1px solid rgba(255,255,255,0.06)',
                   cursor: 'pointer',
                 }}
               >
@@ -336,7 +336,7 @@ export default function JigsawPage() {
 
         {/* Pattern selection */}
         <div style={{ padding: '8px 16px' }}>
-          <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>选择纹样</div>
+          <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>选择纹样</div>
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10,
             maxHeight: '50vh', overflowY: 'auto',
@@ -346,8 +346,8 @@ export default function JigsawPage() {
                 key={p.id}
                 onClick={() => setSelectedPattern(p)}
                 style={{
-                  background: selectedPattern?.id === p.id ? 'rgba(212,175,106,0.12)' : 'rgba(255,255,255,0.02)',
-                  border: selectedPattern?.id === p.id ? '1px solid rgba(212,175,106,0.3)' : '1px solid rgba(255,255,255,0.05)',
+                  background: selectedPattern?.id === p.id ? 'rgba(201,162,75,0.12)' : 'rgba(255,255,255,0.02)',
+                  border: selectedPattern?.id === p.id ? '1px solid rgba(201,162,75,0.3)' : '1px solid rgba(255,255,255,0.05)',
                   borderRadius: 10, padding: 8, cursor: 'pointer',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 }}
@@ -362,7 +362,7 @@ export default function JigsawPage() {
                     borderRadius: p.series === 'shanjing' ? 4 : 0,
                   }}
                 />
-                <span style={{ fontSize: 10, color: '#9A9A9A', textAlign: 'center' }}>{p.name}</span>
+                <span style={{ fontSize: 10, color: 'var(--color-text-secondary)', textAlign: 'center' }}>{p.name}</span>
               </div>
             ))}
           </div>
@@ -375,8 +375,8 @@ export default function JigsawPage() {
             disabled={!selectedPattern}
             style={{
               padding: '12px 40px', borderRadius: 12, fontSize: 15, fontFamily: 'inherit',
-              background: selectedPattern ? 'linear-gradient(145deg, #BC6B2F, #8A4A20)' : 'rgba(255,255,255,0.04)',
-              color: selectedPattern ? '#F5F1E8' : '#4A4A4A',
+              background: selectedPattern ? 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-deep))' : 'rgba(255,255,255,0.04)',
+              color: selectedPattern ? 'var(--color-text-primary)' : 'var(--color-text-dim)',
               border: 'none', cursor: selectedPattern ? 'pointer' : 'default',
             }}
           >
@@ -405,16 +405,16 @@ export default function JigsawPage() {
         padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 1 }}>
             {phase === 'complete' ? '拼图完成!' : '纹样拼图'}
           </span>
           <button
             onClick={() => navigate('/puzzle')}
-            style={{ fontSize: 10, color: '#6A6A6A', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ fontSize: 10, color: 'var(--color-text-secondary)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             返回创作
           </button>
-          <span style={{ fontSize: 11, color: '#6A6A6A', marginLeft: 8 }}>
+          <span style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginLeft: 8 }}>
             {snappedCount}/{totalCount}
           </span>
         </div>
@@ -434,7 +434,7 @@ export default function JigsawPage() {
             height: '100%', width: `${(snappedCount / totalCount) * 100}%`,
             background: phase === 'complete'
               ? 'linear-gradient(90deg, #4CAF50, #81C784)'
-              : 'linear-gradient(90deg, #8B6914, #F2D58A)',
+              : 'linear-gradient(90deg, var(--color-gold-dim), var(--color-gold-bright))',
             borderRadius: 2, transition: 'width 0.3s ease',
           }} />
         </div>
@@ -472,13 +472,13 @@ export default function JigsawPage() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '6px 16px',
       }}>
-        <span style={{ fontSize: 12, color: '#6A6A6A' }}>
+        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
           碎片托盘 {unplacedPieces.length > 0 && `(${unplacedPieces.length})`}
         </span>
         <button
           onClick={() => setShowTray(prev => !prev)}
           style={{
-            background: 'none', border: 'none', color: '#9A9A9A', cursor: 'pointer',
+            background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer',
             fontSize: 12, fontFamily: 'inherit', padding: '4px 8px',
           }}
         >
@@ -513,13 +513,13 @@ export default function JigsawPage() {
                   draggable={false}
                 />
               )}
-              <span style={{ fontSize: 9, color: '#6A6A6A' }}>
+              <span style={{ fontSize: 9, color: 'var(--color-text-secondary)' }}>
                 {piece.row + 1}-{piece.col + 1}
               </span>
             </div>
           ))}
           {unplacedPieces.length === 0 && (
-            <div style={{ padding: '16px 0', color: '#4A4A4A', fontSize: 12 }}>
+            <div style={{ padding: '16px 0', color: 'var(--color-text-dim)', fontSize: 12 }}>
               所有碎片已放置到画布
             </div>
           )}
@@ -532,6 +532,6 @@ export default function JigsawPage() {
 const btnStyle = {
   padding: '5px 14px', borderRadius: 8, fontSize: 13,
   background: 'rgba(255,255,255,0.04)',
-  color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
+  color: 'var(--color-gold-main)', border: '1px solid rgba(255,255,255,0.08)',
   cursor: 'pointer', fontFamily: 'inherit',
 }

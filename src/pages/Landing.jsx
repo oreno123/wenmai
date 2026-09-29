@@ -9,18 +9,18 @@ import PatternImage from '../components/common/PatternImage'
 const PATTERNS_WITH_IMAGES = PATTERN_LIBRARY.filter(p => p.image || p.procedural)
 
 const RARITY_STYLE = {
-  common: { bg: 'rgba(26,26,26,0.9)', text: '#8A8A8A', label: 'N' },
-  rare: { bg: 'rgba(42,38,30,0.9)', text: '#D4AF6A', label: 'SR' },
-  ssr: { bg: 'rgba(140,80,20,0.9)', text: '#F2D58A', label: 'SSR' },
+  common: { bg: 'rgba(26,26,26,0.9)', text: '#A89C88', label: 'N' },
+  rare: { bg: 'rgba(42,38,30,0.9)', text: '#C9A24B', label: 'SR' },
+  ssr: { bg: 'rgba(140,80,20,0.9)', text: '#E3C079', label: 'SSR' },
 }
 
 const FEATURES = [
   {
     icon: (
       <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-        <rect x="3" y="3" width="22" height="22" rx="3" stroke="#D4AF6A" strokeWidth="1.2" />
-        <rect x="7" y="7" width="14" height="14" rx="1" stroke="#F2D58A" strokeWidth="0.7" />
-        <path d="M14 7 L14 21 M7 14 L21 14" stroke="#D4AF6A" strokeWidth="0.3" opacity="0.6" />
+        <rect x="3" y="3" width="22" height="22" rx="3" stroke="#C9A24B" strokeWidth="1.2" />
+        <rect x="7" y="7" width="14" height="14" rx="1" stroke="#E3C079" strokeWidth="0.7" />
+        <path d="M14 7 L14 21 M7 14 L21 14" stroke="#C9A24B" strokeWidth="0.3" opacity="0.6" />
       </svg>
     ),
     title: '抽卡收集',
@@ -29,8 +29,8 @@ const FEATURES = [
   {
     icon: (
       <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-        <path d="M14 3 L25 24 L3 24 Z" stroke="#D4AF6A" strokeWidth="1.2" fill="none" />
-        <circle cx="14" cy="17" r="4" stroke="#F2D58A" strokeWidth="0.7" fill="none" />
+        <path d="M14 3 L25 24 L3 24 Z" stroke="#C9A24B" strokeWidth="1.2" fill="none" />
+        <circle cx="14" cy="17" r="4" stroke="#E3C079" strokeWidth="0.7" fill="none" />
       </svg>
     ),
     title: '创意工坊',
@@ -39,9 +39,9 @@ const FEATURES = [
   {
     icon: (
       <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#F2D58A" strokeWidth="0.7" />
-        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#D4AF6A" strokeWidth="1.2" transform="rotate(60 14 14)" />
-        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#D4AF6A" strokeWidth="1.2" transform="rotate(-60 14 14)" />
+        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#E3C079" strokeWidth="0.7" />
+        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#C9A24B" strokeWidth="1.2" transform="rotate(60 14 14)" />
+        <ellipse cx="14" cy="14" rx="11" ry="5" stroke="#C9A24B" strokeWidth="1.2" transform="rotate(-60 14 14)" />
       </svg>
     ),
     title: '3D 实时预览',
@@ -72,15 +72,15 @@ const sectionReveal = {
 function HuiWenDecor({ size = 100, opacity = 0.1 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" style={{ opacity }}>
-      <rect x="5" y="5" width="90" height="90" stroke="#D4AF6A" strokeWidth="0.8" />
-      <path d="M5 30 L30 30 L30 5" stroke="#D4AF6A" strokeWidth="0.6" fill="none" />
-      <path d="M95 30 L70 30 L70 5" stroke="#D4AF6A" strokeWidth="0.6" fill="none" />
-      <path d="M5 70 L30 70 L30 95" stroke="#D4AF6A" strokeWidth="0.6" fill="none" />
-      <path d="M95 70 L70 70 L70 95" stroke="#D4AF6A" strokeWidth="0.6" fill="none" />
-      <rect x="20" y="20" width="60" height="60" stroke="#D4AF6A" strokeWidth="0.5" />
-      <rect x="35" y="35" width="30" height="30" stroke="#D4AF6A" strokeWidth="0.4" />
-      <circle cx="50" cy="50" r="8" stroke="#F2D58A" strokeWidth="0.4" />
-      <circle cx="50" cy="50" r="2" fill="#D4AF6A" opacity="0.5" />
+      <rect x="5" y="5" width="90" height="90" stroke="#C9A24B" strokeWidth="0.8" />
+      <path d="M5 30 L30 30 L30 5" stroke="#C9A24B" strokeWidth="0.6" fill="none" />
+      <path d="M95 30 L70 30 L70 5" stroke="#C9A24B" strokeWidth="0.6" fill="none" />
+      <path d="M5 70 L30 70 L30 95" stroke="#C9A24B" strokeWidth="0.6" fill="none" />
+      <path d="M95 70 L70 70 L70 95" stroke="#C9A24B" strokeWidth="0.6" fill="none" />
+      <rect x="20" y="20" width="60" height="60" stroke="#C9A24B" strokeWidth="0.5" />
+      <rect x="35" y="35" width="30" height="30" stroke="#C9A24B" strokeWidth="0.4" />
+      <circle cx="50" cy="50" r="8" stroke="#E3C079" strokeWidth="0.4" />
+      <circle cx="50" cy="50" r="2" fill="#C9A24B" opacity="0.5" />
     </svg>
   )
 }
@@ -89,9 +89,9 @@ function HuiWenDecor({ size = 100, opacity = 0.1 }) {
 function GoldDivider() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 14 }}>
-      <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, transparent, rgba(212,175,106,0.3))' }} />
-      <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#D4AF6A', opacity: 0.4 }} />
-      <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, rgba(212,175,106,0.3), transparent)' }} />
+      <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, transparent, rgba(201,162,75,0.3))' }} />
+      <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#C9A24B', opacity: 0.4 }} />
+      <div style={{ width: 36, height: 1, background: 'linear-gradient(90deg, rgba(201,162,75,0.3), transparent)' }} />
     </div>
   )
 }
@@ -217,7 +217,7 @@ export default function Landing() {
           transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
           style={{
             fontFamily: 'Noto Serif SC, STSong, Georgia, serif',
-            fontSize: 48, color: '#F2D58A', fontWeight: 700,
+            fontSize: 48, color: '#E3C079', fontWeight: 700,
             margin: '20px 0 0', lineHeight: 1, position: 'relative', zIndex: 2,
             textShadow: '0 2px 16px rgba(0,0,0,0.5)',
           }}
@@ -230,7 +230,7 @@ export default function Landing() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.7 }}
           style={{
-            fontSize: 11, color: '#D4AF6A', letterSpacing: '0.15em',
+            fontSize: 11, color: '#C9A24B', letterSpacing: '0.15em',
             marginTop: 8, opacity: 0.6, position: 'relative', zIndex: 2,
           }}
         >
@@ -257,7 +257,7 @@ export default function Landing() {
         >
           <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 6 L9 12 L15 6" stroke="#D4AF6A" strokeWidth="1" opacity="0.35" />
+              <path d="M3 6 L9 12 L15 6" stroke="#C9A24B" strokeWidth="1" opacity="0.35" />
             </svg>
           </motion.div>
         </motion.div>
@@ -276,7 +276,7 @@ export default function Landing() {
         <div style={{
           position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)',
           width: 220, height: 220,
-          background: 'radial-gradient(circle, rgba(212,175,106,0.05) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(201,162,75,0.05) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
@@ -295,7 +295,7 @@ export default function Landing() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           style={{
-            fontFamily: 'Noto Serif SC, serif', fontSize: 24, color: '#F2D58A',
+            fontFamily: 'Noto Serif SC, serif', fontSize: 24, color: '#E3C079',
             letterSpacing: '0.2em', marginTop: 20,
           }}
         >
@@ -307,14 +307,14 @@ export default function Landing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          whileHover={{ boxShadow: '0 0 32px rgba(212,175,106,0.25)', borderColor: 'rgba(212,175,106,0.7)' }}
+          whileHover={{ boxShadow: '0 0 32px rgba(201,162,75,0.25)', borderColor: 'rgba(201,162,75,0.7)' }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate('/home')}
           style={{
             background: 'transparent',
-            border: '1px solid rgba(212,175,106,0.45)',
+            border: '1px solid rgba(201,162,75,0.45)',
             borderRadius: 8, padding: '13px 44px',
-            color: '#F2D58A', fontSize: 15,
+            color: '#E3C079', fontSize: 15,
             fontFamily: 'Noto Serif SC, serif',
             letterSpacing: '0.3em', cursor: 'pointer',
             marginTop: 28,
@@ -329,7 +329,7 @@ export default function Landing() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           style={{
-            fontSize: 12, color: '#6A6A6A', marginTop: 44,
+            fontSize: 12, color: '#A89C88', marginTop: 44,
             letterSpacing: '0.05em', lineHeight: 1.8,
           }}
         >
@@ -388,7 +388,7 @@ function AutoCarousel({ series }) {
   return (
     <motion.section {...sectionReveal} style={{ padding: '16px 0 8px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 16px', marginBottom: 8 }}>
-        <span style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 16, color: series.color || '#F2D58A', letterSpacing: '0.05em' }}>
+        <span style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 16, color: series.color || '#E3C079', letterSpacing: '0.05em' }}>
           {series.name}
         </span>
         <span style={{ fontSize: 11, color: '#555' }}>{series.patterns.length} 款</span>
@@ -436,7 +436,7 @@ function AutoCarousel({ series }) {
         }}>
           <img src={getPatternImage(lightbox)} alt={lightbox.name}
             style={{ maxWidth: '85vw', maxHeight: '75vh', objectFit: 'contain', borderRadius: 12 }} />
-          <div style={{ marginTop: 12, fontSize: 15, color: '#F2D58A', fontFamily: 'Noto Serif SC, serif' }}>
+          <div style={{ marginTop: 12, fontSize: 15, color: '#E3C079', fontFamily: 'Noto Serif SC, serif' }}>
             {lightbox.name}
           </div>
           <div style={{ marginTop: 4, fontSize: 12, color: '#777' }}>

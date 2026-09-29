@@ -257,7 +257,7 @@ export function drawPiece(
   ctx.closePath()
 
   // Shadow
-  ctx.shadowColor = isSelected ? 'rgba(201,168,76,0.45)' : 'rgba(0,0,0,0.55)'
+  ctx.shadowColor = isSelected ? 'rgba(201,162,75,0.45)' : 'rgba(0,0,0,0.55)'
   ctx.shadowBlur = isSelected ? 20 : 10
   ctx.shadowOffsetX = 3
   ctx.shadowOffsetY = 3
@@ -280,9 +280,9 @@ export function drawPiece(
   for (const edge of piece.pathCommands) traceEdge(ctx, edge)
   ctx.closePath()
   ctx.strokeStyle = isSelected
-    ? 'rgba(242,213,138,0.75)'
+    ? 'rgba(227,192,121,0.75)'
     : isSnapped
-      ? 'rgba(201,168,76,0.25)'
+      ? 'rgba(201,162,75,0.25)'
       : 'rgba(255,255,255,0.12)'
   ctx.lineWidth = isSelected ? 2.5 : 1.5
   ctx.stroke()

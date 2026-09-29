@@ -188,8 +188,8 @@ function StatCell({ num, label }) {
 
 const pageStyle = {
   minHeight: '100vh',
-  background: '#0A0806',
-  color: '#F2EBDB',
+  background: 'var(--color-bg-base)',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Sans SC', sans-serif",
   fontWeight: 300,
   paddingTop: 80,
@@ -205,8 +205,8 @@ const backBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
-  color: '#A89580',
-  border: '1px solid rgba(212,175,55,0.18)',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid rgba(201,162,75,0.18)',
   padding: '8px 18px',
   cursor: 'pointer',
   letterSpacing: '0.1em',
@@ -231,7 +231,7 @@ const coverWrapStyle = {
   position: 'relative',
   width: '100%',
   aspectRatio: '1/1',
-  background: 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
+  background: 'radial-gradient(ellipse at center, var(--color-text-primary) 0%, #E8DCC2 100%)',
   overflow: 'hidden',
   boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
 }
@@ -250,7 +250,7 @@ const coverFallbackStyle = {
   justifyContent: 'center',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 120,
-  color: '#8B6F1F',
+  color: 'var(--color-gold-dim)',
 }
 
 const rarityTagStyle = {
@@ -259,9 +259,9 @@ const rarityTagStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 11,
   padding: '4px 10px',
-  background: 'rgba(10,8,6,0.78)',
-  border: '1px solid rgba(212,175,55,0.4)',
-  color: '#D4AF37',
+  background: 'rgba(23,21,19,0.78)',
+  border: '1px solid rgba(201,162,75,0.4)',
+  color: 'var(--color-gold-main)',
   letterSpacing: '0.15em',
 }
 
@@ -272,7 +272,7 @@ const seriesTagStyle = {
   fontSize: 11,
   padding: '4px 10px',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   letterSpacing: '0.15em',
 }
 
@@ -286,8 +286,8 @@ const reuseBtnStyle = {
   flex: 2,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   border: 'none',
   padding: '16px 32px',
   cursor: 'pointer',
@@ -301,8 +301,8 @@ const likeBtnStyle = (liked) => ({
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
   background: liked ? 'rgba(196,30,58,0.12)' : 'transparent',
-  color: liked ? '#C41E3A' : '#A89580',
-  border: `1px solid ${liked ? '#C41E3A' : 'rgba(212,175,55,0.18)'}`,
+  color: liked ? '#C41E3A' : 'var(--color-text-secondary)',
+  border: `1px solid ${liked ? '#C41E3A' : 'rgba(201,162,75,0.18)'}`,
   padding: '16px 24px',
   cursor: 'pointer',
   letterSpacing: '0.15em',
@@ -318,7 +318,7 @@ const titleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 'clamp(32px, 4vw, 48px)',
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   letterSpacing: '0.04em',
   lineHeight: 1.3,
   marginBottom: 16,
@@ -332,19 +332,19 @@ const metaStyle = {
   marginBottom: 32,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
 }
 
 const metaItemStyle = {}
-const metaDotStyle = { color: '#6B5C45' }
+const metaDotStyle = { color: 'var(--color-text-dim)' }
 
 const authorCardStyle = {
   display: 'flex',
   alignItems: 'center',
   gap: 16,
   padding: 20,
-  background: 'rgba(31,24,18,0.6)',
-  border: '1px solid rgba(212,175,55,0.18)',
+  background: 'rgba(36,30,25,0.6)',
+  border: '1px solid rgba(201,162,75,0.18)',
   marginBottom: 32,
 }
 
@@ -352,20 +352,20 @@ const avatarStyle = {
   width: 48,
   height: 48,
   borderRadius: '50%',
-  background: 'linear-gradient(135deg, #8B6F1F, #BC6B2F)',
+  background: 'linear-gradient(135deg, var(--color-gold-dim), var(--color-gold-main))',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 20,
-  color: '#0A0806',
+  color: 'var(--color-bg-base)',
   fontWeight: 500,
 }
 
 const authorNameStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 18,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontWeight: 500,
   letterSpacing: '0.05em',
 }
@@ -373,15 +373,15 @@ const authorNameStyle = {
 const authorMetaStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 4,
 }
 
 const statsRowStyle = {
   display: 'flex',
   gap: 0,
-  borderTop: '1px solid rgba(212,175,55,0.18)',
-  borderBottom: '1px solid rgba(212,175,55,0.18)',
+  borderTop: '1px solid rgba(201,162,75,0.18)',
+  borderBottom: '1px solid rgba(201,162,75,0.18)',
   marginBottom: 32,
 }
 
@@ -389,7 +389,7 @@ const statCellStyle = {
   flex: 1,
   padding: '20px 0',
   textAlign: 'center',
-  borderRight: '1px solid rgba(212,175,55,0.18)',
+  borderRight: '1px solid rgba(201,162,75,0.18)',
   ':last-child': { borderRight: 'none' },
 }
 
@@ -397,7 +397,7 @@ const statNumStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontSize: 32,
   fontWeight: 300,
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
   lineHeight: 1,
 }
 
@@ -406,7 +406,7 @@ const statLabelStyle = {
   fontSize: 10,
   letterSpacing: '0.22em',
   textTransform: 'uppercase',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 8,
 }
 
@@ -418,7 +418,7 @@ const forkSourceLabelStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 11,
   letterSpacing: '0.3em',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginBottom: 12,
 }
 
@@ -436,7 +436,7 @@ const forkSourceCardStyle = {
 const forkSourceTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 17,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontWeight: 500,
   letterSpacing: '0.05em',
 }
@@ -445,13 +445,13 @@ const forkSourceAuthorStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 13,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   marginTop: 4,
 }
 
 const arrowStyle = {
   fontSize: 20,
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
 }
 
 const rejectStyle = {
@@ -473,7 +473,7 @@ const rejectLabelStyle = {
 const rejectReasonStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 15,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   lineHeight: 1.8,
   marginBottom: 8,
 }
@@ -481,7 +481,7 @@ const rejectReasonStyle = {
 const rejectHintStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
 }
 
 const forkListStyle = {
@@ -491,11 +491,11 @@ const forkListStyle = {
 const forkListTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   letterSpacing: '0.15em',
   marginBottom: 20,
   paddingBottom: 12,
-  borderBottom: '1px solid rgba(212,175,55,0.18)',
+  borderBottom: '1px solid rgba(201,162,75,0.18)',
 }
 
 const forkGridStyle = {
@@ -522,17 +522,17 @@ const forkItemFallbackStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  background: 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
+  background: 'radial-gradient(ellipse at center, var(--color-text-primary) 0%, #E8DCC2 100%)',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 36,
-  color: '#8B6F1F',
+  color: 'var(--color-gold-dim)',
   marginBottom: 8,
 }
 
 const forkItemTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontWeight: 500,
 }
 
@@ -540,7 +540,7 @@ const forkItemAuthorStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 11,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 2,
 }
 
@@ -550,8 +550,8 @@ const centerMsgStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  background: '#0A0806',
-  color: '#6B5C45',
+  background: 'var(--color-bg-base)',
+  color: 'var(--color-text-dim)',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
 }

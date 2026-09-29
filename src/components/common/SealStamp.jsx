@@ -10,8 +10,8 @@ export default function SealStamp({
   vertical = true,
   stamp = false,
   fontSize = 11,
-  color = '#F5F1E8',
-  red = '#BC1F28',
+  color = 'var(--color-text-primary)',
+  red = 'var(--color-red-accent)',
   style = {},
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '')

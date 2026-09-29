@@ -182,8 +182,8 @@ function AdminContent() {
 
 const pageStyle = {
   minHeight: '100vh',
-  background: '#0A0806',
-  color: '#F2EBDB',
+  background: 'var(--color-bg-base)',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Sans SC', sans-serif",
   fontWeight: 300,
   paddingTop: 60,
@@ -203,8 +203,8 @@ const backBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
-  color: '#A89580',
-  border: '1px solid rgba(212,175,55,0.18)',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid rgba(201,162,75,0.18)',
   padding: '8px 18px',
   cursor: 'pointer',
   letterSpacing: '0.1em',
@@ -213,7 +213,7 @@ const backBtnStyle = {
 const sealStyle = {
   display: 'inline-block',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 500,
   padding: '4px 12px',
@@ -226,7 +226,7 @@ const h1Style = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 36,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   margin: '0 0 8px',
   letterSpacing: '0.05em',
 }
@@ -234,7 +234,7 @@ const h1Style = {
 const subStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
 }
 
 const emptyStyle = {
@@ -242,7 +242,7 @@ const emptyStyle = {
   margin: '0 auto',
   padding: 80,
   textAlign: 'center',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   fontFamily: "'Noto Serif SC', serif",
   lineHeight: 2,
 }
@@ -261,14 +261,14 @@ const cardStyle = {
   gridTemplateColumns: '160px 1fr',
   gap: 24,
   padding: 24,
-  background: 'rgba(31,24,18,0.6)',
-  border: '1px solid rgba(212,175,55,0.18)',
+  background: 'rgba(36,30,25,0.6)',
+  border: '1px solid rgba(201,162,75,0.18)',
 }
 
 const coverWrapStyle = {
   width: 160,
   height: 160,
-  background: 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
+  background: 'radial-gradient(ellipse at center, var(--color-text-primary) 0%, #E8DCC2 100%)',
   overflow: 'hidden',
 }
 
@@ -286,7 +286,7 @@ const coverFallbackStyle = {
   justifyContent: 'center',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 56,
-  color: '#8B6F1F',
+  color: 'var(--color-gold-dim)',
 }
 
 const bodyStyle = {
@@ -298,7 +298,7 @@ const titleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 22,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   letterSpacing: '0.05em',
   marginBottom: 8,
 }
@@ -310,11 +310,11 @@ const metaStyle = {
   flexWrap: 'wrap',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   marginBottom: 16,
 }
 
-const dotStyle = { color: '#6B5C45' }
+const dotStyle = { color: 'var(--color-text-dim)' }
 
 const actionsStyle = {
   display: 'flex',
@@ -325,8 +325,8 @@ const actionsStyle = {
 const approveBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   border: 'none',
   padding: '10px 24px',
   cursor: 'pointer',
@@ -349,8 +349,8 @@ const detailBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
-  color: '#A89580',
-  border: '1px solid rgba(212,175,55,0.18)',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid rgba(201,162,75,0.18)',
   padding: '10px 24px',
   cursor: 'pointer',
   letterSpacing: '0.2em',
@@ -363,9 +363,9 @@ const rejectFormStyle = {
 
 const textareaStyle = {
   width: '100%',
-  background: 'rgba(10,8,6,0.5)',
+  background: 'rgba(23,21,19,0.5)',
   border: '1px solid rgba(196,30,58,0.4)',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   padding: '12px 14px',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
@@ -383,8 +383,8 @@ const cancelBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: 'transparent',
-  color: '#A89580',
-  border: '1px solid rgba(212,175,55,0.18)',
+  color: 'var(--color-text-secondary)',
+  border: '1px solid rgba(201,162,75,0.18)',
   padding: '10px 24px',
   cursor: 'pointer',
   letterSpacing: '0.2em',
@@ -394,7 +394,7 @@ const confirmRejectBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   border: 'none',
   padding: '10px 24px',
   cursor: 'pointer',
@@ -407,9 +407,9 @@ const toastStyle = {
   bottom: 100,
   left: '50%',
   transform: 'translateX(-50%)',
-  background: 'rgba(31,24,18,0.95)',
-  border: '1px solid rgba(212,175,55,0.4)',
-  color: '#D4AF37',
+  background: 'rgba(36,30,25,0.95)',
+  border: '1px solid rgba(201,162,75,0.4)',
+  color: 'var(--color-gold-main)',
   padding: '12px 32px',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,

@@ -109,7 +109,7 @@ export default function CloudShaderBackground({ opacity = 0.6, blur = 1.2 }) {
       inset: 0,
       pointerEvents: 'none',
       opacity,
-      background: '#0A0807',
+      background: '#171513',
       zIndex: 0,
     }} />
   )

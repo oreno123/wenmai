@@ -10,7 +10,7 @@ export function MeanderCorner({ size = 32, opacity = 0.35 }) {
       <path
         d="M2 2 L2 38 L38 38"
         fill="none"
-        stroke="#D4A843"
+        stroke="var(--color-gold-main)"
         strokeWidth="1.2"
         opacity={opacity}
       />
@@ -18,21 +18,21 @@ export function MeanderCorner({ size = 32, opacity = 0.35 }) {
       <path
         d="M2 8 L8 8 L8 2"
         fill="none"
-        stroke="#D4A843"
+        stroke="var(--color-gold-main)"
         strokeWidth="0.8"
         opacity={opacity}
       />
       <path
         d="M2 14 L14 14 L14 2"
         fill="none"
-        stroke="#D4A843"
+        stroke="var(--color-gold-main)"
         strokeWidth="0.6"
         opacity={opacity * 0.7}
       />
       <path
         d="M8 38 L8 20 L20 20 L20 8 L38 8"
         fill="none"
-        stroke="#D4A843"
+        stroke="var(--color-gold-main)"
         strokeWidth="0.5"
         opacity={opacity * 0.5}
       />
@@ -51,13 +51,13 @@ export function ScrollBorder({ width = '100%', height = 16, flip = false }) {
     >
       <defs>
         <linearGradient id="scroll-gold" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#5A420E" stopOpacity="0" />
-          <stop offset="15%" stopColor="#8B6914" />
-          <stop offset="35%" stopColor="#D4A843" />
-          <stop offset="50%" stopColor="#F5D870" />
-          <stop offset="65%" stopColor="#D4A843" />
-          <stop offset="85%" stopColor="#8B6914" />
-          <stop offset="100%" stopColor="#5A420E" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--color-gold-deep)" stopOpacity="0" />
+          <stop offset="15%" stopColor="var(--color-gold-dim)" />
+          <stop offset="35%" stopColor="var(--color-gold-main)" />
+          <stop offset="50%" stopColor="var(--color-gold-bright)" />
+          <stop offset="65%" stopColor="var(--color-gold-main)" />
+          <stop offset="85%" stopColor="var(--color-gold-dim)" />
+          <stop offset="100%" stopColor="var(--color-gold-deep)" stopOpacity="0" />
         </linearGradient>
       </defs>
       {/* 中心线 */}
@@ -82,11 +82,11 @@ export function CirclePattern({ size = 120, opacity = 0.2 }) {
   return (
     <svg width={size} height={size} viewBox="-60 -60 120 120" style={{ display: 'block' }}>
       {/* 外圈 */}
-      <circle cx="0" cy="0" r="55" fill="none" stroke="#D4A843" strokeWidth="0.5" opacity={opacity} />
+      <circle cx="0" cy="0" r="55" fill="none" stroke="var(--color-gold-main)" strokeWidth="0.5" opacity={opacity} />
       {/* 中圈 */}
-      <circle cx="0" cy="0" r="40" fill="none" stroke="#D4A843" strokeWidth="0.3" opacity={opacity * 0.7} />
+      <circle cx="0" cy="0" r="40" fill="none" stroke="var(--color-gold-main)" strokeWidth="0.3" opacity={opacity * 0.7} />
       {/* 内圈 */}
-      <circle cx="0" cy="0" r="25" fill="none" stroke="#F5D870" strokeWidth="0.4" opacity={opacity * 0.5}>
+      <circle cx="0" cy="0" r="25" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.4" opacity={opacity * 0.5}>
         <animate attributeName="r" values="23;27;23" dur="3s" repeatCount="indefinite" />
       </circle>
       {/* 八方位金点 */}
@@ -94,7 +94,7 @@ export function CirclePattern({ size = 120, opacity = 0.2 }) {
         const rad = a * Math.PI / 180
         const x = Math.cos(rad) * 48
         const y = Math.sin(rad) * 48
-        return <circle key={i} cx={x} cy={y} r="1.5" fill="#D4A843" opacity={opacity * 0.8} />
+        return <circle key={i} cx={x} cy={y} r="1.5" fill="var(--color-gold-main)" opacity={opacity * 0.8} />
       })}
       {/* 卷草曲线 */}
       {[0, 60, 120, 180, 240, 300].map((a, i) => {
@@ -110,7 +110,7 @@ export function CirclePattern({ size = 120, opacity = 0.2 }) {
             key={i}
             d={`M${x1},${y1} Q${cx1},${cy1} ${x2},${y2}`}
             fill="none"
-            stroke={i % 2 === 0 ? '#D4A843' : '#F5D870'}
+            stroke={i % 2 === 0 ? 'var(--color-gold-main)' : 'var(--color-gold-bright)'}
             strokeWidth="0.4"
             opacity={opacity * 0.6}
           />
@@ -139,7 +139,7 @@ export function OrnateFrame({ children, style, ssr = false }) {
           width="calc(100% - 2px)" height="calc(100% - 2px)"
           rx="14" ry="14"
           fill="none"
-          stroke={ssr ? '#F5D870' : '#D4A843'}
+          stroke={ssr ? 'var(--color-gold-bright)' : 'var(--color-gold-main)'}
           strokeWidth={ssr ? 1 : 0.5}
           opacity={borderOpacity}
         />
@@ -149,7 +149,7 @@ export function OrnateFrame({ children, style, ssr = false }) {
           width="calc(100% - 12px)" height="calc(100% - 12px)"
           rx="10" ry="10"
           fill="none"
-          stroke="#D4A843"
+          stroke="var(--color-gold-main)"
           strokeWidth="0.3"
           strokeDasharray="8 4 2 4"
           opacity={borderOpacity * 0.5}
@@ -167,7 +167,7 @@ export function OrnateFrame({ children, style, ssr = false }) {
           width="calc(100% - 2px)" height="calc(100% - 2px)"
           rx="14" ry="14"
           fill="none"
-          stroke="#F5D870"
+          stroke="var(--color-gold-bright)"
           strokeWidth="0.3"
           strokeDasharray={ssr ? '60 20 30 40 80 20' : '40 80'}
           opacity={borderOpacity * 0.8}

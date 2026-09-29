@@ -24,19 +24,19 @@ export async function generateShareCard(pattern, seriesInfo) {
 
   // Top brand bar
   const topBar = ctx.createLinearGradient(0, 0, 0, 120)
-  topBar.addColorStop(0, 'rgba(201,148,58,0.15)')
+  topBar.addColorStop(0, 'rgba(201,162,75,0.15)')
   topBar.addColorStop(1, 'transparent')
   ctx.fillStyle = topBar
   ctx.fillRect(0, 0, W, 120)
 
   // Brand text
-  ctx.fillStyle = '#F2D58A'
+  ctx.fillStyle = '#E3C079'
   ctx.font = '700 36px "Noto Serif SC", serif'
   ctx.textAlign = 'center'
   ctx.fillText('纹 脉', W / 2, 72)
 
   // Subtitle
-  ctx.fillStyle = 'rgba(201,162,60,0.4)'
+  ctx.fillStyle = 'rgba(201,162,75,0.4)'
   ctx.font = '400 16px "Noto Serif SC", serif'
   ctx.fillText('中国传统纹样集', W / 2, 102)
 
@@ -53,16 +53,16 @@ export async function generateShareCard(pattern, seriesInfo) {
 
     // Gold border frame
     const framePad = 24
-    ctx.strokeStyle = pattern.rarity === 'ssr' ? 'rgba(201,162,60,0.5)' : 'rgba(201,162,60,0.2)'
+    ctx.strokeStyle = pattern.rarity === 'ssr' ? 'rgba(201,162,75,0.5)' : 'rgba(201,162,75,0.2)'
     ctx.lineWidth = 2
     roundRect(ctx, ix - framePad, iy - framePad, iw + framePad * 2, ih + framePad * 2, 16)
     ctx.stroke()
 
     // SSR glow
     if (pattern.rarity === 'ssr') {
-      ctx.shadowColor = 'rgba(201,162,60,0.3)'
+      ctx.shadowColor = 'rgba(201,162,75,0.3)'
       ctx.shadowBlur = 40
-      ctx.strokeStyle = 'rgba(201,162,60,0.4)'
+      ctx.strokeStyle = 'rgba(201,162,75,0.4)'
       roundRect(ctx, ix - framePad, iy - framePad, iw + framePad * 2, ih + framePad * 2, 16)
       ctx.stroke()
       ctx.shadowColor = 'transparent'
@@ -74,33 +74,33 @@ export async function generateShareCard(pattern, seriesInfo) {
 
   // Pattern name
   const nameY = 720
-  ctx.fillStyle = pattern.rarity === 'ssr' ? '#F2D58A' : '#F5F1E8'
+  ctx.fillStyle = pattern.rarity === 'ssr' ? '#E3C079' : '#D8CDBA'
   ctx.font = '700 42px "Noto Serif SC", serif'
   ctx.textAlign = 'center'
   ctx.fillText(pattern.name, W / 2, nameY)
 
   // Rarity badge
-  const rarityColors = { ssr: '#F2D58A', rare: '#D4AF6A', common: '#8A8A8A' }
+  const rarityColors = { ssr: '#E3C079', rare: '#C9A24B', common: '#A89C88' }
   const rarityLabels = { ssr: '传说', rare: '稀有', common: '普通' }
   const rarityText = rarityLabels[pattern.rarity] || '普通'
   ctx.font = '600 22px "Noto Serif SC", serif'
   const rarityW = ctx.measureText(rarityText).width + 32
   const rx = (W - rarityW) / 2
-  ctx.fillStyle = pattern.rarity === 'ssr' ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.06)'
+  ctx.fillStyle = pattern.rarity === 'ssr' ? 'rgba(201,162,75,0.2)' : 'rgba(255,255,255,0.06)'
   roundRect(ctx, rx, nameY + 16, rarityW, 36, 18)
   ctx.fill()
-  ctx.fillStyle = rarityColors[pattern.rarity] || '#8A8A8A'
+  ctx.fillStyle = rarityColors[pattern.rarity] || '#A89C88'
   ctx.font = '600 20px "Noto Serif SC", serif'
   ctx.fillText(rarityText, W / 2, nameY + 41)
 
   // Series + type
   const seriesName = seriesInfo?.name || pattern.series
-  ctx.fillStyle = 'rgba(201,162,60,0.5)'
+  ctx.fillStyle = 'rgba(201,162,75,0.5)'
   ctx.font = '400 20px "Noto Serif SC", serif'
   ctx.fillText(`${seriesName} · ${pattern.type}`, W / 2, nameY + 80)
 
   // Divider line
-  ctx.strokeStyle = 'rgba(201,162,60,0.12)'
+  ctx.strokeStyle = 'rgba(201,162,75,0.12)'
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(W * 0.2, nameY + 110)
@@ -109,20 +109,20 @@ export async function generateShareCard(pattern, seriesInfo) {
 
   // Tags
   if (pattern.tags && pattern.tags.length > 0) {
-    ctx.fillStyle = 'rgba(201,162,60,0.35)'
+    ctx.fillStyle = 'rgba(201,162,75,0.35)'
     ctx.font = '400 18px "Noto Serif SC", serif'
     ctx.fillText(pattern.tags.join(' · '), W / 2, nameY + 145)
   }
 
   // Bottom decoration
-  ctx.fillStyle = 'rgba(201,162,60,0.08)'
+  ctx.fillStyle = 'rgba(201,162,75,0.08)'
   ctx.font = '400 16px "Noto Serif SC", serif'
   ctx.fillText('收集中国传统纹样 传承千年之美', W / 2, H - 80)
 
   // Bottom bar
   const bottomBar = ctx.createLinearGradient(0, H - 40, W, H - 40)
   bottomBar.addColorStop(0, 'transparent')
-  bottomBar.addColorStop(0.5, 'rgba(201,162,60,0.15)')
+  bottomBar.addColorStop(0.5, 'rgba(201,162,75,0.15)')
   bottomBar.addColorStop(1, 'transparent')
   ctx.fillStyle = bottomBar
   ctx.fillRect(0, H - 40, W, 2)

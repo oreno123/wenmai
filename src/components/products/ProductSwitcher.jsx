@@ -11,7 +11,7 @@ export default function ProductSwitcher({ active, onChange }) {
       display: 'flex', gap: '8px', padding: '8px 16px',
       borderTop: '1px solid var(--border-gold)',
       borderBottom: '1px solid var(--border-gold)',
-      background: 'rgba(15,15,16,0.9)',
+      background: 'rgba(23,21,19,0.9)',
     }}>
       {PRODUCTS.map(p => (
         <button
@@ -22,7 +22,7 @@ export default function ProductSwitcher({ active, onChange }) {
             padding: '8px',
             borderRadius: '8px',
             border: `1px solid ${active === p.id ? 'var(--gold-main)' : 'var(--border-gold)'}`,
-            background: active === p.id ? 'rgba(212,175,106,0.15)' : 'transparent',
+            background: active === p.id ? 'rgba(201,162,75,0.15)' : 'transparent',
             color: active === p.id ? 'var(--gold-main)' : 'var(--text-secondary)',
             fontSize: '13px',
             fontWeight: active === p.id ? 600 : 400,

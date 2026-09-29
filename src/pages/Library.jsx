@@ -39,12 +39,12 @@ export default function Library() {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <h1 style={{
               fontFamily: 'Noto Serif SC, serif', fontSize: 22, fontWeight: 600,
-              color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
+              color: 'var(--color-gold-bright)', letterSpacing: '0.15em', margin: 0,
             }}>
               图鉴
             </h1>
             <span style={{
-              fontSize: 9, color: '#8A6A30', letterSpacing: '0.35em',
+              fontSize: 9, color: 'var(--color-gold-dim)', letterSpacing: '0.35em',
               textTransform: 'uppercase', fontWeight: 500,
             }}>
               Collection
@@ -56,9 +56,9 @@ export default function Library() {
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               fontSize: 11, padding: '5px 12px', borderRadius: 14,
-              background: myPatterns.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,106,0.1)',
-              color: myPatterns.length === 0 ? '#4A4A4A' : '#F2D58A',
-              border: myPatterns.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(212,175,106,0.25)',
+              background: myPatterns.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(201,162,75,0.1)',
+              color: myPatterns.length === 0 ? 'var(--color-text-dim)' : 'var(--color-gold-bright)',
+              border: myPatterns.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(201,162,75,0.25)',
               cursor: myPatterns.length === 0 ? 'default' : 'pointer',
               fontFamily: 'inherit', letterSpacing: '0.08em',
               transition: 'all 0.2s',
@@ -79,18 +79,18 @@ export default function Library() {
             flex: 1, height: 4,
             background: 'rgba(255,255,255,0.04)',
             borderRadius: 2, overflow: 'hidden',
-            border: '1px solid rgba(212,175,106,0.06)',
+            border: '1px solid rgba(201,162,75,0.06)',
           }}>
             <div style={{
               height: '100%', width: `${(collected / total) * 100}%`,
-              background: 'linear-gradient(90deg, #BC6B2F, #F2D58A)',
+              background: 'linear-gradient(90deg, var(--color-gold-main), var(--color-gold-bright))',
               borderRadius: 2,
-              boxShadow: '0 0 8px rgba(242,213,138,0.4)',
+              boxShadow: '0 0 8px rgba(227,192,121,0.4)',
               transition: 'width 0.5s ease',
             }} />
           </div>
           <span style={{
-            fontSize: 11, color: '#8A6A30',
+            fontSize: 11, color: 'var(--color-gold-dim)',
             fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
             minWidth: 56, textAlign: 'right',
           }}>
@@ -102,8 +102,8 @@ export default function Library() {
       {/* Tab */}
       <div style={{
         display: 'flex', marginBottom: 14,
-        background: 'rgba(15,15,16,0.5)',
-        border: '1px solid rgba(212,175,106,0.08)',
+        background: 'rgba(23,21,19,0.5)',
+        border: '1px solid rgba(201,162,75,0.08)',
         borderRadius: 12, padding: 4,
       }}>
         {TABS.map(t => (
@@ -112,11 +112,11 @@ export default function Library() {
             onClick={() => setTab(t.id)}
             style={{
               flex: 1, padding: '8px 12px', borderRadius: 9,
-              background: tab === t.id ? 'linear-gradient(145deg, rgba(212,175,106,0.18), rgba(212,175,106,0.06))' : 'transparent',
-              color: tab === t.id ? '#F2D58A' : '#6A6A6A',
+              background: tab === t.id ? 'linear-gradient(145deg, rgba(201,162,75,0.18), rgba(201,162,75,0.06))' : 'transparent',
+              color: tab === t.id ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
               fontSize: 12, fontWeight: 500, cursor: 'pointer',
               fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
-              border: tab === t.id ? '1px solid rgba(212,175,106,0.25)' : '1px solid transparent',
+              border: tab === t.id ? '1px solid rgba(201,162,75,0.25)' : '1px solid transparent',
               transition: 'all 0.2s',
             }}
           >
@@ -151,14 +151,14 @@ export default function Library() {
                 {!owned && (
                   <div style={{
                     position: 'absolute', inset: 0,
-                    background: 'rgba(8,6,4,0.7)',
+                    background: 'rgba(23,21,19,0.7)',
                     backdropFilter: 'blur(2px)',
                     WebkitBackdropFilter: 'blur(2px)',
                     borderRadius: '16px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="#D4AF6A" strokeWidth="1.2" opacity="0.55"
+                      stroke="var(--color-gold-main)" strokeWidth="1.2" opacity="0.55"
                       strokeLinecap="round" strokeLinejoin="round">
                       <rect x="5" y="11" width="14" height="10" rx="2" />
                       <path d="M8 11V7a4 4 0 1 1 8 0v4" />
@@ -194,13 +194,13 @@ export default function Library() {
 }
 
 function pillStyle(active, accent) {
-  const c = accent || '#F2D58A'
+  const c = accent || 'var(--color-gold-bright)'
   return {
     padding: '5px 14px', borderRadius: 14, fontSize: 12, whiteSpace: 'nowrap',
-    background: active ? `${c === '#F2D58A' ? 'rgba(212,175,106,0.15)' : 'rgba(212,175,106,0.12)'}` : 'rgba(255,255,255,0.02)',
-    color: active ? c : '#7A7060',
+    background: active ? `${c === 'var(--color-gold-bright)' ? 'rgba(201,162,75,0.15)' : 'rgba(201,162,75,0.12)'}` : 'rgba(255,255,255,0.02)',
+    color: active ? c : 'var(--color-text-dim)',
     border: active
-      ? `1px solid ${c === '#F2D58A' ? 'rgba(212,175,106,0.3)' : c + '40'}`
+      ? `1px solid ${c === 'var(--color-gold-bright)' ? 'rgba(201,162,75,0.3)' : c + '40'}`
       : '1px solid rgba(255,255,255,0.04)',
     cursor: 'pointer',
     fontFamily: 'Noto Serif SC, serif',

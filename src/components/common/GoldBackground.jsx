@@ -72,7 +72,7 @@ export default function GoldBackground() {
         const x2 = r.x + Math.cos(r.angle) * r.len;
         const y2 = r.y + Math.sin(r.angle) * r.len;
         const grad = ctx.createLinearGradient(r.x, r.y, x2, y2);
-        grad.addColorStop(0, "rgba(242,213,138,0)");
+        grad.addColorStop(0, "rgba(227,192,121,0)");
         grad.addColorStop(0.15, `rgba(252,230,160,${r.alpha * flicker * 1.4})`);
         grad.addColorStop(0.5, `rgba(222,185,100,${r.alpha * flicker})`);
         grad.addColorStop(0.85, `rgba(188,130,50,${r.alpha * 0.4 * flicker})`);

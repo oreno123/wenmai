@@ -64,7 +64,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-16 flex items-end justify-around z-[100]"
       style={{
         background: 'rgba(10,10,10,0.95)',
-        borderTop: '1px solid rgba(212,175,106,0.12)',
+        borderTop: '1px solid rgba(201,162,75,0.12)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -72,7 +72,7 @@ export default function BottomNav() {
       {TABS.map(tab => {
         const active = pathname === tab.path
         // 非选中也从纯装饰灰提到次级文字灰，Tab 标签满足 AA 对比度
-        const color = active ? '#F2D58A' : 'var(--color-text-secondary)'
+        const color = active ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)'
 
         if (tab.center) {
           return (
@@ -83,7 +83,7 @@ export default function BottomNav() {
                   background: 'linear-gradient(145deg, var(--color-accent-transient), var(--color-accent-transient-deep))',
                   boxShadow: '0 0 24px rgba(212,129,58,0.45)',
                 }}>
-                {ICONS[tab.icon]('#F5F1E8')}
+                {ICONS[tab.icon]('var(--color-text-primary)')}
               </div>
               <span className={`text-[10px] mt-0.5 ${active ? 'text-gold-bright' : 'text-text-secondary'}`}>
                 {tab.label}

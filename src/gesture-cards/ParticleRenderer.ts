@@ -1,9 +1,9 @@
 import type { Particle, HandData, SwipeEvent } from './types'
 
-const GOLD_COLORS = ['#F2D58A', '#D4AF6A', '#FFE9B8']
+const GOLD_COLORS = ['#E3C079', '#C9A24B', '#FFE9B8']
 const CORE_COLOR = '#FFF8E0'
-const SILK_COLOR = 'rgba(242,213,138,0.55)'
-const SILK_GLOW_COLOR = 'rgba(242,213,138,0.15)'
+const SILK_COLOR = 'rgba(227,192,121,0.55)'
+const SILK_GLOW_COLOR = 'rgba(227,192,121,0.15)'
 
 // MediaPipe hand landmark indices for fingertips
 const FINGERTIPS = [4, 8, 12, 16, 20]
@@ -105,7 +105,7 @@ export class ParticleRenderer {
         // Outer halo
         ctx.beginPath()
         ctx.arc(x, y, 14, 0, Math.PI * 2)
-        ctx.fillStyle = '#F2D58A'
+        ctx.fillStyle = '#E3C079'
         ctx.globalAlpha = 0.12
         ctx.fill()
 

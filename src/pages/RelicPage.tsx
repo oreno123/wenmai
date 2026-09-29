@@ -439,10 +439,10 @@ export default function RelicPage() {
           alignItems: 'baseline',
           gap: 16,
           padding: '22px 32px 10px',
-          borderBottom: '1px solid rgba(201,162,60,0.18)',
+          borderBottom: '1px solid rgba(201,162,75,0.18)',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 22, letterSpacing: 4, color: '#d4af37' }}>
+        <h1 style={{ margin: 0, fontSize: 22, letterSpacing: 4, color: '#C9A24B' }}>
           3D 文物纹样提取
         </h1>
         <span style={{ fontSize: 12.5, opacity: 0.7, letterSpacing: 1 }}>
@@ -454,8 +454,8 @@ export default function RelicPage() {
           style={{
             marginLeft: 'auto',
             background: 'transparent',
-            border: '1px solid rgba(201,162,60,0.4)',
-            color: '#d4af37',
+            border: '1px solid rgba(201,162,75,0.4)',
+            color: '#C9A24B',
             borderRadius: 999,
             padding: '5px 16px',
             cursor: 'pointer',
@@ -501,7 +501,7 @@ export default function RelicPage() {
                   alignItems: 'center',
                   gap: 10,
                   background: switcherOpen ? 'rgba(28,22,12,0.92)' : 'rgba(20,16,8,0.72)',
-                  border: '1px solid rgba(212,175,55,0.42)',
+                  border: '1px solid rgba(201,162,75,0.42)',
                   color: '#ffe6a8',
                   borderRadius: 10,
                   padding: '8px 14px',
@@ -538,7 +538,7 @@ export default function RelicPage() {
                     maxHeight: '52vh',
                     overflowY: 'auto',
                     background: 'rgba(24,18,10,0.94)',
-                    border: '1px solid rgba(212,175,55,0.32)',
+                    border: '1px solid rgba(201,162,75,0.32)',
                     borderRadius: 12,
                     padding: 10,
                     display: 'grid',
@@ -557,9 +557,9 @@ export default function RelicPage() {
                         gap: 9,
                         padding: '7px 8px',
                         background:
-                          m.id === model.id ? 'rgba(212,175,55,0.16)' : 'rgba(255,255,255,0.03)',
+                          m.id === model.id ? 'rgba(201,162,75,0.16)' : 'rgba(255,255,255,0.03)',
                         border: `1px solid ${
-                          m.id === model.id ? 'rgba(212,175,55,0.55)' : 'rgba(255,255,255,0.07)'
+                          m.id === model.id ? 'rgba(201,162,75,0.55)' : 'rgba(255,255,255,0.07)'
                         }`,
                         borderRadius: 9,
                         cursor: 'pointer',
@@ -625,7 +625,7 @@ export default function RelicPage() {
                   left: '50%',
                   transform: 'translateX(-50%)',
                   background: 'rgba(20,16,8,0.88)',
-                  border: '1px solid rgba(212,175,55,0.5)',
+                  border: '1px solid rgba(201,162,75,0.5)',
                   color: '#ffe6a8',
                   padding: '8px 22px',
                   borderRadius: 8,
@@ -672,7 +672,7 @@ export default function RelicPage() {
               onClick={extractAll}
               disabled={done}
               style={{
-                background: done ? 'rgba(201,162,60,0.15)' : 'linear-gradient(135deg,#d4af37,#a8862f)',
+                background: done ? 'rgba(201,162,75,0.15)' : 'linear-gradient(135deg,#C9A24B,#a8862f)',
                 color: done ? 'rgba(232,220,192,0.4)' : '#1a1408',
                 border: 'none',
                 borderRadius: 8,
@@ -681,7 +681,7 @@ export default function RelicPage() {
                 cursor: done ? 'default' : 'pointer',
                 fontSize: 13.5,
                 letterSpacing: 1,
-                boxShadow: done ? 'none' : '0 4px 18px rgba(212,175,55,0.35)',
+                boxShadow: done ? 'none' : '0 4px 18px rgba(201,162,75,0.35)',
               }}
             >
               {done ? '已全部提取' : `一键提取全部 (${picked.size}/${elems.length})`}
@@ -691,8 +691,8 @@ export default function RelicPage() {
                 onClick={reset}
                 style={{
                   background: 'transparent',
-                  border: '1px solid rgba(201,162,60,0.35)',
-                  color: '#d4af37',
+                  border: '1px solid rgba(201,162,75,0.35)',
+                  color: '#C9A24B',
                   borderRadius: 8,
                   padding: '10px 16px',
                   cursor: 'pointer',
@@ -710,7 +710,7 @@ export default function RelicPage() {
           style={{
             width: 330,
             background: 'rgba(24,18,10,0.55)',
-            borderLeft: '1px solid rgba(201,162,60,0.28)',
+            borderLeft: '1px solid rgba(201,162,75,0.28)',
             padding: '20px 22px',
             overflowY: 'auto',
             display: 'flex',
@@ -721,7 +721,7 @@ export default function RelicPage() {
         >
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontSize: 14.5, letterSpacing: 2, color: '#d4af37' }}>纹样基因库</span>
+              <span style={{ fontSize: 14.5, letterSpacing: 2, color: '#C9A24B' }}>纹样基因库</span>
               <span style={{ fontSize: 12, opacity: 0.7 }}>
                 {picked.size} / {elems.length} · {pct}%
               </span>
@@ -731,7 +731,7 @@ export default function RelicPage() {
                 marginTop: 10,
                 height: 3,
                 borderRadius: 2,
-                background: 'rgba(201,162,60,0.15)',
+                background: 'rgba(201,162,75,0.15)',
                 overflow: 'hidden',
               }}
             >
@@ -826,7 +826,7 @@ export default function RelicPage() {
           {picked.size === 0 && (
             <div
               style={{
-                border: '1px dashed rgba(201,162,60,0.3)',
+                border: '1px dashed rgba(201,162,75,0.3)',
                 borderRadius: 12,
                 padding: '28px 18px',
                 textAlign: 'center',
@@ -849,7 +849,7 @@ export default function RelicPage() {
               fontSize: 11,
               opacity: 0.42,
               lineHeight: 1.8,
-              borderTop: '1px solid rgba(201,162,60,0.15)',
+              borderTop: '1px solid rgba(201,162,75,0.15)',
               paddingTop: 12,
             }}
           >

@@ -7,9 +7,9 @@ import { getArtifactsForPattern, ARTIFACT_DIR } from '../data/artifactMap'
 import PatternImage from '../components/common/PatternImage'
 import SealStamp from '../components/common/SealStamp'
 
-const GOLD_MAIN = '#D4AF6A'
-const GOLD_BRIGHT = '#F2D58A'
-const TEXT_PRIMARY = '#F5F1E8'
+const GOLD_MAIN = 'var(--color-gold-main)'
+const GOLD_BRIGHT = 'var(--color-gold-bright)'
+const TEXT_PRIMARY = 'var(--color-text-primary)'
 const TEXT_SECONDARY = 'var(--color-text-secondary)'
 
 /* 章节小标：编号 + 题 + 渐隐线 */
@@ -18,11 +18,11 @@ function Part({ no, title, children }) {
     <div style={{ marginTop: 48 }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        fontSize: 11, color: '#8A6A30', letterSpacing: '0.35em',
+        fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: '0.35em',
       }}>
         <span>{no}</span>
         <span>{title}</span>
-        <span style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(212,175,106,0.35), transparent)' }} />
+        <span style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(201,162,75,0.35), transparent)' }} />
       </div>
       {children}
     </div>
@@ -64,7 +64,7 @@ export default function PatternDetailPage() {
         </button>
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', minHeight: '60vh', color: '#4A4A4A',
+          justifyContent: 'center', minHeight: '60vh', color: 'var(--color-text-dim)',
         }}>
           <span style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>&#9788;</span>
           <span style={{ fontSize: '16px', color: TEXT_SECONDARY }}>纹样未找到</span>
@@ -98,7 +98,7 @@ export default function PatternDetailPage() {
         )}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(10,9,7,0.3) 0%, rgba(12,11,9,0.08) 40%, #0F0F10 100%)',
+          background: 'linear-gradient(180deg, rgba(10,9,7,0.3) 0%, rgba(12,11,9,0.08) 40%, var(--color-bg-base) 100%)',
         }} />
 
         {/* 返回 */}
@@ -129,7 +129,7 @@ export default function PatternDetailPage() {
         {bgArtifact && (
           <div style={{
             position: 'absolute', bottom: 16, left: 16, zIndex: 1,
-            fontSize: 10, color: 'rgba(245,241,232,0.78)', letterSpacing: '0.15em',
+            fontSize: 10, color: 'rgba(216,205,186,0.78)', letterSpacing: '0.15em',
             background: 'rgba(10,9,7,0.55)', padding: '4px 10px', borderRadius: 10,
             backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
           }}>
@@ -161,9 +161,9 @@ export default function PatternDetailPage() {
           marginTop: 32, aspectRatio: '1.05', borderRadius: 3,
           background: 'radial-gradient(ellipse at 50% 42%, #1A1710, #0D0B08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-          border: '1px solid rgba(212,175,106,0.16)',
+          border: '1px solid rgba(201,162,75,0.16)',
         }}>
-          <div style={{ position: 'absolute', inset: 12, border: '1px solid rgba(212,175,106,0.12)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', inset: 12, border: '1px solid rgba(201,162,75,0.12)', pointerEvents: 'none' }} />
           <PatternImage
             src={imgSrc}
             alt={pattern.name}
@@ -171,7 +171,7 @@ export default function PatternDetailPage() {
             style={{
               maxWidth: '78%', maxHeight: '78%', objectFit: 'contain',
               filter: pattern.rarity === 'ssr'
-                ? 'drop-shadow(0 8px 34px rgba(201,162,60,0.35))'
+                ? 'drop-shadow(0 8px 34px rgba(201,162,75,0.35))'
                 : 'drop-shadow(0 8px 34px rgba(0,0,0,0.7))',
             }}
           />
@@ -179,7 +179,7 @@ export default function PatternDetailPage() {
           <div style={{
             position: 'absolute', top: 12, left: 12,
             fontSize: 10, color: GOLD_BRIGHT, letterSpacing: '0.2em',
-            background: 'rgba(15,15,16,0.7)', border: '1px solid rgba(212,175,106,0.35)',
+            background: 'rgba(23,21,19,0.7)', border: '1px solid rgba(201,162,75,0.35)',
             padding: '3px 10px', borderRadius: 10,
           }}>{getRarityLabel(pattern.rarity)}</div>
           {/* 收藏钤印：未藏=空心剪影，已藏=落章动效实心 */}
@@ -210,7 +210,7 @@ export default function PatternDetailPage() {
           <div style={{ margin: '48px 12px 0', textAlign: 'center', position: 'relative', padding: '32px 10px' }}>
             <div style={{
               position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
+              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, var(--color-gold-main), transparent)',
             }} />
             <div style={{
               fontSize: 18, lineHeight: 2.1, color: GOLD_BRIGHT,
@@ -218,10 +218,10 @@ export default function PatternDetailPage() {
             }}>
               {description.significance}
             </div>
-            <div style={{ marginTop: 16, fontSize: 11, color: '#8A6A30', letterSpacing: '0.3em' }}>— 它 的 寓 意</div>
+            <div style={{ marginTop: 16, fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: '0.3em' }}>— 它 的 寓 意</div>
             <div style={{
               position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, #D4AF6A, transparent)',
+              width: 60, height: 1, background: 'linear-gradient(90deg, transparent, var(--color-gold-main), transparent)',
             }} />
           </div>
         )}
@@ -242,11 +242,11 @@ export default function PatternDetailPage() {
         {description?.funFact && (
           <div style={{
             marginTop: 48, padding: '24px 20px', borderRadius: 4,
-            background: 'rgba(212,175,106,0.05)', border: '1px solid rgba(212,175,106,0.16)',
+            background: 'rgba(201,162,75,0.05)', border: '1px solid rgba(201,162,75,0.16)',
             position: 'relative',
           }}>
             <span style={{
-              position: 'absolute', top: -9, left: 16, background: '#0F0F10',
+              position: 'absolute', top: -9, left: 16, background: 'var(--color-bg-base)',
               padding: '0 10px', fontSize: 11, color: GOLD_MAIN, letterSpacing: '0.3em',
             }}>掌 故</span>
             <p style={{ fontSize: 13, lineHeight: 2.1, color: '#B8B2A6' }}>
@@ -262,8 +262,8 @@ export default function PatternDetailPage() {
               <span key={tag} style={{
                 fontSize: 11,
                 padding: '3px 10px', borderRadius: 12,
-                background: 'rgba(212,175,106,0.08)',
-                border: '1px solid rgba(212,175,106,0.12)',
+                background: 'rgba(201,162,75,0.08)',
+                border: '1px solid rgba(201,162,75,0.12)',
                 color: GOLD_MAIN,
                 whiteSpace: 'nowrap',
               }}>
@@ -274,17 +274,17 @@ export default function PatternDetailPage() {
         )}
 
         {/* ── 收束 CTA ── */}
-        <div style={{ marginTop: 48, textAlign: 'center', paddingTop: 32, borderTop: '1px solid rgba(212,175,106,0.14)' }}>
+        <div style={{ marginTop: 48, textAlign: 'center', paddingTop: 32, borderTop: '1px solid rgba(201,162,75,0.14)' }}>
           <div style={{ fontSize: 15, color: GOLD_BRIGHT, letterSpacing: '0.2em', lineHeight: 2 }}>
             {isOwned ? '这道纹样，是某个古人的呼吸' : '这道纹样，还在等你收下'}
           </div>
-          <div style={{ fontSize: 11, fontStyle: 'italic', color: '#8A6A30', marginTop: 8, fontFamily: 'Georgia, serif' }}>
+          <div style={{ fontSize: 11, fontStyle: 'italic', color: 'var(--color-gold-dim)', marginTop: 8, fontFamily: 'Georgia, serif' }}>
             {isOwned ? 'A craftsman\'s breath, thousands of years ago' : 'Collect it, then keep it alive'}
           </div>
           <button
             onClick={() => navigate(isOwned ? '/puzzle' : '/gacha')}
             style={{
-              marginTop: 24, background: 'transparent', border: '1px solid rgba(212,175,106,0.5)',
+              marginTop: 24, background: 'transparent', border: '1px solid rgba(201,162,75,0.5)',
               color: GOLD_BRIGHT, fontFamily: 'inherit', fontSize: 13,
               letterSpacing: '0.4em', textIndent: '0.4em', padding: '12px 42px', borderRadius: 3, cursor: 'pointer',
             }}

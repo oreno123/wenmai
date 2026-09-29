@@ -273,8 +273,8 @@ function PublishCTA({ onPublish }) {
 
 const pageStyle = {
   minHeight: '100vh',
-  background: '#0A0806',
-  color: '#F2EBDB',
+  background: 'var(--color-bg-base)',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Sans SC', sans-serif",
   fontWeight: 300,
   paddingTop: 0,
@@ -284,13 +284,13 @@ const heroStyle = {
   position: 'relative',
   padding: '160px 64px 60px',
   textAlign: 'center',
-  borderBottom: '1px solid rgba(212,175,55,0.18)',
+  borderBottom: '1px solid rgba(201,162,75,0.18)',
 }
 
 const sealTagStyle = {
   display: 'inline-block',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 500,
   padding: '5px 14px',
@@ -304,7 +304,7 @@ const h1Style = {
   fontSize: 'clamp(40px, 5.5vw, 68px)',
   fontWeight: 500,
   lineHeight: 1.25,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   marginBottom: 24,
   letterSpacing: '0.04em',
   margin: '0 0 24px',
@@ -313,7 +313,7 @@ const h1Style = {
 const emStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
   fontWeight: 400,
 }
 
@@ -321,7 +321,7 @@ const ledeStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 300,
   fontSize: 17,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   maxWidth: 560,
   margin: '0 auto',
   lineHeight: 1.95,
@@ -333,7 +333,7 @@ const metaRowStyle = {
   gap: 48,
   marginTop: 36,
   paddingTop: 32,
-  borderTop: '1px solid rgba(212,175,55,0.18)',
+  borderTop: '1px solid rgba(201,162,75,0.18)',
   maxWidth: 560,
   marginLeft: 'auto',
   marginRight: 'auto',
@@ -345,7 +345,7 @@ const numStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontSize: 32,
   fontWeight: 300,
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
   lineHeight: 1,
 }
 
@@ -354,7 +354,7 @@ const labelStyle = {
   fontSize: 10,
   letterSpacing: '0.22em',
   textTransform: 'uppercase',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 6,
 }
 
@@ -362,11 +362,11 @@ const filterBarStyle = {
   position: 'sticky',
   top: 0,
   zIndex: 50,
-  background: 'rgba(10,8,6,0.92)',
+  background: 'rgba(23,21,19,0.92)',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
-  borderTop: '1px solid rgba(212,175,55,0.18)',
-  borderBottom: '1px solid rgba(212,175,55,0.18)',
+  borderTop: '1px solid rgba(201,162,75,0.18)',
+  borderBottom: '1px solid rgba(201,162,75,0.18)',
   padding: '18px 48px',
   display: 'flex',
   alignItems: 'center',
@@ -386,7 +386,7 @@ const filterLabelStyle = {
   fontSize: 10,
   letterSpacing: '0.24em',
   textTransform: 'uppercase',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginRight: 4,
 }
 
@@ -395,8 +395,8 @@ const chipStyle = {
   fontSize: 13,
   padding: '7px 16px',
   background: 'transparent',
-  border: '1px solid rgba(212,175,55,0.18)',
-  color: '#A89580',
+  border: '1px solid rgba(201,162,75,0.18)',
+  color: 'var(--color-text-secondary)',
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
   letterSpacing: '0.1em',
@@ -404,15 +404,15 @@ const chipStyle = {
 
 const chipActiveStyle = {
   ...chipStyle,
-  borderColor: '#D4AF37',
-  color: '#D4AF37',
-  background: 'rgba(212,175,55,0.08)',
+  borderColor: 'var(--color-gold-main)',
+  color: 'var(--color-gold-main)',
+  background: 'rgba(201,162,75,0.08)',
 }
 
 const dividerStyle = {
   width: 1,
   height: 18,
-  background: 'rgba(212,175,55,0.18)',
+  background: 'rgba(201,162,75,0.18)',
   margin: '0 8px',
 }
 
@@ -424,7 +424,7 @@ const curatedWrapStyle = {
 
 const curatedCardStyle = {
   position: 'relative',
-  background: 'linear-gradient(135deg, rgba(31,24,18,0.95) 0%, rgba(45,34,24,0.9) 100%)',
+  background: 'linear-gradient(135deg, rgba(36,30,25,0.95) 0%, rgba(45,34,24,0.9) 100%)',
   border: '1px solid #5C4A1A',
   padding: 48,
   overflow: 'hidden',
@@ -434,7 +434,7 @@ const curatedCardStyle = {
 const curatedTagStyle = {
   display: 'inline-block',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
   fontWeight: 500,
@@ -447,7 +447,7 @@ const curatedTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 32,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   marginBottom: 14,
   letterSpacing: '0.05em',
   lineHeight: 1.3,
@@ -456,7 +456,7 @@ const curatedTitleStyle = {
 const curatedDescStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 15,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   lineHeight: 1.85,
   marginBottom: 24,
   fontWeight: 300,
@@ -466,16 +466,16 @@ const curatedMetaStyle = {
   display: 'flex',
   gap: 24,
   paddingTop: 18,
-  borderTop: '1px solid rgba(212,175,55,0.18)',
+  borderTop: '1px solid rgba(201,162,75,0.18)',
   fontFamily: "'Outfit', sans-serif",
   fontSize: 11,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
 }
 
 const curatedStrongStyle = {
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 18,
@@ -490,8 +490,8 @@ const curatedActionStyle = {
   marginTop: 24,
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 14,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   border: 'none',
   padding: '12px 32px',
   cursor: 'pointer',
@@ -514,7 +514,7 @@ const gridStyle = {
 const loadingStyle = {
   padding: 80,
   textAlign: 'center',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   fontFamily: "'Noto Serif SC', serif",
 }
 
@@ -526,7 +526,7 @@ const errorStyle = {
 const emptyStyle = {
   padding: 80,
   textAlign: 'center',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   fontFamily: "'Noto Serif SC', serif",
   lineHeight: 2,
 }
@@ -538,7 +538,7 @@ const ctaWrapStyle = {
 }
 
 const ctaCardStyle = {
-  background: 'linear-gradient(135deg, rgba(196,30,58,0.08) 0%, rgba(212,175,55,0.04) 100%)',
+  background: 'linear-gradient(135deg, rgba(196,30,58,0.08) 0%, rgba(201,162,75,0.04) 100%)',
   border: '1px solid #5C4A1A',
   padding: '56px 48px',
   textAlign: 'center',
@@ -549,7 +549,7 @@ const ctaCardStyle = {
 const ctaSealStyle = {
   display: 'inline-block',
   background: '#C41E3A',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   fontFamily: "'Noto Serif SC', serif",
   fontWeight: 500,
   padding: '6px 16px',
@@ -562,7 +562,7 @@ const ctaTitleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 38,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   marginBottom: 18,
   letterSpacing: '0.05em',
   lineHeight: 1.3,
@@ -571,7 +571,7 @@ const ctaTitleStyle = {
 const ctaDescStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   marginBottom: 32,
   fontWeight: 300,
   lineHeight: 1.95,
@@ -580,8 +580,8 @@ const ctaDescStyle = {
 const ctaBtnStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 16,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   border: 'none',
   padding: '16px 44px',
   cursor: 'pointer',

@@ -5,9 +5,9 @@ import PatternImage from '../components/common/PatternImage'
 import ReliefScene from '../components/relief/ReliefScene'
 
 const RARITY_COLOR = {
-  ssr: '#C9A23C',
-  rare: '#BC6B2F',
-  common: '#666',
+  ssr: 'var(--color-gold-main)',
+  rare: 'var(--color-gold-main)',
+  common: 'var(--color-text-secondary)',
 }
 
 // Group by series (in a defined order), then by rarity inside each group —
@@ -75,20 +75,20 @@ export default function Editor() {
       <div style={{
         padding: '14px 16px 12px',
         flex: '0 0 auto',
-        borderBottom: '1px solid rgba(212,175,106,0.08)',
-        background: 'rgba(8,6,4,0.4)',
+        borderBottom: '1px solid rgba(201,162,75,0.08)',
+        background: 'rgba(23,21,19,0.4)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 10 }}>
           <h1 style={{
             fontFamily: 'Noto Serif SC, serif', fontSize: 20, fontWeight: 600,
-            color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
+            color: 'var(--color-gold-bright)', letterSpacing: '0.15em', margin: 0,
           }}>
             {compositionImage ? '作品浮雕' : '纹样浮雕'}
           </h1>
           <span style={{
-            fontSize: 9, color: '#8A6A30', letterSpacing: '0.3em',
+            fontSize: 9, color: 'var(--color-gold-dim)', letterSpacing: '0.3em',
             textTransform: 'uppercase', fontWeight: 500,
           }}>
             Relief
@@ -100,7 +100,7 @@ export default function Editor() {
                 marginLeft: 'auto', padding: '4px 12px', borderRadius: 9,
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.06)',
-                color: '#A09682', fontSize: 11, cursor: 'pointer',
+                color: 'var(--color-text-secondary)', fontSize: 11, cursor: 'pointer',
                 fontFamily: 'inherit', letterSpacing: '0.1em',
               }}
             >← 返回单纹样</button>
@@ -112,7 +112,7 @@ export default function Editor() {
         <div>
           <div style={{
             fontFamily: 'Noto Serif SC, serif', fontSize: 11, fontWeight: 600,
-            color: '#A09682', marginBottom: 6, letterSpacing: '0.15em',
+            color: 'var(--color-text-secondary)', marginBottom: 6, letterSpacing: '0.15em',
           }}>
             选择纹样
           </div>
@@ -123,15 +123,15 @@ export default function Editor() {
                 onClick={() => setSelectedPattern(p.id)}
                 style={{
                   flex: '0 0 auto', width: 56, height: 56, borderRadius: 10,
-                  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
+                  background: 'linear-gradient(145deg, var(--color-bg-card), var(--color-bg-card))',
                   border: selectedPattern === p.id
-                    ? '2px solid rgba(212,175,106,0.55)'
-                    : '1px solid rgba(212,175,106,0.15)',
+                    ? '2px solid rgba(201,162,75,0.55)'
+                    : '1px solid rgba(201,162,75,0.15)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', overflow: 'hidden',
                   transition: 'all 0.25s ease',
                   boxShadow: selectedPattern === p.id
-                    ? '0 0 14px rgba(212,175,106,0.3), inset 0 1px 0 rgba(212,175,106,0.1)'
+                    ? '0 0 14px rgba(201,162,75,0.3), inset 0 1px 0 rgba(201,162,75,0.1)'
                     : 'none',
                 }}
               >
@@ -155,7 +155,7 @@ export default function Editor() {
       {/* ── 3D Relief (full remaining space) ── */}
       <div style={{
         flex: '1 1 auto', minHeight: 0, position: 'relative',
-        background: '#0A0807',
+        background: 'var(--color-bg-base)',
       }}>
         {imageUrl ? (
           <ReliefScene image={imageUrl} {...reliefParams} />
@@ -169,11 +169,11 @@ export default function Editor() {
           }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              background: 'rgba(8,6,4,0.72)',
+              background: 'rgba(23,21,19,0.72)',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
               padding: '8px 18px 8px 14px', borderRadius: 22,
-              border: '1px solid rgba(212,175,106,0.18)',
+              border: '1px solid rgba(201,162,75,0.18)',
             }}>
               <div style={{
                 width: 6, height: 6, borderRadius: '50%',
@@ -182,16 +182,16 @@ export default function Editor() {
               }} />
               <span style={{
                 fontFamily: 'Noto Serif SC, serif', fontSize: 14,
-                color: '#F2D58A', letterSpacing: '0.15em', fontWeight: 500,
+                color: 'var(--color-gold-bright)', letterSpacing: '0.15em', fontWeight: 500,
               }}>
                 {selected.name}
               </span>
               <span style={{
-                fontSize: 10, color: '#7A7060',
+                fontSize: 10, color: 'var(--color-text-dim)',
                 fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em',
                 padding: '2px 8px', borderRadius: 10,
-                background: 'rgba(212,175,106,0.06)',
-                border: '1px solid rgba(212,175,106,0.1)',
+                background: 'rgba(201,162,75,0.06)',
+                border: '1px solid rgba(201,162,75,0.1)',
               }}>
                 {getRarityLabel(selected.rarity)}
               </span>
@@ -204,9 +204,9 @@ export default function Editor() {
           position: 'absolute', top: 12, right: 12,
           fontSize: 10, color: '#5A4A30', letterSpacing: '0.15em',
           fontFamily: 'Noto Serif SC, serif',
-          background: 'rgba(8,6,4,0.5)',
+          background: 'rgba(23,21,19,0.5)',
           padding: '4px 10px', borderRadius: 12,
-          border: '1px solid rgba(212,175,106,0.08)',
+          border: '1px solid rgba(201,162,75,0.08)',
         }}>
           拖动旋转 · 滚轮缩放
         </div>

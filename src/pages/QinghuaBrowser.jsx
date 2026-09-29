@@ -4,7 +4,7 @@ import { PATTERN_LIBRARY, getAllSeries, getPatternImage } from '../store/pattern
 import { QINGHUA_CATEGORIES } from '../data/qinghuaPatterns'
 
 const RARITY_ORDER = { ssr: 0, rare: 1, common: 2 }
-const RARITY_COLOR = { ssr: '#C9A23C', rare: '#BC6B2F', common: '#666' }
+const RARITY_COLOR = { ssr: 'var(--color-gold-main)', rare: 'var(--color-gold-main)', common: 'var(--color-text-secondary)' }
 
 export default function QinghuaBrowser() {
   const navigate = useNavigate()
@@ -36,19 +36,19 @@ export default function QinghuaBrowser() {
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
           <h1 style={{
             fontFamily: 'Noto Serif SC, serif', fontSize: 22, fontWeight: 600,
-            color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
+            color: 'var(--color-gold-bright)', letterSpacing: '0.15em', margin: 0,
           }}>
             纹样总览
           </h1>
           <span style={{
-            fontSize: 9, color: '#8A6A30', letterSpacing: '0.35em',
+            fontSize: 9, color: 'var(--color-gold-dim)', letterSpacing: '0.35em',
             textTransform: 'uppercase', fontWeight: 500,
           }}>
             All Patterns
           </span>
         </div>
         <div style={{
-          fontSize: 11, color: '#7A7060',
+          fontSize: 11, color: 'var(--color-text-dim)',
           fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.05em',
         }}>
           {filtered.length} 张 · 涵盖 {seriesList.length} 个系列
@@ -68,8 +68,8 @@ export default function QinghuaBrowser() {
       {/* Rarity */}
       <div style={{ display: 'flex', gap: 5, marginBottom: 8, overflowX: 'auto' }}>
         <button onClick={() => setRarityFilter('all')} style={pill(rarityFilter === 'all')}>全部</button>
-        <button onClick={() => setRarityFilter(rarityFilter === 'ssr' ? 'all' : 'ssr')} style={pill(rarityFilter === 'ssr', '#C9A23C')}>传说</button>
-        <button onClick={() => setRarityFilter(rarityFilter === 'rare' ? 'all' : 'rare')} style={pill(rarityFilter === 'rare', '#BC6B2F')}>稀有</button>
+        <button onClick={() => setRarityFilter(rarityFilter === 'ssr' ? 'all' : 'ssr')} style={pill(rarityFilter === 'ssr', 'var(--color-gold-main)')}>传说</button>
+        <button onClick={() => setRarityFilter(rarityFilter === 'rare' ? 'all' : 'rare')} style={pill(rarityFilter === 'rare', 'var(--color-gold-main)')}>稀有</button>
       </div>
 
       {/* Category (qinghua only) */}
@@ -123,11 +123,11 @@ export default function QinghuaBrowser() {
 }
 
 function pill(active, color) {
-  const c = color || '#F2D58A'
+  const c = color || 'var(--color-gold-bright)'
   return {
     padding: '3px 10px', borderRadius: 10, fontSize: 11, whiteSpace: 'nowrap',
     background: active ? `${c}20` : 'rgba(255,255,255,0.03)',
-    color: active ? c : '#666',
+    color: active ? c : 'var(--color-text-secondary)',
     border: active ? `1px solid ${c}40` : '1px solid transparent',
     cursor: 'pointer', fontFamily: 'inherit',
   }

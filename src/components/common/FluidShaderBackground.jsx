@@ -40,10 +40,10 @@ export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 
       u_time: { value: 0.0 },
       u_intensity: { value: intensity },
       // Gold-on-warm-dark palette — feels traditional Chinese without being literal.
-      u_colorBright: { value: new THREE.Color(0.95, 0.83, 0.55) }, // #F2D58A bright gold
-      u_colorMid:    { value: new THREE.Color(0.73, 0.42, 0.18) }, // #BC6B2F orange-gold
-      u_colorDeep:   { value: new THREE.Color(0.05, 0.03, 0.02) }, // #0A0807 warm near-black
-      u_colorAccent: { value: new THREE.Color(0.74, 0.12, 0.16) }, // #BC1F28 red dab
+      u_colorBright: { value: new THREE.Color(0.95, 0.83, 0.55) }, // #E3C079 bright gold
+      u_colorMid:    { value: new THREE.Color(0.73, 0.42, 0.18) }, // #C9A24B orange-gold
+      u_colorDeep:   { value: new THREE.Color(0.05, 0.03, 0.02) }, // #171513 warm near-black
+      u_colorAccent: { value: new THREE.Color(0.74, 0.12, 0.16) }, // #9E3530 red dab
     }
 
     const geometry = new THREE.PlaneGeometry(2, 2)
@@ -89,7 +89,7 @@ export default function FluidShaderBackground({ opacity = 0.65, intensity = 1.0 
       inset: 0,
       pointerEvents: 'none',
       opacity,
-      background: '#0A0807',
+      background: '#171513',
       zIndex: 0,
     }} />
   )

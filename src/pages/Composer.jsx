@@ -16,7 +16,7 @@ const SYMMETRY_MODES = [
   { id: 8, label: '八分', desc: '八角对称' },
 ]
 
-const COLORS = ['#C9A84C', '#8B6914', '#F2D58A', '#FFFFFF', '#E8D5B7', '#5C3D1A']
+const COLORS = ['#C9A24B', '#8A6F35', '#E3C079', '#FFFFFF', '#E8D5B7', '#5C3D1A']
 
 const PANEL_TABS = [
   { id: 'math', label: '几何组件' },
@@ -37,7 +37,7 @@ export default function Composer() {
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [dragging, setDragging] = useState(null)
   const [dragFromPanel, setDragFromPanel] = useState(null)
-  const [strokeColor, setStrokeColor] = useState('#C9A84C')
+  const [strokeColor, setStrokeColor] = useState('#C9A24B')
   const [filter, setFilter] = useState('all')
   const [centerComp, setCenterComp] = useState(null)
   const [panelTab, setPanelTab] = useState('math')
@@ -145,7 +145,7 @@ export default function Composer() {
           drawElementOnCanvas(ctx, p.elementId, rx, ry, p.size, p.rotation)
         } else if (p.component) {
           // 数学组件（SVG）
-          const color = isSelected ? '#F2D58A' : (p.color || strokeColor)
+          const color = isSelected ? '#E3C079' : (p.color || strokeColor)
           drawComponentOnCanvas(ctx, p.component, rx, ry, p.size, p.rotation, color)
         }
         ctx.restore()
@@ -156,7 +156,7 @@ export default function Composer() {
         ctx.translate(p.x, p.y)
         ctx.rotate(p.rotation * Math.PI / 180)
         const s = p.size * 0.5
-        ctx.strokeStyle = 'rgba(242,213,138,0.4)'
+        ctx.strokeStyle = 'rgba(227,192,121,0.4)'
         ctx.lineWidth = 1.5
         ctx.setLineDash([4, 4])
         ctx.strokeRect(-s / 2, -s / 2, s, s)
@@ -371,14 +371,14 @@ export default function Composer() {
     <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>
       {/* 标题 */}
       <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>纹样工坊</span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 1 }}>纹样工坊</span>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={saveToLibrary} style={{
             ...btnStyle,
-            background: saved ? 'rgba(100,180,100,0.15)' : 'rgba(212,175,106,0.12)',
-            color: saved ? '#6B6' : '#D4AF6A',
+            background: saved ? 'rgba(100,180,100,0.15)' : 'rgba(201,162,75,0.12)',
+            color: saved ? '#6B6' : 'var(--color-gold-main)',
           }}>{saved ? '已保存' : '保存'}</button>
-          <button onClick={exportPNG} style={{ ...btnStyle, background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)' }}>导出</button>
+          <button onClick={exportPNG} style={{ ...btnStyle, background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-deep))' }}>导出</button>
         </div>
       </div>
 
@@ -390,9 +390,9 @@ export default function Composer() {
             onClick={() => setFolds(m.id)}
             style={{
               padding: '6px 16px', borderRadius: 10, fontSize: 13,
-              background: folds === m.id ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.04)',
-              color: folds === m.id ? '#F2D58A' : '#6A6A6A',
-              border: folds === m.id ? '1px solid rgba(212,175,106,0.3)' : '1px solid transparent',
+              background: folds === m.id ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.04)',
+              color: folds === m.id ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+              border: folds === m.id ? '1px solid rgba(201,162,75,0.3)' : '1px solid transparent',
               cursor: 'pointer', fontFamily: 'inherit',
             }}
           >
@@ -460,8 +460,8 @@ export default function Composer() {
             onClick={() => setPanelTab(t.id)}
             style={{
               flex: 1, padding: '8px', border: 'none', borderRadius: 8,
-              background: panelTab === t.id ? 'rgba(212,175,106,0.12)' : 'transparent',
-              color: panelTab === t.id ? '#F2D58A' : '#6A6A6A',
+              background: panelTab === t.id ? 'rgba(201,162,75,0.12)' : 'transparent',
+              color: panelTab === t.id ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
               fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
             }}
           >
@@ -480,8 +480,8 @@ export default function Composer() {
                 onClick={() => setFilter(t)}
                 style={{
                   padding: '4px 12px', borderRadius: 12, fontSize: 12,
-                  background: filter === t ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
-                  color: filter === t ? '#F2D58A' : '#6A6A6A',
+                  background: filter === t ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.03)',
+                  color: filter === t ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit',
                 }}
               >
@@ -506,10 +506,10 @@ export default function Composer() {
                 }}
               >
                 <div
-                  dangerouslySetInnerHTML={{ __html: getComponentSVG(comp, '#C9A84C', 1.5) }}
+                  dangerouslySetInnerHTML={{ __html: getComponentSVG(comp, '#C9A24B', 1.5) }}
                   style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 />
-                <span style={{ fontSize: 9, color: '#6A6A6A', textAlign: 'center', lineHeight: 1.2 }}>{comp.name}</span>
+                <span style={{ fontSize: 9, color: 'var(--color-text-secondary)', textAlign: 'center', lineHeight: 1.2 }}>{comp.name}</span>
               </div>
             ))}
           </div>
@@ -557,7 +557,7 @@ export default function Composer() {
                     loading="lazy"
                   />
                 </div>
-                <span style={{ fontSize: 9, color: '#6A6A6A', textAlign: 'center', lineHeight: 1.2 }}>
+                <span style={{ fontSize: 9, color: 'var(--color-text-secondary)', textAlign: 'center', lineHeight: 1.2 }}>
                   {SOURCE_NAMES[el.source] || el.source}
                 </span>
               </div>
@@ -572,9 +572,9 @@ export default function Composer() {
 function pillStyle(active) {
   return {
     padding: '4px 12px', borderRadius: 12, fontSize: 12, whiteSpace: 'nowrap',
-    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
-    color: active ? '#F2D58A' : '#6A6A6A',
-    border: active ? '1px solid rgba(212,175,106,0.2)' : '1px solid transparent',
+    background: active ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.03)',
+    color: active ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+    border: active ? '1px solid rgba(201,162,75,0.2)' : '1px solid transparent',
     cursor: 'pointer', fontFamily: 'inherit',
   }
 }
@@ -582,6 +582,6 @@ function pillStyle(active) {
 const btnStyle = {
   padding: '5px 14px', borderRadius: 8, fontSize: 13,
   background: 'rgba(255,255,255,0.04)',
-  color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
+  color: 'var(--color-gold-main)', border: '1px solid rgba(255,255,255,0.08)',
   cursor: 'pointer', fontFamily: 'inherit',
 }

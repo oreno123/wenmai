@@ -34,7 +34,7 @@ function PageLoader() {
       position: 'fixed', inset: 0, display: 'flex',
       alignItems: 'center', justifyContent: 'center',
       background: 'var(--bg-primary, #0C0A0E)',
-      color: 'rgba(201,162,60,0.5)', fontSize: 24,
+      color: 'rgba(201,162,75,0.5)', fontSize: 24,
     }}>
       ☯
     </div>

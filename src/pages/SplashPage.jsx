@@ -145,14 +145,14 @@ export default function SplashPage() {
       }}>
         <div style={{
           fontFamily: 'Noto Serif SC, STSong, Georgia, serif',
-          fontSize: 64, color: '#F2D58A', fontWeight: 700,
+          fontSize: 64, color: '#E3C079', fontWeight: 700,
           letterSpacing: '0.3em',
           textShadow: '0 2px 20px rgba(0,0,0,0.6)',
         }}>
           纹脉
         </div>
         <div style={{
-          fontSize: 12, color: 'rgba(242,213,138,0.6)', letterSpacing: '0.2em',
+          fontSize: 12, color: 'rgba(227,192,121,0.6)', letterSpacing: '0.2em',
           marginTop: 8, textShadow: '0 1px 8px rgba(0,0,0,0.5)',
         }}>
           PATTERN VEINS

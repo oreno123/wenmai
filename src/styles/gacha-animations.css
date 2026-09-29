@@ -14,7 +14,7 @@
 }
 
 .btn-gold {
-  background: linear-gradient(135deg, #D4AF6A, #BC6B2F);
+  background: linear-gradient(135deg, var(--color-gold-main), var(--color-gold-main));
   color: #000;
   border: none;
   border-radius: 12px;
@@ -31,19 +31,19 @@
     conic-gradient(
       from 0deg at 50% 30%,
       transparent 0deg,
-      rgba(212, 175, 106, 0.03) 10deg,
+      rgba(201,162,75, 0.03) 10deg,
       transparent 20deg,
-      rgba(212, 175, 106, 0.02) 60deg,
+      rgba(201,162,75, 0.02) 60deg,
       transparent 70deg,
-      rgba(212, 175, 106, 0.03) 120deg,
+      rgba(201,162,75, 0.03) 120deg,
       transparent 130deg,
-      rgba(212, 175, 106, 0.02) 180deg,
+      rgba(201,162,75, 0.02) 180deg,
       transparent 190deg,
-      rgba(212, 175, 106, 0.03) 240deg,
+      rgba(201,162,75, 0.03) 240deg,
       transparent 250deg,
-      rgba(212, 175, 106, 0.02) 300deg,
+      rgba(201,162,75, 0.02) 300deg,
       transparent 310deg,
-      rgba(212, 175, 106, 0.03) 350deg,
+      rgba(201,162,75, 0.03) 350deg,
       transparent 360deg
     );
   animation: light-rays 20s linear infinite;
@@ -66,16 +66,16 @@
 }
 
 .rarity-rare {
-  background: rgba(201, 162, 60, 0.1);
+  background: rgba(201,162,75, 0.1);
   color: var(--gold-main);
-  border: 1px solid rgba(201, 162, 60, 0.15);
+  border: 1px solid rgba(201,162,75, 0.15);
 }
 
 .rarity-ssr {
-  background: linear-gradient(135deg, rgba(201, 162, 60, 0.2), rgba(242, 213, 138, 0.15));
+  background: linear-gradient(135deg, rgba(201,162,75, 0.2), rgba(227,192,121, 0.15));
   color: var(--gold-bright);
-  border: 1px solid rgba(242, 213, 138, 0.25);
-  text-shadow: 0 0 8px rgba(201, 162, 60, 0.3);
+  border: 1px solid rgba(227,192,121, 0.25);
+  text-shadow: 0 0 8px rgba(201,162,75, 0.3);
 }
 
 /* ========== Keyframes ========== */
@@ -199,10 +199,10 @@
 /* Glow pulse for SSR cards */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(201, 162, 60, 0.05);
+    box-shadow: 0 0 20px rgba(201,162,75, 0.05);
   }
   50% {
-    box-shadow: 0 0 40px rgba(201, 162, 60, 0.15), 0 0 80px rgba(201, 162, 60, 0.05);
+    box-shadow: 0 0 40px rgba(201,162,75, 0.15), 0 0 80px rgba(201,162,75, 0.05);
   }
 }
 

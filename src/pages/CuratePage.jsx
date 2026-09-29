@@ -89,8 +89,8 @@ export default function CuratePage() {
     <div style={{ padding: '0 0 80px 0', minHeight: '100vh' }}>
       {/* Header */}
       <div style={{ padding: '12px 16px' }}>
-        <span style={{ fontSize: 16, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>元素筛选</span>
-        <span style={{ fontSize: 12, color: '#6A6A6A', marginLeft: 8 }}>
+        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 1 }}>元素筛选</span>
+        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginLeft: 8 }}>
           {approvedCount}/{totalCount} 已通过
         </span>
       </div>
@@ -100,7 +100,7 @@ export default function CuratePage() {
         <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
           <div style={{
             height: '100%', width: `${(approvedCount / totalCount) * 100}%`,
-            background: 'linear-gradient(90deg, #8B6914, #F2D58A)', borderRadius: 2, transition: 'width 0.3s',
+            background: 'linear-gradient(90deg, var(--color-gold-dim), var(--color-gold-bright))', borderRadius: 2, transition: 'width 0.3s',
           }} />
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function CuratePage() {
       <div style={{ display: 'flex', gap: 8, padding: '0 16px 12px', flexWrap: 'wrap', alignItems: 'center' }}>
         <button onClick={approveAll} style={btnStyle}>全部通过</button>
         <button onClick={clearAll} style={btnStyle}>全部拒绝</button>
-        <button onClick={saveToProject} style={{ ...btnStyle, background: 'linear-gradient(145deg, #BC6B2F, #8A4A20)', color: '#F5F1E8' }}>
+        <button onClick={saveToProject} style={{ ...btnStyle, background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-deep))', color: 'var(--color-text-primary)' }}>
           保存到项目
         </button>
         {saveStatus && <span style={{ fontSize: 12, color: '#81C784' }}>{saveStatus}</span>}
@@ -152,7 +152,7 @@ export default function CuratePage() {
                 alignSelf: 'flex-end', fontSize: 10, padding: '1px 6px',
                 borderRadius: 4, fontWeight: 600,
                 background: isApproved ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.05)',
-                color: isApproved ? '#81C784' : '#6A6A6A',
+                color: isApproved ? '#81C784' : 'var(--color-text-secondary)',
               }}>
                 {isApproved ? '✓' : '✗'}
               </div>
@@ -171,7 +171,7 @@ export default function CuratePage() {
                 />
               </div>
 
-              <span style={{ fontSize: 9, color: '#9A9A9A', textAlign: 'center', lineHeight: 1.2 }}>
+              <span style={{ fontSize: 9, color: 'var(--color-text-secondary)', textAlign: 'center', lineHeight: 1.2 }}>
                 {SOURCE_NAMES[el.source] || el.source}
               </span>
             </div>
@@ -185,9 +185,9 @@ export default function CuratePage() {
 function pillStyle(active) {
   return {
     padding: '4px 12px', borderRadius: 12, fontSize: 11, whiteSpace: 'nowrap',
-    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.03)',
-    color: active ? '#F2D58A' : '#6A6A6A',
-    border: active ? '1px solid rgba(212,175,106,0.2)' : '1px solid transparent',
+    background: active ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.03)',
+    color: active ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+    border: active ? '1px solid rgba(201,162,75,0.2)' : '1px solid transparent',
     cursor: 'pointer', fontFamily: 'inherit',
   }
 }
@@ -195,6 +195,6 @@ function pillStyle(active) {
 const btnStyle = {
   padding: '5px 14px', borderRadius: 8, fontSize: 13,
   background: 'rgba(255,255,255,0.04)',
-  color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
+  color: 'var(--color-gold-main)', border: '1px solid rgba(255,255,255,0.08)',
   cursor: 'pointer', fontFamily: 'inherit',
 }

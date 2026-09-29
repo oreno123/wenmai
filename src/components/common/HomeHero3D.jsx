@@ -334,7 +334,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
       {/* 底色：暖黑到页面底渐隐 + 鎏金微光 */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse at 50% 42%, rgba(242,213,138,0.10), transparent 55%), linear-gradient(180deg, #171208 0%, #0F0F10 100%)',
+        background: 'radial-gradient(ellipse at 50% 42%, rgba(227,192,121,0.10), transparent 55%), linear-gradient(180deg, #171208 0%, #171513 100%)',
       }} />
       <div style={{
         position: 'absolute', inset: 0,
@@ -350,7 +350,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'absolute', bottom: '34%', left: 0, right: 0, textAlign: 'center',
-            fontSize: 10, letterSpacing: '0.4em', textIndent: '0.4em', color: 'rgba(212,175,106,0.9)',
+            fontSize: 10, letterSpacing: '0.4em', textIndent: '0.4em', color: 'rgba(201,162,75,0.9)',
             pointerEvents: 'none', zIndex: 2,
           }}
         >
@@ -377,7 +377,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
       {/* 顶部衔接遮罩 */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 70,
-        background: 'linear-gradient(180deg, rgba(15,15,16,0.9), transparent)',
+        background: 'linear-gradient(180deg, rgba(23,21,19,0.9), transparent)',
         pointerEvents: 'none',
       }} />
 
@@ -393,7 +393,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
             initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.25 }}
           >
-            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '0.3em', color: '#F2D58A' }}>
+            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '0.3em', color: '#E3C079' }}>
               {ding.name}
             </div>
             <div style={{ fontSize: 11, letterSpacing: '0.24em', color: 'var(--color-text-secondary)', marginTop: 10 }}>
@@ -414,8 +414,8 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
             position: 'absolute', top: '46%', [side]: 12, zIndex: 3,
             width: 40, height: 40, borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(15,15,16,0.35)', color: '#F2D58A',
-            border: '1px solid rgba(212,175,106,0.35)',
+            background: 'rgba(23,21,19,0.35)', color: '#E3C079',
+            border: '1px solid rgba(201,162,75,0.35)',
             backdropFilter: 'blur(4px)', cursor: 'pointer', padding: 0,
           }}
         >
@@ -431,7 +431,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
         padding: '0 20px 18px',
       }}>
-        <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'rgba(212,175,106,0.55)' }}>
+        <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'rgba(201,162,75,0.55)' }}>
           ‹ 滑动换鼎 · 上手转它 ›
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -444,7 +444,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
               }}>
               <span style={{
                 display: 'block', width: i === idx ? 16 : 5, height: 5, borderRadius: 3,
-                background: i === idx ? '#F2D58A' : 'rgba(212,175,106,0.45)',
+                background: i === idx ? '#E3C079' : 'rgba(201,162,75,0.45)',
                 transition: 'all 0.3s',
               }} />
             </button>
@@ -454,8 +454,8 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
           whileTap={{ scale: 0.96 }}
           onClick={() => navigate('/photo-match')}
           style={{
-            background: 'rgba(15,15,16,0.4)', color: '#F2D58A',
-            border: '1px solid rgba(212,175,106,0.5)',
+            background: 'rgba(23,21,19,0.4)', color: '#E3C079',
+            border: '1px solid rgba(201,162,75,0.5)',
             borderRadius: 3, padding: '10px 30px',
             fontSize: 14, letterSpacing: '0.5em', textIndent: '0.5em',
             cursor: 'pointer', fontFamily: 'inherit',

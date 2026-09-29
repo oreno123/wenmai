@@ -16,7 +16,7 @@ function PlateGeometry({ texture }) {
       {/* Main bowl body */}
       <mesh>
         <cylinderGeometry args={[topRadius, bottomRadius, height, 64]} />
-        <meshStandardMaterial color="#F0EBE0" metalness={0.08} roughness={0.88} />
+        <meshStandardMaterial color="#D8CDBA" metalness={0.08} roughness={0.88} />
       </mesh>
       {/* Inner cavity */}
       <mesh position={[0, height * 0.15, 0]}>
@@ -30,13 +30,13 @@ function PlateGeometry({ texture }) {
           map={texture}
           metalness={0.12}
           roughness={0.8}
-          color={texture ? '#ffffff' : '#F0EBE0'}
+          color={texture ? '#ffffff' : '#D8CDBA'}
         />
       </mesh>
       {/* Gold rim */}
       <mesh position={[0, height / 2, 0]}>
         <torusGeometry args={[rimRadius, rimTube, 12, 64]} />
-        <meshStandardMaterial color="#D4AF6A" metalness={0.5} roughness={0.35} />
+        <meshStandardMaterial color="#C9A24B" metalness={0.5} roughness={0.35} />
       </mesh>
       {/* Foot ring */}
       <mesh position={[0, -height / 2 - footHeight / 2, 0]}>

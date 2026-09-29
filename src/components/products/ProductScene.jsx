@@ -16,14 +16,14 @@ function Lights() {
         angle={0.6}
         penumbra={1}
         intensity={1.5}
-        color="#F2D58A"
+        color="#E3C079"
       />
       <spotLight
         position={[-3, 3, -3]}
         angle={0.5}
         penumbra={1}
         intensity={0.8}
-        color="#D4AF6A"
+        color="#C9A24B"
       />
     </>
   )

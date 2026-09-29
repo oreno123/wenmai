@@ -125,8 +125,8 @@ function CoverFallback({ title }) {
     <div style={{
       position: 'absolute', inset: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Noto Serif SC, serif', fontSize: 28, color: '#8B6F1F',
-      background: 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
+      fontFamily: 'Noto Serif SC, serif', fontSize: 28, color: 'var(--color-gold-dim)',
+      background: 'radial-gradient(ellipse at center, var(--color-text-primary) 0%, #E8DCC2 100%)',
     }}>
       {title?.charAt(0) || '?'}
     </div>
@@ -138,7 +138,7 @@ function CoverFallback({ title }) {
 const cardStyle = {
   position: 'relative',
   background: '#1A140E',
-  border: '1px solid rgba(212,175,55,0.18)',
+  border: '1px solid rgba(201,162,75,0.18)',
   display: 'block',
   overflow: 'hidden',
   cursor: 'pointer',
@@ -152,7 +152,7 @@ const coverStyle = (coverPath, imgError) => ({
   aspectRatio: '4/5',
   background: coverPath && !imgError
     ? '#0F0B08'
-    : 'radial-gradient(ellipse at center, #F2EBDB 0%, #E8DCC2 100%)',
+    : 'radial-gradient(ellipse at center, var(--color-text-primary) 0%, #E8DCC2 100%)',
   overflow: 'hidden',
 })
 
@@ -172,9 +172,9 @@ const rarityBadgeStyle = {
   fontSize: 10,
   letterSpacing: '0.2em',
   padding: '4px 9px',
-  background: 'rgba(10,8,6,0.78)',
-  border: '1px solid rgba(212,175,55,0.4)',
-  color: '#D4AF37',
+  background: 'rgba(23,21,19,0.78)',
+  border: '1px solid rgba(201,162,75,0.4)',
+  color: 'var(--color-gold-main)',
   zIndex: 2,
 }
 
@@ -186,15 +186,15 @@ const seriesBadgeStyle = {
   letterSpacing: '0.15em',
   padding: '4px 9px',
   background: 'rgba(196,30,58,0.85)',
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   zIndex: 2,
 }
 
 const actionStyle = {
   position: 'absolute',
   bottom: 14, right: 14,
-  background: 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-  color: '#0A0806',
+  background: 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+  color: 'var(--color-bg-base)',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 12,
   fontWeight: 500,
@@ -210,7 +210,7 @@ const actionStyle = {
 
 const bodyStyle = {
   padding: '18px 20px 20px',
-  borderTop: '1px solid rgba(212,175,55,0.18)',
+  borderTop: '1px solid rgba(201,162,75,0.18)',
 }
 
 const titleRowStyle = {
@@ -225,7 +225,7 @@ const titleStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 17,
   fontWeight: 500,
-  color: '#F2EBDB',
+  color: 'var(--color-text-primary)',
   letterSpacing: '0.08em',
   lineHeight: 1.4,
 }
@@ -235,7 +235,7 @@ const templateStyle = {
   fontSize: 10,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
   marginTop: 4,
 }
 
@@ -250,13 +250,13 @@ const avatarStyle = {
   width: 28,
   height: 28,
   borderRadius: '50%',
-  background: 'linear-gradient(135deg, #8B6F1F, #BC6B2F)',
+  background: 'linear-gradient(135deg, var(--color-gold-dim), var(--color-gold-main))',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#0A0806',
+  color: 'var(--color-bg-base)',
   fontWeight: 500,
   flexShrink: 0,
 }
@@ -264,7 +264,7 @@ const avatarStyle = {
 const authorNameStyle = {
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 13,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -274,17 +274,17 @@ const eraStyle = {
   fontFamily: "'Cormorant Garamond', serif",
   fontStyle: 'italic',
   fontSize: 11,
-  color: '#6B5C45',
+  color: 'var(--color-text-dim)',
 }
 
 const statsStyle = {
   display: 'flex',
   gap: 18,
   paddingTop: 14,
-  borderTop: '1px dashed rgba(212,175,55,0.18)',
+  borderTop: '1px dashed rgba(201,162,75,0.18)',
   fontFamily: "'Outfit', sans-serif",
   fontSize: 12,
-  color: '#A89580',
+  color: 'var(--color-text-secondary)',
   alignItems: 'center',
 }
 
@@ -298,6 +298,6 @@ const reuseTagStyle = {
   marginLeft: 'auto',
   fontFamily: "'Noto Serif SC', serif",
   fontSize: 11,
-  color: '#D4AF37',
+  color: 'var(--color-gold-main)',
   letterSpacing: '0.1em',
 }

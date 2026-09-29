@@ -24,7 +24,7 @@ function ScarfGeometry({ texture }) {
         side={THREE.DoubleSide}
         metalness={0.0}
         roughness={0.92}
-        color={texture ? '#ffffff' : '#D4AF6A'}
+        color={texture ? '#ffffff' : '#C9A24B'}
       />
     </mesh>
   )

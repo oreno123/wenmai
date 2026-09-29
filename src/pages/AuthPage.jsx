@@ -9,12 +9,12 @@ import FluidShaderBackground from '../components/common/FluidShaderBackground'
 function CrestMark({ size = 48, opacity = 0.9 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" style={{ opacity }}>
-      <circle cx="24" cy="24" r="20" stroke="#D4AF6A" strokeWidth="0.5" />
-      <circle cx="24" cy="24" r="14" stroke="#D4AF6A" strokeWidth="0.35" />
+      <circle cx="24" cy="24" r="20" stroke="var(--color-gold-main)" strokeWidth="0.5" />
+      <circle cx="24" cy="24" r="14" stroke="var(--color-gold-main)" strokeWidth="0.35" />
       <path d="M24 6 L24 42 M6 24 L42 24 M11.5 11.5 L36.5 36.5 M36.5 11.5 L11.5 36.5"
-        stroke="#D4AF6A" strokeWidth="0.25" opacity="0.5" />
-      <circle cx="24" cy="24" r="4" stroke="#F2D58A" strokeWidth="0.5" />
-      <circle cx="24" cy="24" r="1.4" fill="#F2D58A" />
+        stroke="var(--color-gold-main)" strokeWidth="0.25" opacity="0.5" />
+      <circle cx="24" cy="24" r="4" stroke="var(--color-gold-bright)" strokeWidth="0.5" />
+      <circle cx="24" cy="24" r="1.4" fill="var(--color-gold-bright)" />
     </svg>
   )
 }
@@ -23,13 +23,13 @@ function CrestMark({ size = 48, opacity = 0.9 }) {
 const ink = {
   900: '#f0e6d2',
   700: '#c4b49a',
-  500: 'rgba(200,180,150,0.45)',
-  400: 'rgba(200,180,150,0.30)',
-  300: 'rgba(200,180,150,0.22)',
+  500: 'rgba(216,205,186,0.45)',
+  400: 'rgba(216,205,186,0.30)',
+  300: 'rgba(216,205,186,0.22)',
 }
-const accent = '#F2D58A'
-const accentDeep = '#D4AF6A'
-const accentRed = '#BC1F28'
+const accent = 'var(--color-gold-bright)'
+const accentDeep = 'var(--color-gold-main)'
+const accentRed = 'var(--color-red-accent)'
 
 const features = [
   { label: '400+ 纹样', desc: '商周到明清，九大系列收藏' },
@@ -92,7 +92,7 @@ export default function AuthPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#0A0807',
+        background: 'var(--color-bg-base)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '40px 24px',
         position: 'relative', overflow: 'hidden',
@@ -110,12 +110,12 @@ export default function AuthPage() {
 
           <div style={{
             width: 92, height: 92, borderRadius: '50%',
-            background: 'linear-gradient(145deg, #C9943A, #8B6914)',
-            border: '2px solid rgba(242,213,138,0.55)',
-            boxShadow: '0 0 36px rgba(201,148,58,0.35), inset 0 1px 0 rgba(255,255,255,0.18)',
+            background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+            border: '2px solid rgba(227,192,121,0.55)',
+            boxShadow: '0 0 36px rgba(201,162,75,0.35), inset 0 1px 0 rgba(255,255,255,0.18)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 18px',
-            fontFamily: 'Noto Serif SC, serif', fontSize: 38, color: '#F5F1E8', fontWeight: 700,
+            fontFamily: 'Noto Serif SC, serif', fontSize: 38, color: 'var(--color-text-primary)', fontWeight: 700,
           }}>
             {displayName.slice(0, 1).toUpperCase()}
           </div>
@@ -147,11 +147,11 @@ export default function AuthPage() {
               width: '100%', padding: '14px',
               borderRadius: 12, fontSize: 14, fontWeight: 600,
               fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.25em',
-              background: 'linear-gradient(145deg, #C9943A, #8B6914)',
-              color: '#F5F1E8',
-              border: '1px solid rgba(201,148,58,0.45)',
+              background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+              color: 'var(--color-text-primary)',
+              border: '1px solid rgba(201,162,75,0.45)',
               cursor: 'pointer',
-              boxShadow: '0 4px 18px rgba(201,148,58,0.25), inset 0 1px 0 rgba(255,255,255,0.1)',
+              boxShadow: '0 4px 18px rgba(201,162,75,0.25), inset 0 1px 0 rgba(255,255,255,0.1)',
               marginBottom: 10,
             }}
           >
@@ -179,7 +179,7 @@ export default function AuthPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0A0807',
+      background: 'var(--color-bg-base)',
       padding: '48px 24px 40px',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       position: 'relative', overflow: 'hidden',
@@ -189,7 +189,7 @@ export default function AuthPage() {
           background so foreground content reads cleanly. */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse at 50% 45%, transparent 0%, rgba(8,6,4,0.45) 60%, rgba(8,6,4,0.78) 100%)',
+        background: 'radial-gradient(ellipse at 50% 45%, transparent 0%, rgba(23,21,19,0.45) 60%, rgba(23,21,19,0.78) 100%)',
         pointerEvents: 'none', zIndex: 1,
       }} />
 
@@ -198,7 +198,7 @@ export default function AuthPage() {
         <motion.div {...reveal(0.05)} style={{ textAlign: 'center' }}>
           <div style={{
             fontSize: 10, letterSpacing: '0.4em', textTransform: 'uppercase',
-            color: 'rgba(200,180,150,0.32)', fontWeight: 500,
+            color: 'rgba(216,205,186,0.32)', fontWeight: 500,
             marginBottom: 14,
           }}>
             Pattern Veins
@@ -220,7 +220,7 @@ export default function AuthPage() {
             纹脉
           </h1>
           <p style={{
-            fontSize: 13, color: 'rgba(245,241,232,0.7)', lineHeight: 1.7,
+            fontSize: 13, color: 'rgba(216,205,186,0.7)', lineHeight: 1.7,
             letterSpacing: '0.05em', marginTop: 14, maxWidth: 300, margin: '14px auto 0',
             textShadow: '0 1px 8px rgba(0,0,0,0.5)',
           }}>
@@ -233,21 +233,21 @@ export default function AuthPage() {
           marginTop: 28, marginBottom: 28,
           display: 'flex', flexDirection: 'column', gap: 9,
           padding: '12px 14px',
-          background: 'rgba(8,6,4,0.4)',
+          background: 'rgba(23,21,19,0.4)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           borderRadius: 12,
-          border: '1px solid rgba(200,180,150,0.06)',
+          border: '1px solid rgba(216,205,186,0.06)',
         }}>
           {features.map((f, i) => (
             <div key={i} style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 12, color: 'rgba(245,241,232,0.55)', letterSpacing: '0.04em',
+              fontSize: 12, color: 'rgba(216,205,186,0.55)', letterSpacing: '0.04em',
             }}>
               <div style={{
                 width: 5, height: 5, borderRadius: '50%',
-                background: '#F2D58A', opacity: 0.75, flexShrink: 0,
-                boxShadow: '0 0 6px rgba(242,213,138,0.4)',
+                background: 'var(--color-gold-bright)', opacity: 0.75, flexShrink: 0,
+                boxShadow: '0 0 6px rgba(227,192,121,0.4)',
               }} />
               <span style={{ color: '#F8F4E8', fontWeight: 500, minWidth: 78 }}>{f.label}</span>
               <span style={{ opacity: 0.7 }}>{f.desc}</span>
@@ -259,11 +259,11 @@ export default function AuthPage() {
         <motion.div {...reveal(0.35)} style={{
           padding: '24px 22px',
           borderRadius: 18,
-          background: 'rgba(8,6,4,0.72)',
+          background: 'rgba(23,21,19,0.72)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(200,180,150,0.12)',
-          boxShadow: '0 0 0 1px rgba(242,213,138,0.05), 0 12px 48px rgba(0,0,0,0.55)',
+          border: '1px solid rgba(216,205,186,0.12)',
+          boxShadow: '0 0 0 1px rgba(227,192,121,0.05), 0 12px 48px rgba(0,0,0,0.55)',
         }}>
           <h2 style={{
             fontFamily: 'Noto Serif SC, serif',
@@ -329,11 +329,11 @@ export default function AuthPage() {
                 padding: '13px',
                 borderRadius: 11, fontSize: 13, fontWeight: 600,
                 fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.25em',
-                background: loading ? 'rgba(212,175,106,0.08)' : 'linear-gradient(145deg, #C9943A, #8B6914)',
-                color: '#F5F1E8',
-                border: '1px solid rgba(201,148,58,0.45)',
+                background: loading ? 'rgba(201,162,75,0.08)' : 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+                color: 'var(--color-text-primary)',
+                border: '1px solid rgba(201,162,75,0.45)',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: loading ? 'none' : '0 4px 16px rgba(201,148,58,0.22), inset 0 1px 0 rgba(255,255,255,0.1)',
+                boxShadow: loading ? 'none' : '0 4px 16px rgba(201,162,75,0.22), inset 0 1px 0 rgba(255,255,255,0.1)',
                 transition: 'all 0.2s',
               }}
             >
@@ -362,7 +362,7 @@ export default function AuthPage() {
         {/* ───── Footer hint ───── */}
         <motion.div {...reveal(0.5)} style={{
           marginTop: 18, textAlign: 'center',
-          fontSize: 10, color: 'rgba(200,180,150,0.25)',
+          fontSize: 10, color: 'rgba(216,205,186,0.25)',
           letterSpacing: '0.15em',
         }}>
           {mode === 'register' ? '注册后需邮箱验证激活' : '数据加密存储 · 跨设备同步'}
@@ -397,21 +397,21 @@ function FieldInput({ icon, type, placeholder, value, onChange, required, minLen
           width: '100%',
           padding: '12px 14px 12px 40px',
           borderRadius: 10,
-          background: 'rgba(245,241,232,0.92)',
-          border: '1px solid rgba(200,180,150,0.25)',
+          background: 'rgba(216,205,186,0.92)',
+          border: '1px solid rgba(216,205,186,0.25)',
           color: '#2A2015', fontSize: 13.5,
           fontFamily: 'inherit', letterSpacing: '0.04em',
           outline: 'none',
           transition: 'all 0.2s',
         }}
         onFocus={(e) => {
-          e.target.style.borderColor = 'rgba(201,148,58,0.6)'
+          e.target.style.borderColor = 'rgba(201,162,75,0.6)'
           e.target.style.background = 'rgba(248,244,235,1)'
-          e.target.style.boxShadow = '0 0 0 3px rgba(201,148,58,0.12)'
+          e.target.style.boxShadow = '0 0 0 3px rgba(201,162,75,0.12)'
         }}
         onBlur={(e) => {
-          e.target.style.borderColor = 'rgba(200,180,150,0.25)'
-          e.target.style.background = 'rgba(245,241,232,0.92)'
+          e.target.style.borderColor = 'rgba(216,205,186,0.25)'
+          e.target.style.background = 'rgba(216,205,186,0.92)'
           e.target.style.boxShadow = 'none'
         }}
       />

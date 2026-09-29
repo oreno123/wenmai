@@ -55,31 +55,31 @@ export default function AiPatternsPage() {
     <div style={{ padding: '14px 16px', paddingBottom: '80px', maxWidth: 1080, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
         <span onClick={() => navigate('/home')}
-          style={{ color: '#7A7060', fontSize: 13, cursor: 'pointer', letterSpacing: '0.1em' }}>‹ 返回</span>
+          style={{ color: 'var(--color-text-dim)', fontSize: 13, cursor: 'pointer', letterSpacing: '0.1em' }}>‹ 返回</span>
         <h1 style={{
           fontFamily: 'Noto Serif SC, serif', fontSize: 22, fontWeight: 600,
-          color: '#F2D58A', letterSpacing: '0.15em', margin: 0,
+          color: 'var(--color-gold-bright)', letterSpacing: '0.15em', margin: 0,
         }}>AI 纹样库</h1>
       </div>
-      <p style={{ color: '#7A7060', fontSize: 12, margin: '0 0 22px', letterSpacing: '0.05em' }}>
+      <p style={{ color: 'var(--color-text-dim)', fontSize: 12, margin: '0 0 22px', letterSpacing: '0.05em' }}>
         {status === 'ready'
           ? `${vessels.length} 件青铜器 · ${vessels.reduce((s, v) => s + v.cards.length, 0)} 张精选纹样 · 博物馆 3D 扫描提取精修`
           : '博物馆 3D 扫描提取精修'}
       </p>
 
       {status === 'loading' && (
-        <div style={{ padding: '42px 20px', textAlign: 'center', color: '#A09682', fontSize: 13 }}>
+        <div style={{ padding: '42px 20px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 13 }}>
           正在载入 AI 纹样库…
         </div>
       )}
 
       {status === 'error' && (
-        <div style={{ padding: '42px 20px', textAlign: 'center', border: '1px solid rgba(212,175,106,0.2)', borderRadius: 12 }}>
+        <div style={{ padding: '42px 20px', textAlign: 'center', border: '1px solid rgba(201,162,75,0.2)', borderRadius: 12 }}>
           <div style={{ color: '#E8D9B0', fontSize: 14, marginBottom: 8 }}>未能加载 AI 纹样库</div>
-          <div style={{ color: '#7A7060', fontSize: 12, marginBottom: 16 }}>请检查网络连接后重试</div>
+          <div style={{ color: 'var(--color-text-dim)', fontSize: 12, marginBottom: 16 }}>请检查网络连接后重试</div>
           <button type="button" onClick={loadLibrary} style={{
-            border: '1px solid rgba(212,175,106,0.45)', borderRadius: 6, padding: '7px 14px',
-            color: '#F2D58A', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
+            border: '1px solid rgba(201,162,75,0.45)', borderRadius: 6, padding: '7px 14px',
+            color: 'var(--color-gold-bright)', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
           }}>重新加载</button>
         </div>
       )}
@@ -88,7 +88,7 @@ export default function AiPatternsPage() {
         <section key={v.slug} style={{ marginBottom: 30 }}>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: 8,
-            borderBottom: '1px solid rgba(212,175,106,0.18)', paddingBottom: 7, marginBottom: 12,
+            borderBottom: '1px solid rgba(201,162,75,0.18)', paddingBottom: 7, marginBottom: 12,
           }}>
             <h2 style={{
               fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600,
@@ -101,15 +101,15 @@ export default function AiPatternsPage() {
             {v.cards.map(c => (
               <motion.div key={c.id} whileHover={{ y: -3 }} onClick={() => setPick({ ...c, vessel: v })}
                 style={{
-                  background: '#F7F3EA', borderRadius: 8, padding: 8, cursor: 'pointer',
-                  border: '1px solid rgba(212,175,106,0.2)',
+                  background: 'var(--color-text-primary)', borderRadius: 8, padding: 8, cursor: 'pointer',
+                  border: '1px solid rgba(201,162,75,0.2)',
                 }}>
                 <img src={`/relic/ai/${c.webp}`} alt={c.name || c.id} loading="lazy"
                   style={{ width: '100%', display: 'block', borderRadius: 4 }} />
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, gap: 6,
                 }}>
-                  <span style={{ color: '#2B221A', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--color-bg-card)', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600 }}>
                     {c.name || c.id}
                   </span>
                   <span style={{ color: '#C0392B', fontSize: 10, letterSpacing: -1, whiteSpace: 'nowrap' }}>{'★'.repeat(c.score)}</span>
@@ -134,12 +134,12 @@ export default function AiPatternsPage() {
             }}>
             <motion.div initial={{ scale: 0.94, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.94 }}
               onClick={e => e.stopPropagation()}
-              style={{ background: '#F7F3EA', borderRadius: 12, padding: 16, maxWidth: 'min(680px, 92vw)', maxHeight: '88vh', overflow: 'auto' }}>
+              style={{ background: 'var(--color-text-primary)', borderRadius: 12, padding: 16, maxWidth: 'min(680px, 92vw)', maxHeight: '88vh', overflow: 'auto' }}>
               <img src={`/relic/ai/${pick.webp}`} alt={pick.name || pick.id}
                 style={{ width: '100%', display: 'block', borderRadius: 6 }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600, color: '#2B221A' }}>
+                  <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600, color: 'var(--color-bg-card)' }}>
                     {pick.name || pick.id}
                     <span style={{ color: '#C0392B', fontSize: 11, letterSpacing: -1, marginLeft: 8 }}>{'★'.repeat(pick.score)}</span>
                   </div>
@@ -152,14 +152,14 @@ export default function AiPatternsPage() {
                 </div>
                 <a href={`/relic/ai/${pick.webp}`} download
                   style={{
-                    fontSize: 12, color: '#F7F3EA', background: '#2B221A', borderRadius: 6,
+                    fontSize: 12, color: 'var(--color-text-primary)', background: 'var(--color-bg-card)', borderRadius: 6,
                     padding: '7px 12px', textDecoration: 'none', letterSpacing: '0.05em',
                   }}>下载 PNG</a>
                 {pick.svg && (
                   <a href={`/relic/ai/${pick.svg}`} download
                     style={{
-                      fontSize: 12, color: '#2B221A', background: 'transparent',
-                      border: '1px solid #2B221A', borderRadius: 6, padding: '6px 12px',
+                      fontSize: 12, color: 'var(--color-bg-card)', background: 'transparent',
+                      border: '1px solid var(--color-bg-card)', borderRadius: 6, padding: '6px 12px',
                       textDecoration: 'none', letterSpacing: '0.05em',
                     }}>下载 SVG</a>
                 )}

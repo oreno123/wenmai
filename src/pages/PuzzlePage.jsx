@@ -168,7 +168,7 @@ export default function PuzzlePage() {
       CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.1,
       CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.7,
     )
-    grad.addColorStop(0, '#F2EBDB')
+    grad.addColorStop(0, '#D8CDBA')
     grad.addColorStop(1, '#E8DFC8')
     cx.fillStyle = grad
     cx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
@@ -201,23 +201,23 @@ export default function PuzzlePage() {
         ctx.save()
         ctx.translate(p.x, p.y)
         ctx.rotate((p.rotation || 0) * Math.PI / 180)
-        ctx.strokeStyle = 'rgba(212,175,106,0.45)'
+        ctx.strokeStyle = 'rgba(201,162,75,0.45)'
         ctx.lineWidth = 2
         ctx.setLineDash([10, 6])
         const half = p.size / 2
         ctx.strokeRect(-half, -half, p.size, p.size)
         ctx.setLineDash([])
         // Inner tint so the slot reads as "intentional empty" not "broken"
-        ctx.fillStyle = 'rgba(212,175,106,0.04)'
+        ctx.fillStyle = 'rgba(201,162,75,0.04)'
         ctx.fillRect(-half, -half, p.size, p.size)
         // Centered label
-        ctx.fillStyle = 'rgba(212,175,106,0.65)'
+        ctx.fillStyle = 'rgba(201,162,75,0.65)'
         ctx.font = `${Math.max(14, Math.floor(p.size * 0.09))}px "Noto Serif SC", serif`
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(p.slotLabel || '空位', 0, 0)
         if (drawSelection && idx === selectedIdx) {
-          ctx.strokeStyle = 'rgba(201,168,76,0.9)'
+          ctx.strokeStyle = 'rgba(201,162,75,0.9)'
           ctx.lineWidth = 2.5
           ctx.setLineDash([6, 4])
           ctx.strokeRect(-half - 4, -half - 4, p.size + 8, p.size + 8)
@@ -247,7 +247,7 @@ export default function PuzzlePage() {
       ctx.shadowBlur = 0
 
       if (drawSelection && idx === selectedIdx) {
-        ctx.strokeStyle = 'rgba(201,168,76,0.8)'
+        ctx.strokeStyle = 'rgba(201,162,75,0.8)'
         ctx.lineWidth = 2.5
         ctx.setLineDash([6, 4])
         ctx.strokeRect(-sX / 2 - 4, -sY / 2 - 4, sX + 8, sY + 8)
@@ -726,18 +726,18 @@ export default function PuzzlePage() {
       {/* Header */}
       <div style={{
         padding: '14px 16px 10px',
-        borderBottom: '1px solid rgba(212,175,106,0.08)',
+        borderBottom: '1px solid rgba(201,162,75,0.08)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{
               fontFamily: 'Noto Serif SC, serif', fontSize: 20, fontWeight: 600,
-              color: '#F2D58A', letterSpacing: '0.15em',
+              color: 'var(--color-gold-bright)', letterSpacing: '0.15em',
             }}>
               纹样创作
             </span>
             <span style={{
-              fontSize: 9, color: '#8A6A30', letterSpacing: '0.3em',
+              fontSize: 9, color: 'var(--color-gold-dim)', letterSpacing: '0.3em',
               textTransform: 'uppercase', fontWeight: 500,
             }}>
               Compose
@@ -748,17 +748,17 @@ export default function PuzzlePage() {
               onClick={() => setShowTemplateModal(true)}
               style={{
                 ...ghostBtnStyle,
-                color: activeTemplateId ? '#F2D58A' : '#A09682',
-                borderColor: activeTemplateId ? 'rgba(212,175,106,0.3)' : 'rgba(255,255,255,0.05)',
-                background: activeTemplateId ? 'rgba(212,175,106,0.1)' : 'rgba(255,255,255,0.02)',
+                color: activeTemplateId ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+                borderColor: activeTemplateId ? 'rgba(201,162,75,0.3)' : 'rgba(255,255,255,0.05)',
+                background: activeTemplateId ? 'rgba(201,162,75,0.1)' : 'rgba(255,255,255,0.02)',
               }}
             >模板{activeTemplateId ? ` · ${getTemplateById(activeTemplateId)?.name}` : ''}</button>
             <button onClick={clearCanvas} style={ghostBtnStyle}>清空</button>
             <button onClick={saveToLibrary} disabled={placements.length === 0 || saved} style={{
               ...ghostBtnStyle,
-              background: saved ? 'rgba(100,180,100,0.12)' : placements.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(212,175,106,0.1)',
-              color: saved ? '#8BC387' : placements.length === 0 ? '#4A4A4A' : '#F2D58A',
-              border: saved ? '1px solid rgba(100,180,100,0.25)' : placements.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(212,175,106,0.25)',
+              background: saved ? 'rgba(100,180,100,0.12)' : placements.length === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(201,162,75,0.1)',
+              color: saved ? '#8BC387' : placements.length === 0 ? 'var(--color-text-dim)' : 'var(--color-gold-bright)',
+              border: saved ? '1px solid rgba(100,180,100,0.25)' : placements.length === 0 ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(201,162,75,0.25)',
               opacity: placements.length === 0 ? 0.6 : 1,
             }}>{saved ? '已保存' : '保存'}</button>
             <button
@@ -776,14 +776,14 @@ export default function PuzzlePage() {
                 fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em', fontWeight: 500,
                 background: placements.length === 0
                   ? 'rgba(255,255,255,0.03)'
-                  : 'linear-gradient(145deg, #C9943A, #8B6914)',
-                color: placements.length === 0 ? '#4A4A4A' : '#F5F1E8',
+                  : 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+                color: placements.length === 0 ? 'var(--color-text-dim)' : 'var(--color-text-primary)',
                 border: placements.length === 0
                   ? '1px solid rgba(255,255,255,0.05)'
-                  : '1px solid rgba(201,148,58,0.45)',
+                  : '1px solid rgba(201,162,75,0.45)',
                 opacity: placements.length === 0 ? 0.7 : 1,
                 cursor: placements.length === 0 ? 'not-allowed' : 'pointer',
-                boxShadow: placements.length === 0 ? 'none' : '0 2px 12px rgba(201,148,58,0.18)',
+                boxShadow: placements.length === 0 ? 'none' : '0 2px 12px rgba(201,162,75,0.18)',
                 transition: 'all 0.2s',
               }}
             >完成创作</button>
@@ -795,14 +795,14 @@ export default function PuzzlePage() {
                 fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em', fontWeight: 500,
                 background: placements.length === 0
                   ? 'rgba(255,255,255,0.02)'
-                  : 'linear-gradient(135deg, #D4AF37 0%, #BC6B2F 100%)',
-                color: placements.length === 0 ? '#4A4A4A' : '#0A0806',
+                  : 'linear-gradient(135deg, var(--color-gold-main) 0%, var(--color-gold-main) 100%)',
+                color: placements.length === 0 ? 'var(--color-text-dim)' : 'var(--color-bg-base)',
                 border: placements.length === 0
                   ? '1px solid rgba(255,255,255,0.04)'
-                  : '1px solid rgba(212,175,55,0.45)',
+                  : '1px solid rgba(201,162,75,0.45)',
                 opacity: placements.length === 0 ? 0.6 : 1,
                 cursor: placements.length === 0 ? 'not-allowed' : 'pointer',
-                boxShadow: placements.length === 0 ? 'none' : '0 2px 10px rgba(212,175,55,0.2)',
+                boxShadow: placements.length === 0 ? 'none' : '0 2px 10px rgba(201,162,75,0.2)',
                 transition: 'all 0.2s',
               }}
             >发 布 到 广 场</button>
@@ -838,7 +838,7 @@ export default function PuzzlePage() {
           width: '100%', maxWidth: DISPLAY_SIZE, aspectRatio: '1',
           borderRadius: 12, overflow: 'hidden',
           border: '1px solid rgba(160,140,100,0.25)',
-          boxShadow: '0 0 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,175,106,0.05)',
+          boxShadow: '0 0 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(201,162,75,0.05)',
         }}>
           <canvas
             ref={canvasRef}
@@ -870,7 +870,7 @@ export default function PuzzlePage() {
               <path d="M21 4v5h-5" />
             </svg>
           </button>
-          <div style={{ width: 1, background: 'rgba(212,175,106,0.1)', margin: '4px 2px' }} />
+          <div style={{ width: 1, background: 'rgba(201,162,75,0.1)', margin: '4px 2px' }} />
           <button onClick={() => scaleSelected(-15)} style={iconBtnStyle} title="缩小">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
@@ -881,7 +881,7 @@ export default function PuzzlePage() {
               <path d="M12 5v14M5 12h14" />
             </svg>
           </button>
-          <div style={{ width: 1, background: 'rgba(212,175,106,0.1)', margin: '4px 2px' }} />
+          <div style={{ width: 1, background: 'rgba(201,162,75,0.1)', margin: '4px 2px' }} />
           <button onClick={deleteSelected} style={{ ...iconBtnStyle, color: '#E85D5D', borderColor: 'rgba(232,93,93,0.2)' }} title="删除">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" />
@@ -895,12 +895,12 @@ export default function PuzzlePage() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '8px 16px 4px',
       }}>
-        <span style={{ fontSize: 12, color: '#6A6A6A' }}>
+        <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
           纹样碎片 ({filteredElements.length})
         </span>
         <button
           onClick={() => setShowTray(prev => !prev)}
-          style={{ background: 'none', border: 'none', color: '#9A9A9A', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', padding: '2px 8px' }}
+          style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit', padding: '2px 8px' }}
         >
           {showTray ? '收起 ▼' : '展开 ▲'}
         </button>
@@ -971,11 +971,11 @@ export default function PuzzlePage() {
                     draggable={false}
                   />
                 ) : (
-                  <span style={{ fontSize: 9, color: '#4A4A4A' }}>...</span>
+                  <span style={{ fontSize: 9, color: 'var(--color-text-dim)' }}>...</span>
                 )}
               </div>
               <span style={{
-                fontSize: 8, color: '#6A6A6A', textAlign: 'center',
+                fontSize: 8, color: 'var(--color-text-secondary)', textAlign: 'center',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 maxWidth: '100%',
               }}>
@@ -1022,7 +1022,7 @@ export default function PuzzlePage() {
       {forkSource && (
         <div style={{
           position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(196,30,58,0.92)', color: '#F2EBDB',
+          background: 'rgba(196,30,58,0.92)', color: 'var(--color-text-primary)',
           padding: '6px 16px', borderRadius: 6,
           fontFamily: 'Noto Serif SC, serif', fontSize: 11, letterSpacing: '0.15em',
           boxShadow: '0 4px 16px rgba(196,30,58,0.4)', zIndex: 90,
@@ -1073,8 +1073,8 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: 360,
-          background: 'linear-gradient(160deg, #1F1D17, #14120D)',
-          border: '1px solid rgba(212,175,106,0.25)',
+          background: 'linear-gradient(160deg, var(--color-bg-card), var(--color-bg-card))',
+          border: '1px solid rgba(201,162,75,0.25)',
           borderRadius: 16, padding: 20,
           boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
           fontFamily: 'Noto Serif SC, serif',
@@ -1082,14 +1082,14 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
       >
         <div style={{ marginBottom: 4 }}>
           <span style={{
-            fontSize: 16, fontWeight: 600, color: '#F2D58A', letterSpacing: '0.12em',
+            fontSize: 16, fontWeight: 600, color: 'var(--color-gold-bright)', letterSpacing: '0.12em',
           }}>选择导出规格</span>
           <span style={{
-            marginLeft: 8, fontSize: 9, color: '#8A6A30',
+            marginLeft: 8, fontSize: 9, color: 'var(--color-gold-dim)',
             letterSpacing: '0.3em', textTransform: 'uppercase',
           }}>Export</span>
         </div>
-        <div style={{ fontSize: 11, color: '#7A7060', marginBottom: 14, fontFamily: 'inherit' }}>
+        <div style={{ fontSize: 11, color: 'var(--color-text-dim)', marginBottom: 14, fontFamily: 'inherit' }}>
           当前作品 {placementCount} 个元素 · 推荐「{EXPORT_SIZES.find(s => s.size === recommendedSize)?.label}」
         </div>
 
@@ -1105,10 +1105,10 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
                   padding: '10px 12px',
                   borderRadius: 10,
                   background: selected
-                    ? 'rgba(212,175,106,0.12)'
+                    ? 'rgba(201,162,75,0.12)'
                     : 'rgba(255,255,255,0.02)',
                   border: selected
-                    ? '1px solid rgba(212,175,106,0.4)'
+                    ? '1px solid rgba(201,162,75,0.4)'
                     : '1px solid rgba(255,255,255,0.05)',
                   cursor: 'pointer',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -1117,17 +1117,17 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
               >
                 <div>
                   <div style={{
-                    fontSize: 13, color: selected ? '#F2D58A' : '#C7B58A',
+                    fontSize: 13, color: selected ? 'var(--color-gold-bright)' : '#C7B58A',
                     fontFamily: 'inherit', letterSpacing: '0.05em',
                     display: 'flex', alignItems: 'center', gap: 8,
                   }}>
                     {opt.label}
-                    <span style={{ fontSize: 10, color: '#7A7060', fontFamily: 'inherit' }}>
+                    <span style={{ fontSize: 10, color: 'var(--color-text-dim)', fontFamily: 'inherit' }}>
                       {opt.size}×{opt.size}
                     </span>
                   </div>
                   <div style={{
-                    fontSize: 10, color: '#7A7060', marginTop: 2,
+                    fontSize: 10, color: 'var(--color-text-dim)', marginTop: 2,
                     fontFamily: 'inherit',
                   }}>
                     {opt.useCase}
@@ -1136,7 +1136,7 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
                 {recommended && (
                   <span style={{
                     fontSize: 9, color: '#1A1A1A',
-                    background: 'linear-gradient(145deg, #F2D58A, #C9943A)',
+                    background: 'linear-gradient(145deg, var(--color-gold-bright), var(--color-gold-main))',
                     padding: '2px 8px', borderRadius: 8,
                     fontFamily: 'inherit', letterSpacing: '0.1em', fontWeight: 600,
                   }}>推荐</span>
@@ -1155,11 +1155,11 @@ function ExportSizeModal({ currentSize, recommendedSize, placementCount, onSelec
           <button onClick={onConfirm} style={{
             padding: '7px 18px', borderRadius: 9, fontSize: 12,
             fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.1em', fontWeight: 500,
-            background: 'linear-gradient(145deg, #C9943A, #8B6914)',
-            color: '#F5F1E8',
-            border: '1px solid rgba(201,148,58,0.45)',
+            background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+            color: 'var(--color-text-primary)',
+            border: '1px solid rgba(201,162,75,0.45)',
             cursor: 'pointer',
-            boxShadow: '0 2px 12px rgba(201,148,58,0.18)',
+            boxShadow: '0 2px 12px rgba(201,162,75,0.18)',
           }}>导出 {currentSize}×{currentSize}</button>
         </div>
       </div>
@@ -1198,8 +1198,8 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: 420, maxHeight: '85vh', overflowY: 'auto',
-          background: 'linear-gradient(160deg, #1F1D17, #14120D)',
-          border: '1px solid rgba(212,175,106,0.25)',
+          background: 'linear-gradient(160deg, var(--color-bg-card), var(--color-bg-card))',
+          border: '1px solid rgba(201,162,75,0.25)',
           borderRadius: 16, padding: 20,
           boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
           fontFamily: 'Noto Serif SC, serif',
@@ -1207,14 +1207,14 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
       >
         <div style={{ marginBottom: 14 }}>
           <span style={{
-            fontSize: 16, fontWeight: 600, color: '#F2D58A', letterSpacing: '0.12em',
+            fontSize: 16, fontWeight: 600, color: 'var(--color-gold-bright)', letterSpacing: '0.12em',
           }}>选择构图模板</span>
           <span style={{
-            marginLeft: 8, fontSize: 9, color: '#8A6A30',
+            marginLeft: 8, fontSize: 9, color: 'var(--color-gold-dim)',
             letterSpacing: '0.3em', textTransform: 'uppercase',
           }}>Template</span>
         </div>
-        <div style={{ fontSize: 11, color: '#7A7060', marginBottom: 14, fontFamily: 'inherit' }}>
+        <div style={{ fontSize: 11, color: 'var(--color-text-dim)', marginBottom: 14, fontFamily: 'inherit' }}>
           应用模板后自动从你的图鉴填充元素 · 缺失的位置显示为虚线空位
         </div>
 
@@ -1231,10 +1231,10 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
                   padding: '12px 14px',
                   borderRadius: 10,
                   background: isActive
-                    ? 'rgba(212,175,106,0.15)'
+                    ? 'rgba(201,162,75,0.15)'
                     : 'rgba(255,255,255,0.02)',
                   border: isActive
-                    ? '1px solid rgba(212,175,106,0.45)'
+                    ? '1px solid rgba(201,162,75,0.45)'
                     : '1px solid rgba(255,255,255,0.05)',
                   cursor: 'pointer',
                   transition: 'all 0.15s',
@@ -1245,19 +1245,19 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
                   marginBottom: 4,
                 }}>
                   <span style={{
-                    fontSize: 14, color: isActive ? '#F2D58A' : '#E0D4B0',
+                    fontSize: 14, color: isActive ? 'var(--color-gold-bright)' : '#E0D4B0',
                     fontFamily: 'inherit', letterSpacing: '0.08em', fontWeight: 500,
                   }}>{tpl.name}</span>
                   <span style={{
                     fontSize: 10,
-                    color: full ? '#8BC387' : '#C9943A',
+                    color: full ? '#8BC387' : 'var(--color-gold-main)',
                     fontFamily: 'inherit',
-                    background: full ? 'rgba(100,180,100,0.1)' : 'rgba(201,148,58,0.1)',
+                    background: full ? 'rgba(100,180,100,0.1)' : 'rgba(201,162,75,0.1)',
                     padding: '2px 7px', borderRadius: 8,
                   }}>{c.filled}/{c.total} 可填</span>
                 </div>
                 <div style={{
-                  fontSize: 11, color: '#7A7060', fontFamily: 'inherit',
+                  fontSize: 11, color: 'var(--color-text-dim)', fontFamily: 'inherit',
                   lineHeight: 1.5,
                 }}>{tpl.description}</div>
               </div>
@@ -1276,13 +1276,13 @@ function TemplatePickerModal({ activeId, library, onSelect, onCancel }) {
 }
 
 function pillStyle(active, accent) {
-  const c = accent || '#F2D58A'
+  const c = accent || 'var(--color-gold-bright)'
   return {
     padding: '5px 14px', borderRadius: 14, fontSize: 12, whiteSpace: 'nowrap',
-    background: active ? 'rgba(212,175,106,0.15)' : 'rgba(255,255,255,0.02)',
-    color: active ? c : '#7A7060',
+    background: active ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.02)',
+    color: active ? c : 'var(--color-text-dim)',
     border: active
-      ? `1px solid ${c === '#F2D58A' ? 'rgba(212,175,106,0.3)' : c + '40'}`
+      ? `1px solid ${c === 'var(--color-gold-bright)' ? 'rgba(201,162,75,0.3)' : c + '40'}`
       : '1px solid rgba(255,255,255,0.04)',
     cursor: 'pointer',
     fontFamily: 'Noto Serif SC, serif',
@@ -1295,7 +1295,7 @@ function pillStyle(active, accent) {
 const btnStyle = {
   padding: '5px 14px', borderRadius: 8, fontSize: 13,
   background: 'rgba(255,255,255,0.04)',
-  color: '#D4AF6A', border: '1px solid rgba(255,255,255,0.08)',
+  color: 'var(--color-gold-main)', border: '1px solid rgba(255,255,255,0.08)',
   cursor: 'pointer', fontFamily: 'inherit',
 }
 
@@ -1394,7 +1394,7 @@ function resolveMove(moved, placements, draggingIdx, shapeCacheRef) {
 const ghostBtnStyle = {
   padding: '6px 14px', borderRadius: 9, fontSize: 12,
   background: 'rgba(255,255,255,0.02)',
-  color: '#A09682',
+  color: 'var(--color-text-secondary)',
   border: '1px solid rgba(255,255,255,0.05)',
   cursor: 'pointer',
   fontFamily: 'Noto Serif SC, serif',
@@ -1406,7 +1406,7 @@ const navBtnStyle = {
   display: 'flex', alignItems: 'center', gap: 5,
   padding: '4px 10px', borderRadius: 12,
   background: 'rgba(255,255,255,0.02)',
-  color: '#7A7060',
+  color: 'var(--color-text-dim)',
   border: '1px solid rgba(255,255,255,0.04)',
   fontSize: 10, cursor: 'pointer',
   fontFamily: 'inherit', letterSpacing: '0.05em',
@@ -1416,9 +1416,9 @@ const navBtnStyle = {
 const iconBtnStyle = {
   width: 34, height: 34, borderRadius: 9,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'linear-gradient(145deg, #1F1D17, #14120D)',
-  color: '#F2D58A',
-  border: '1px solid rgba(212,175,106,0.2)',
+  background: 'linear-gradient(145deg, var(--color-bg-card), var(--color-bg-card))',
+  color: 'var(--color-gold-bright)',
+  border: '1px solid rgba(201,162,75,0.2)',
   cursor: 'pointer',
   transition: 'all 0.2s',
 }

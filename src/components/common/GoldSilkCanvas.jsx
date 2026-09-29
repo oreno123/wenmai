@@ -58,7 +58,7 @@ export default function GoldSilkCanvas() {
         // 层1: 大范围 bloom
         ctx.save()
         curve(ctx, tr.points)
-        ctx.strokeStyle = 'rgba(201, 162, 60, 0.02)'
+        ctx.strokeStyle = 'rgba(201,162,75, 0.02)'
         ctx.lineWidth = tr.width * 6
         ctx.lineCap = 'round'
         ctx.filter = `blur(${tr.width * 1.2}px)`
@@ -69,13 +69,13 @@ export default function GoldSilkCanvas() {
         ctx.save()
         curve(ctx, tr.points)
         const g = ctx.createLinearGradient(0, 0, w, 0)
-        g.addColorStop(0, 'rgba(201, 162, 60, 0)')
-        g.addColorStop(0.15, 'rgba(201, 162, 60, 0.05)')
+        g.addColorStop(0, 'rgba(201,162,75, 0)')
+        g.addColorStop(0.15, 'rgba(201,162,75, 0.05)')
         g.addColorStop(0.4, 'rgba(232, 200, 74, 0.08)')
-        g.addColorStop(0.5, 'rgba(255, 240, 176, 0.1)')
+        g.addColorStop(0.5, 'rgba(227,192,121, 0.1)')
         g.addColorStop(0.6, 'rgba(232, 200, 74, 0.08)')
-        g.addColorStop(0.85, 'rgba(201, 162, 60, 0.05)')
-        g.addColorStop(1, 'rgba(201, 162, 60, 0)')
+        g.addColorStop(0.85, 'rgba(201,162,75, 0.05)')
+        g.addColorStop(1, 'rgba(201,162,75, 0)')
         ctx.strokeStyle = g
         ctx.lineWidth = tr.width
         ctx.lineCap = 'round'
@@ -86,7 +86,7 @@ export default function GoldSilkCanvas() {
         // 层3: 核心亮线
         ctx.save()
         curve(ctx, tr.points)
-        ctx.strokeStyle = 'rgba(255, 240, 176, 0.08)'
+        ctx.strokeStyle = 'rgba(227,192,121, 0.08)'
         ctx.lineWidth = 2
         ctx.lineCap = 'round'
         ctx.filter = 'blur(1px)'

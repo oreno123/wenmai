@@ -24,7 +24,7 @@ function MugGeometry({ texture }) {
           side={THREE.DoubleSide}
           metalness={0.25}
           roughness={0.55}
-          color={texture ? '#ffffff' : '#D4AF6A'}
+          color={texture ? '#ffffff' : '#C9A24B'}
         />
       </mesh>
       {/* Back half of outer wall - ceramic */}
@@ -40,12 +40,12 @@ function MugGeometry({ texture }) {
       {/* Inner wall */}
       <mesh position={[0, 0.08, 0]}>
         <cylinderGeometry args={[0.85, 0.85, 2.34, 64, 1, true]} />
-        <meshStandardMaterial color="#F0EBE0" side={THREE.DoubleSide} metalness={0.1} roughness={0.8} />
+        <meshStandardMaterial color="#D8CDBA" side={THREE.DoubleSide} metalness={0.1} roughness={0.8} />
       </mesh>
       {/* Rim ring */}
       <mesh position={[0, 1.25, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.85, 1, 64]} />
-        <meshStandardMaterial color="#F0EBE0" metalness={0.15} roughness={0.7} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#D8CDBA" metalness={0.15} roughness={0.7} side={THREE.DoubleSide} />
       </mesh>
       {/* Bottom */}
       <mesh position={[0, -1.25, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -54,7 +54,7 @@ function MugGeometry({ texture }) {
       </mesh>
       {/* Handle */}
       <mesh geometry={handleGeo}>
-        <meshStandardMaterial color="#D4AF6A" metalness={0.4} roughness={0.45} />
+        <meshStandardMaterial color="#C9A24B" metalness={0.4} roughness={0.45} />
       </mesh>
     </group>
   )

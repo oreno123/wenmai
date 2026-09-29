@@ -36,7 +36,7 @@ function CardImage({ pattern }: { pattern: Pattern }) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          filter: isSSR ? 'drop-shadow(0 0 12px rgba(201,162,60,0.6))' : undefined,
+          filter: isSSR ? 'drop-shadow(0 0 12px rgba(201,162,75,0.6))' : undefined,
         }}
       />
     </div>
@@ -44,9 +44,9 @@ function CardImage({ pattern }: { pattern: Pattern }) {
 }
 
 const RARITY_COLORS: Record<Rarity, string> = {
-  ssr: '#C9A23C',
-  rare: '#8B6914',
-  common: '#666',
+  ssr: 'var(--color-gold-main)',
+  rare: 'var(--color-gold-dim)',
+  common: 'var(--color-text-secondary)',
 }
 
 function CardInfo({ pattern }: { pattern: Pattern }) {
@@ -246,8 +246,8 @@ export default function GestureCardView({ patterns, onClose }: Props) {
     }
 
     if (isSSR) {
-      base.border = '2px solid #C9A23C'
-      base.boxShadow = '0 0 20px rgba(201,162,60,0.4), 0 8px 32px rgba(0,0,0,0.3)'
+      base.border = '2px solid var(--color-gold-main)'
+      base.boxShadow = '0 0 20px rgba(201,162,75,0.4), 0 8px 32px rgba(0,0,0,0.3)'
     } else {
       base.boxShadow = '0 8px 32px rgba(0,0,0,0.3)'
     }
@@ -385,8 +385,8 @@ export default function GestureCardView({ patterns, onClose }: Props) {
           fontFamily: 'var(--font-serif)',
           fontSize: 18,
           fontWeight: 600,
-          color: '#C9A23C',
-          textShadow: '0 0 10px rgba(201,162,60,0.4)',
+          color: 'var(--color-gold-main)',
+          textShadow: '0 0 10px rgba(201,162,75,0.4)',
           zIndex: 10,
         }}
       >

@@ -653,7 +653,7 @@ export function getCategories(): string[] {
  */
 export function getComponentSVG(
   component: Component,
-  stroke: string = '#C9A84C',
+  stroke: string = 'var(--color-gold-main)',
   strokeWidth: number = 2,
   fill: string = '#1A1612',
 ): string {
@@ -665,9 +665,9 @@ export function getComponentSVG(
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${component.viewBox}" width="${w}" height="${h}">
   <defs>
     <linearGradient id="gold-${uid}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#F2D58A"/>
-      <stop offset="50%" stop-color="#C9A84C"/>
-      <stop offset="100%" stop-color="#8B6914"/>
+      <stop offset="0%" stop-color="var(--color-gold-bright)"/>
+      <stop offset="50%" stop-color="var(--color-gold-main)"/>
+      <stop offset="100%" stop-color="var(--color-gold-dim)"/>
     </linearGradient>
     <filter id="shadow-${uid}">
       <feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.6"/>
@@ -685,7 +685,7 @@ export function getComponentSVG(
  */
 export function getComponentDataURL(
   component: Component,
-  stroke: string = '#C9A84C',
+  stroke: string = 'var(--color-gold-main)',
   strokeWidth: number = 1.5,
 ): string {
   const svg = getComponentSVG(component, stroke, strokeWidth)
@@ -703,7 +703,7 @@ export function drawComponentOnCanvas(
   y: number,
   size: number,
   rotation: number = 0,
-  stroke: string = '#C9A84C',
+  stroke: string = 'var(--color-gold-main)',
   strokeWidth: number = 2.5,
 ): void {
   ctx.save()

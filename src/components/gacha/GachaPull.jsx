@@ -126,7 +126,7 @@ export default function GachaPull() {
             height: '280px',
             margin: '0 auto 16px',
             background: result.rarity === 'ssr'
-              ? 'radial-gradient(circle at 50% 30%, rgba(212,175,106,0.2), transparent 60%)'
+              ? 'radial-gradient(circle at 50% 30%, rgba(201,162,75,0.2), transparent 60%)'
               : 'var(--bg-secondary)',
             borderRadius: '16px',
             border: `2px solid ${

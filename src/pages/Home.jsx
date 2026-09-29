@@ -22,7 +22,7 @@ const STORY_CHAPTERS = [
     desc: '千年纹样触手可及',
     cta: '进入图鉴', path: '/library',
     deco: (
-      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.6">
         <circle cx="24" cy="24" r="18" />
         <circle cx="24" cy="24" r="11" />
         <circle cx="24" cy="24" r="5" />
@@ -34,7 +34,7 @@ const STORY_CHAPTERS = [
     desc: '每条纹样都在低语',
     cta: '听 故 事', path: '/library',
     deco: (
-      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.6">
         <path d="M14 18a10 10 0 0 1 20 0v8a10 10 0 0 1-20 0z" />
         <path d="M10 26a4 4 0 0 0 4 4M38 26a4 4 0 0 1-4 4" />
       </svg>
@@ -45,7 +45,7 @@ const STORY_CHAPTERS = [
     desc: '拼出属于你的纹样',
     cta: '开始创作', path: '/puzzle',
     deco: (
-      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.6">
         <path d="M14 6l4 4-8 8 8 8-4 4-8-8 8-8z" />
         <path d="M34 6l8 8-8 8M30 42l-4-4 8-8-8-8 4-4 8 8-8 8z" />
       </svg>
@@ -56,7 +56,7 @@ const STORY_CHAPTERS = [
     desc: '把它变成实物',
     cta: '看浮雕预览', path: '/editor',
     deco: (
-      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="#F2D58A" strokeWidth="0.6">
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.6">
         <path d="M10 18l14-8 14 8v18l-14 8-14-8z" />
         <path d="M10 18l14 8 14-8M24 26v18" />
       </svg>
@@ -92,15 +92,15 @@ function DailyFlipCard({ navigate, freePulls }) {
       >
         {/* 正面：今日日期 */}
         <div className="wm-flip-face" style={{
-          background: 'radial-gradient(ellipse at 50% 18%, rgba(242,213,138,0.14), transparent 55%), linear-gradient(165deg, #201A0E 0%, #0E0C06 100%)',
-          border: '1px solid rgba(212,175,106,0.4)',
+          background: 'radial-gradient(ellipse at 50% 18%, rgba(227,192,121,0.14), transparent 55%), linear-gradient(165deg, #201A0E 0%, #0E0C06 100%)',
+          border: '1px solid rgba(201,162,75,0.4)',
           boxShadow: '0 18px 60px rgba(0,0,0,0.55)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}>
           {/* 角线：右上为主装饰（最长最粗），左下短细呼应，左上/右下留白 */}
-          <div style={{ position: 'absolute', top: 14, right: 14, width: 34, height: 34, borderTop: '1.5px solid rgba(212,175,106,0.55)', borderRight: '1.5px solid rgba(212,175,106,0.55)' }} />
-          <div style={{ position: 'absolute', bottom: 14, left: 14, width: 20, height: 20, borderBottom: '0.75px solid rgba(212,175,106,0.35)', borderLeft: '0.75px solid rgba(212,175,106,0.35)' }} />
-          <div style={{ fontSize: 12, letterSpacing: '0.55em', textIndent: '0.55em', color: '#8A6A30' }}>{month}</div>
+          <div style={{ position: 'absolute', top: 14, right: 14, width: 34, height: 34, borderTop: '1.5px solid rgba(201,162,75,0.55)', borderRight: '1.5px solid rgba(201,162,75,0.55)' }} />
+          <div style={{ position: 'absolute', bottom: 14, left: 14, width: 20, height: 20, borderBottom: '0.75px solid rgba(201,162,75,0.35)', borderLeft: '0.75px solid rgba(201,162,75,0.35)' }} />
+          <div style={{ fontSize: 12, letterSpacing: '0.55em', textIndent: '0.55em', color: 'var(--color-gold-dim)' }}>{month}</div>
           <div
             className="wm-hollow wm-hollow-num"
             style={{ '--wm-tex': `url(${today ? getPatternImage(today) : ''})`, fontSize: 128, fontWeight: 900, lineHeight: 1.1, margin: '4px 0 2px' }}
@@ -109,35 +109,35 @@ function DailyFlipCard({ navigate, freePulls }) {
           <motion.div
             animate={{ y: [0, -4, 0], opacity: [0.6, 1, 0.6] }}
             transition={{ duration: 2.4, ease: 'easeInOut', repeat: Infinity }}
-            style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: '#D4AF6A', letterSpacing: '0.3em', textIndent: '0.3em' }}
+            style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: 'var(--color-gold-main)', letterSpacing: '0.3em', textIndent: '0.3em' }}
           >轻 触 掀 开</motion.div>
         </div>
 
         {/* 背面：今日纹样（底部留出底部导航凸起相机的侵入区） */}
         <div className="wm-flip-face wm-flip-back" style={{
           background: 'linear-gradient(165deg, #1E1910 0%, #0D0B06 100%)',
-          border: '1px solid rgba(212,175,106,0.4)',
+          border: '1px solid rgba(201,162,75,0.4)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 18px 88px',
         }}>
           <div style={{
-            marginTop: 2, fontSize: 10, letterSpacing: '0.3em', color: '#F2D58A',
-            padding: '3px 12px', border: '1px solid rgba(242,213,138,0.35)', borderRadius: 10,
-            background: 'rgba(242,213,138,0.08)',
+            marginTop: 2, fontSize: 10, letterSpacing: '0.3em', color: 'var(--color-gold-bright)',
+            padding: '3px 12px', border: '1px solid rgba(227,192,121,0.35)', borderRadius: 10,
+            background: 'rgba(227,192,121,0.08)',
           }}>{today ? getRarityLabel(today.rarity) : ''}</div>
           <div style={{
             flex: 1, width: '100%', marginTop: 12, borderRadius: 12,
             minHeight: 0, overflow: 'hidden',
-            background: 'radial-gradient(circle, rgba(242,213,138,0.07), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(227,192,121,0.07), transparent 70%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <PatternImage
               src={today ? getPatternImage(today) : ''}
               alt={today?.name}
               fallbackSize={48}
-              style={{ maxWidth: '80%', maxHeight: '80%', objectFit: 'contain', filter: 'drop-shadow(0 4px 24px rgba(201,162,60,0.3))' }}
+              style={{ maxWidth: '80%', maxHeight: '80%', objectFit: 'contain', filter: 'drop-shadow(0 4px 24px rgba(201,162,75,0.3))' }}
             />
           </div>
-          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.2em', color: '#F2D58A', marginTop: 12 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.2em', color: 'var(--color-gold-bright)', marginTop: 12 }}>
             {today?.name}
           </div>
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', letterSpacing: '0.25em', marginTop: 5 }}>
@@ -145,16 +145,16 @@ function DailyFlipCard({ navigate, freePulls }) {
           </div>
           <div style={{
             width: '100%', marginTop: 14, paddingTop: 10, textAlign: 'center',
-            borderTop: '1px solid rgba(212,175,106,0.25)',
+            borderTop: '1px solid rgba(201,162,75,0.25)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16,
           }}>
-            <span style={{ fontSize: 11, color: '#8A6A30', letterSpacing: '0.15em' }}>
+            <span style={{ fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: '0.15em' }}>
               今日免费 {freePulls > 0 ? freePulls : 0} 次
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); navigate('/gacha') }}
               style={{
-                background: '#BC1F28', color: '#F5F1E8', border: 'none', borderRadius: 4,
+                background: 'var(--color-red-accent)', color: 'var(--color-text-primary)', border: 'none', borderRadius: 4,
                 padding: '8px 22px', fontSize: 13, letterSpacing: '0.35em', textIndent: '0.35em',
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
@@ -167,7 +167,7 @@ function DailyFlipCard({ navigate, freePulls }) {
 }
 
 /* 五入口图标 — 线条 SVG，统一风格 */
-function FeatureIcon({ name, size = 22, color = '#F2D58A' }) {
+function FeatureIcon({ name, size = 22, color = 'var(--color-gold-bright)' }) {
   const icons = {
     camera: (
       <>
@@ -261,12 +261,12 @@ export default function Home() {
             onClick={() => navigate('/landing')} title="回到首页">
             <span style={{
               fontFamily: 'Noto Serif SC, serif', fontSize: 24, fontWeight: 600,
-              color: '#F2D58A', letterSpacing: '0.2em',
+              color: 'var(--color-gold-bright)', letterSpacing: '0.2em',
             }}>
               纹脉
             </span>
             <span style={{
-              fontSize: 9, color: '#8A6A30', letterSpacing: '0.35em',
+              fontSize: 9, color: 'var(--color-gold-dim)', letterSpacing: '0.35em',
               textTransform: 'uppercase', fontWeight: 500,
             }}>
               Pattern Veins
@@ -279,20 +279,20 @@ export default function Home() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '6px 12px', borderRadius: 18,
-                background: 'rgba(212,175,106,0.04)',
-                border: '1px solid rgba(212,175,106,0.12)',
-                color: '#F2D58A', fontSize: 12, cursor: 'pointer',
+                background: 'rgba(201,162,75,0.04)',
+                border: '1px solid rgba(201,162,75,0.12)',
+                color: 'var(--color-gold-bright)', fontSize: 12, cursor: 'pointer',
                 fontFamily: 'inherit', fontWeight: 500,
                 letterSpacing: '0.08em',
                 transition: 'all 0.2s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(212,175,106,0.12)'
-                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.35)'
+                e.currentTarget.style.background = 'rgba(201,162,75,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(201,162,75,0.35)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(212,175,106,0.04)'
-                e.currentTarget.style.borderColor = 'rgba(212,175,106,0.12)'
+                e.currentTarget.style.background = 'rgba(201,162,75,0.04)'
+                e.currentTarget.style.borderColor = 'rgba(201,162,75,0.12)'
               }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -302,7 +302,7 @@ export default function Home() {
               <span>作品</span>
               {data.creations && data.creations.length > 0 && (
                 <span style={{
-                  background: '#BC1F28', color: '#F5F1E8',
+                  background: 'var(--color-red-accent)', color: 'var(--color-text-primary)',
                   fontSize: 10, fontWeight: 700,
                   padding: '1px 7px', borderRadius: 9,
                   minWidth: 18, textAlign: 'center', lineHeight: '14px',
@@ -314,16 +314,16 @@ export default function Home() {
             <div style={{
               display: 'flex', alignItems: 'baseline', gap: 4,
               padding: '6px 12px', borderRadius: 18,
-              background: 'rgba(212,175,106,0.08)',
-              border: '1px solid rgba(212,175,106,0.22)',
+              background: 'rgba(201,162,75,0.08)',
+              border: '1px solid rgba(201,162,75,0.22)',
             }}>
               <span style={{
-                color: '#F2D58A', fontSize: 13, fontWeight: 600,
+                color: 'var(--color-gold-bright)', fontSize: 13, fontWeight: 600,
                 fontFamily: 'Noto Serif SC, serif',
               }}>
                 {data.points}
               </span>
-              <span style={{ fontSize: 10, color: '#F2D58A', opacity: 0.7 }}>积分</span>
+              <span style={{ fontSize: 10, color: 'var(--color-gold-bright)', opacity: 0.7 }}>积分</span>
             </div>
             {/* Account button — shows avatar chip when logged in, plain text "登录" otherwise */}
             <button
@@ -334,7 +334,7 @@ export default function Home() {
                 padding: user ? '4px 6px 4px 4px' : '4px 2px',
                 background: 'transparent',
                 border: 'none',
-                color: user ? '#F2D58A' : 'var(--color-text-secondary)', fontSize: user ? 12 : 12,
+                color: user ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)', fontSize: user ? 12 : 12,
                 cursor: 'pointer',
                 fontFamily: 'inherit', fontWeight: 400,
                 letterSpacing: '0.08em',
@@ -346,10 +346,10 @@ export default function Home() {
                 <>
                   <div style={{
                     width: 22, height: 22, borderRadius: '50%',
-                    background: 'linear-gradient(145deg, #C9943A, #8B6914)',
+                    background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: 'Noto Serif SC, serif', fontSize: 12,
-                    color: '#F5F1E8', fontWeight: 700,
+                    color: 'var(--color-text-primary)', fontWeight: 700,
                   }}>
                     {(displayName || '?').slice(0, 1).toUpperCase()}
                   </div>
@@ -376,9 +376,9 @@ export default function Home() {
                     onClick={() => navigate('/photo-match')}
                     style={{
                       background: 'linear-gradient(150deg, #221C10 0%, #100D07 100%)',
-                      border: '1.5px solid rgba(212,175,106,0.5)',
+                      border: '1.5px solid rgba(201,162,75,0.5)',
                       borderRadius: 18, padding: '24px 20px 22px', position: 'relative', overflow: 'hidden',
-                      boxShadow: '0 0 46px rgba(212,175,106,0.13)', cursor: 'pointer',
+                      boxShadow: '0 0 46px rgba(201,162,75,0.13)', cursor: 'pointer',
                     }}
                   >
                     {/* 底纹：云雷纹 5% 平铺（降低浓度，避免与镂空字叠纹） */}
@@ -401,7 +401,7 @@ export default function Home() {
                         style={{ '--wm-tex': 'url(/patterns/xiangyun.webp)', fontSize: 84, fontWeight: 900, lineHeight: 1, letterSpacing: '0.06em', display: 'inline-block' }}
                       >拍</span>
                       <div style={{ paddingBottom: 10 }}>
-                        <div style={{ fontSize: 11, letterSpacing: '0.4em', color: '#8A6A30' }}>拍 照 识 纹</div>
+                        <div style={{ fontSize: 11, letterSpacing: '0.4em', color: 'var(--color-gold-dim)' }}>拍 照 识 纹</div>
                         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.9, marginTop: 10 }}>
                           逛博物馆时拍一张<br />立刻认出它、听它说话
                         </div>
@@ -413,8 +413,8 @@ export default function Home() {
                       <motion.button
                         whileHover={{ filter: 'brightness(1.15)' }}
                         style={{
-                          background: 'transparent', color: '#F2D58A',
-                          border: '1px solid rgba(212,175,106,0.5)',
+                          background: 'transparent', color: 'var(--color-gold-bright)',
+                          border: '1px solid rgba(201,162,75,0.5)',
                           borderRadius: 3, padding: '9px 26px',
                           fontSize: 14, letterSpacing: '0.5em', textIndent: '0.5em', cursor: 'pointer', fontFamily: 'inherit',
                           display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -449,7 +449,7 @@ export default function Home() {
               <div style={{
                 fontFamily: 'Noto Serif SC, serif',
                 fontSize: 19, fontWeight: 500,
-                color: '#F2D58A', letterSpacing: '0.18em',
+                color: 'var(--color-gold-bright)', letterSpacing: '0.18em',
                 lineHeight: 1.6,
               }}>
                 每一道纹样，都是某个人的呼吸
@@ -457,7 +457,7 @@ export default function Home() {
               <div style={{
                 fontFamily: 'Cormorant Garamond, serif',
                 fontStyle: 'italic',
-                fontSize: 12, color: '#8A6A30',
+                fontSize: 12, color: 'var(--color-gold-dim)',
                 marginTop: 4, letterSpacing: '0.1em',
               }}>
                 千年纹样在此复活，等你接续
@@ -475,7 +475,7 @@ export default function Home() {
                   style={{
                     position: 'relative',
                     background: 'linear-gradient(155deg, #1A1812 0%, #0E0C08 100%)',
-                    border: '1px solid rgba(212,175,106,0.22)',
+                    border: '1px solid rgba(201,162,75,0.22)',
                     borderRadius: 14,
                     padding: '14px 10px 12px',
                     cursor: 'pointer',
@@ -484,12 +484,12 @@ export default function Home() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.55)'
-                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(0,0,0,0.45), 0 0 18px rgba(212,175,106,0.15)'
+                    e.currentTarget.style.borderColor = 'rgba(201,162,75,0.55)'
+                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(0,0,0,0.45), 0 0 18px rgba(201,162,75,0.15)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.22)'
+                    e.currentTarget.style.borderColor = 'rgba(201,162,75,0.22)'
                     e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
@@ -497,8 +497,8 @@ export default function Home() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                     <span style={{
                       display: 'inline-block',
-                      background: '#BC1F28',
-                      color: '#F5F1E8',
+                      background: 'var(--color-red-accent)',
+                      color: 'var(--color-text-primary)',
                       fontFamily: 'Noto Serif SC, serif',
                       fontWeight: 600,
                       padding: '1px 6px',
@@ -508,7 +508,7 @@ export default function Home() {
                     <span style={{
                       fontFamily: 'Cormorant Garamond, serif',
                       fontStyle: 'italic',
-                      fontSize: 9, color: '#8A6A30',
+                      fontSize: 9, color: 'var(--color-gold-dim)',
                       letterSpacing: '0.18em',
                     }}>{ch.en}</span>
                   </div>
@@ -517,7 +517,7 @@ export default function Home() {
                   <div style={{
                     fontFamily: 'Noto Serif SC, serif',
                     fontSize: 18, fontWeight: 500,
-                    color: '#F2D58A', letterSpacing: '0.15em',
+                    color: 'var(--color-gold-bright)', letterSpacing: '0.15em',
                     marginBottom: 6,
                   }}>{ch.cn}</div>
 
@@ -533,7 +533,7 @@ export default function Home() {
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: 4,
                     fontFamily: 'Noto Serif SC, serif',
-                    fontSize: 10, color: '#D4AF37',
+                    fontSize: 10, color: 'var(--color-gold-main)',
                     letterSpacing: '0.15em',
                     fontWeight: 500,
                   }}>
@@ -562,22 +562,22 @@ export default function Home() {
                 marginTop: 10,
                 padding: '12px 16px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                background: 'rgba(188,31,40,0.06)',
-                border: '1px solid rgba(188,31,40,0.28)',
+                background: 'rgba(158,53,48,0.06)',
+                border: '1px solid rgba(158,53,48,0.28)',
                 borderRadius: 10,
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(188,31,40,0.12)'
-                e.currentTarget.style.borderColor = 'rgba(188,31,40,0.5)'
+                e.currentTarget.style.background = 'rgba(158,53,48,0.12)'
+                e.currentTarget.style.borderColor = 'rgba(158,53,48,0.5)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(188,31,40,0.06)'
-                e.currentTarget.style.borderColor = 'rgba(188,31,40,0.28)'
+                e.currentTarget.style.background = 'rgba(158,53,48,0.06)'
+                e.currentTarget.style.borderColor = 'rgba(158,53,48,0.28)'
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-bright)" strokeWidth="1.5">
                 <rect x="3" y="3" width="7.5" height="7.5" rx="1" />
                 <rect x="13.5" y="3" width="7.5" height="7.5" rx="1" />
                 <rect x="3" y="13.5" width="7.5" height="7.5" rx="1" />
@@ -585,12 +585,12 @@ export default function Home() {
               </svg>
               <span style={{
                 fontFamily: 'Noto Serif SC, serif',
-                fontSize: 12, color: '#F2D58A',
+                fontSize: 12, color: 'var(--color-gold-bright)',
                 letterSpacing: '0.15em',
               }}>
                 或看看别人怎么做的 · 进入广场
               </span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F2D58A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-bright)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M13 5l7 7-7 7" />
               </svg>
             </motion.div>
@@ -613,21 +613,21 @@ export default function Home() {
                 <div style={{
                   width: 44, height: 44,
                   background: 'linear-gradient(145deg, #1A1812, #0F0D08)',
-                  border: '1px solid rgba(212,175,106,0.15)',
+                  border: '1px solid rgba(201,162,75,0.15)',
                   borderRadius: 11,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.25s ease',
                 }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
+                    e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(212,175,106,0.15)'
+                    e.currentTarget.style.borderColor = 'rgba(201,162,75,0.15)'
                   }}
                 >
-                  <FeatureIcon name={item.icon} size={18} color="#A09682" />
+                  <FeatureIcon name={item.icon} size={18} color="var(--color-text-secondary)" />
                 </div>
                 <span style={{
                   fontSize: 10, color: 'var(--color-text-secondary)', marginTop: 6,
@@ -650,20 +650,20 @@ export default function Home() {
               display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
               marginBottom: 4,
               paddingBottom: 6,
-              borderBottom: '1px solid rgba(212,175,106,0.15)',
+              borderBottom: '1px solid rgba(201,162,75,0.15)',
             }}>
               <span style={{
                 fontFamily: 'Noto Serif SC, serif',
                 fontSize: 19, fontWeight: 600,
-                color: '#F2D58A', letterSpacing: '0.1em',
+                color: 'var(--color-gold-bright)', letterSpacing: '0.1em',
               }}>
                 我的作品集
               </span>
               {data.creations && data.creations.length > 0 && (
                 <span style={{
-                  fontSize: 11, color: '#8A6A30',
+                  fontSize: 11, color: 'var(--color-gold-dim)',
                   padding: '2px 10px', borderRadius: 10,
-                  background: 'rgba(212,175,106,0.06)',
+                  background: 'rgba(201,162,75,0.06)',
                 }}>
                   共 {data.creations.length} 件
                 </span>
@@ -692,18 +692,18 @@ export default function Home() {
                   }} style={{
                     position: 'relative',
                     aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
-                    border: '1px solid rgba(212,175,106,0.18)',
+                    border: '1px solid rgba(201,162,75,0.18)',
                     background: 'linear-gradient(145deg, #1E1C16, #14120E)',
                     cursor: 'pointer',
                     transition: 'transform 0.2s, border-color 0.2s',
                   }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'scale(1.03)'
-                      e.currentTarget.style.borderColor = 'rgba(212,175,106,0.4)'
+                      e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'scale(1)'
-                      e.currentTarget.style.borderColor = 'rgba(212,175,106,0.18)'
+                      e.currentTarget.style.borderColor = 'rgba(201,162,75,0.18)'
                     }}
                   >
                     <img src={c.image} alt="创作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -718,7 +718,7 @@ export default function Home() {
                       style={{
                         position: 'absolute', top: 5, right: 5,
                         width: 22, height: 22, borderRadius: '50%',
-                        background: 'rgba(8,6,4,0.72)',
+                        background: 'rgba(23,21,19,0.72)',
                         backdropFilter: 'blur(6px)',
                         WebkitBackdropFilter: 'blur(6px)',
                         border: '1px solid rgba(232,128,128,0.25)',
@@ -745,7 +745,7 @@ export default function Home() {
                 onClick={() => setDeleteTarget(null)}
                 style={{
                   position: 'fixed', inset: 0, zIndex: 200,
-                  background: 'rgba(8,6,4,0.78)',
+                  background: 'rgba(23,21,19,0.78)',
                   backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: 24,
@@ -758,8 +758,8 @@ export default function Home() {
                     width: '100%', maxWidth: 280,
                     padding: '22px 22px 18px',
                     borderRadius: 14,
-                    background: 'linear-gradient(145deg, #1F1D17, #14120D)',
-                    border: '1px solid rgba(212,175,106,0.22)',
+                    background: 'linear-gradient(145deg, var(--color-bg-card), var(--color-bg-card))',
+                    border: '1px solid rgba(201,162,75,0.22)',
                     boxShadow: '0 12px 48px rgba(0,0,0,0.5)',
                     textAlign: 'center',
                   }}
@@ -777,7 +777,7 @@ export default function Home() {
                   </div>
                   <div style={{
                     fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600,
-                    color: '#F2D58A', letterSpacing: '0.1em', marginBottom: 6,
+                    color: 'var(--color-gold-bright)', letterSpacing: '0.1em', marginBottom: 6,
                   }}>
                     删除这幅作品？
                   </div>
@@ -794,7 +794,7 @@ export default function Home() {
                         borderRadius: 10, fontSize: 12,
                         fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em',
                         background: 'rgba(255,255,255,0.04)',
-                        color: '#A09682',
+                        color: 'var(--color-text-secondary)',
                         border: '1px solid rgba(255,255,255,0.06)',
                         cursor: 'pointer',
                       }}
@@ -809,7 +809,7 @@ export default function Home() {
                         borderRadius: 10, fontSize: 12, fontWeight: 600,
                         fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.15em',
                         background: 'linear-gradient(145deg, #C0392B, #8B2A1F)',
-                        color: '#F5F1E8',
+                        color: 'var(--color-text-primary)',
                         border: '1px solid rgba(192,57,43,0.4)',
                         cursor: 'pointer',
                         boxShadow: '0 2px 10px rgba(192,57,43,0.25)',
@@ -824,7 +824,7 @@ export default function Home() {
           {/* ── 系列收集进度 ── */}
           <motion.div variants={stagger} initial="initial" animate="animate" style={{ marginTop: 28 }}>
             <motion.div variants={fadeUp}>
-              <span style={{ fontFamily: 'serif', fontSize: 16, color: '#F5F1E8' }}>系列收集进度</span>
+              <span style={{ fontFamily: 'serif', fontSize: 16, color: 'var(--color-text-primary)' }}>系列收集进度</span>
             </motion.div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginTop: 12 }}>
@@ -835,18 +835,18 @@ export default function Home() {
                 return (
                   <motion.div key={s.id} variants={fadeUp} style={{
                     background: 'linear-gradient(135deg, #1A1814, #0F0E0A)',
-                    border: '1px solid rgba(212,175,106,0.15)', borderRadius: 12, padding: 14,
+                    border: '1px solid rgba(201,162,75,0.15)', borderRadius: 12, padding: 14,
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                      <span style={{ fontFamily: 'serif', fontSize: 14, color: '#F2D58A' }}>{s.name}</span>
+                      <span style={{ fontFamily: 'serif', fontSize: 14, color: 'var(--color-gold-bright)' }}>{s.name}</span>
                       <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{collected}/{total}</span>
                     </div>
                     <div style={{ height: 3, background: '#2A2A2A', borderRadius: 2, marginTop: 8, overflow: 'hidden' }}>
                       <div style={{
                         width: `${progress}%`, height: '100%',
-                        background: 'linear-gradient(90deg, #BC6B2F, #F2D58A)',
+                        background: 'linear-gradient(90deg, var(--color-gold-main), var(--color-gold-bright))',
                         borderRadius: 2,
-                        boxShadow: '0 0 6px #F2D58A',
+                        boxShadow: '0 0 6px var(--color-gold-bright)',
                       }} />
                     </div>
                   </motion.div>
@@ -894,7 +894,7 @@ function SeriesCarousel({ series, navigate }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <span style={{
           fontFamily: 'Noto Serif SC, serif', fontSize: 15, fontWeight: 600,
-          color: series.color || '#F2D58A', letterSpacing: '0.1em',
+          color: series.color || 'var(--color-gold-bright)', letterSpacing: '0.1em',
         }}>
           {series.name}
         </span>

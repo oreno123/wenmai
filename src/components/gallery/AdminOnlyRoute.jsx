@@ -33,8 +33,8 @@ export default function AdminOnlyRoute({ children }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#0A0806',
-        color: '#6B5C45',
+        background: 'var(--color-bg-base)',
+        color: 'var(--color-text-dim)',
         fontFamily: "'Noto Serif SC', serif",
       }}>
         验证权限中

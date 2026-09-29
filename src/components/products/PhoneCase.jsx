@@ -12,7 +12,7 @@ function PhoneCaseGeometry({ texture }) {
           map={texture}
           metalness={0.2}
           roughness={0.7}
-          color={texture ? '#ffffff' : '#D4AF6A'}
+          color={texture ? '#ffffff' : '#C9A24B'}
         />
       </mesh>
       {/* Camera bump */}

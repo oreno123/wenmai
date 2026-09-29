@@ -7,10 +7,10 @@ import { callStepFunVision, matchPattern, fileToCompressedBase64 } from '../util
 import PatternImage from '../components/common/PatternImage'
 
 function similarityLabel(score) {
-  if (score >= 0.85) return { label: '很像', color: '#F2D58A' }
-  if (score >= 0.65) return { label: '相似', color: '#D4AF6A' }
-  if (score >= 0.45) return { label: '略像', color: '#8a7a4a' }
-  return { label: '参考', color: '#5a5a5a' }
+  if (score >= 0.85) return { label: '很像', color: 'var(--color-gold-bright)' }
+  if (score >= 0.65) return { label: '相似', color: 'var(--color-gold-main)' }
+  if (score >= 0.45) return { label: '略像', color: 'var(--color-gold-dim)' }
+  return { label: '参考', color: 'var(--color-text-dim)' }
 }
 
 export default function PhotoMatchPage() {
@@ -212,15 +212,15 @@ export default function PhotoMatchPage() {
       <div key={match.patternId} style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: 12, marginBottom: 8,
-        background: idx === 0 ? 'rgba(201,162,60,0.08)' : 'rgba(255,255,255,0.02)',
+        background: idx === 0 ? 'rgba(201,162,75,0.08)' : 'rgba(255,255,255,0.02)',
         borderRadius: 12,
-        border: `1px solid ${idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)'}`,
+        border: `1px solid ${idx === 0 ? 'rgba(201,162,75,0.2)' : 'rgba(255,255,255,0.05)'}`,
       }}>
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
-          background: idx === 0 ? 'rgba(201,162,60,0.2)' : 'rgba(255,255,255,0.05)',
+          background: idx === 0 ? 'rgba(201,162,75,0.2)' : 'rgba(255,255,255,0.05)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13, fontWeight: 700, color: idx === 0 ? '#F2D58A' : '#6A6A6A',
+          fontSize: 13, fontWeight: 700, color: idx === 0 ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
           flexShrink: 0,
         }}>
           {idx + 1}
@@ -233,10 +233,10 @@ export default function PhotoMatchPage() {
           <PatternImage src={getPatternImage(pattern)} alt={pattern.name} fallbackSize={24} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#F5F1E8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {pattern.name}
           </div>
-          <div style={{ fontSize: 11, color: '#6A6A6A', marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 2 }}>
             <span className={`rarity-badge rarity-${pattern.rarity}`} style={{ fontSize: 10, padding: '1px 6px' }}>
               {getRarityLabel(pattern.rarity)}
             </span>
@@ -262,12 +262,12 @@ export default function PhotoMatchPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <button onClick={() => navigate('/home')} style={{
-          background: 'none', border: 'none', color: '#D4AF6A', fontSize: 16,
+          background: 'none', border: 'none', color: 'var(--color-gold-main)', fontSize: 16,
           cursor: 'pointer', fontFamily: 'inherit', padding: 0,
         }}>
           ← 返回
         </button>
-        <h1 style={{ fontSize: 18, fontWeight: 700, color: '#F2D58A', letterSpacing: 1 }}>
+        <h1 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 1 }}>
           找相似
         </h1>
       </div>
@@ -278,23 +278,23 @@ export default function PhotoMatchPage() {
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           style={{
-            border: '2px dashed rgba(201,162,60,0.3)',
+            border: '2px dashed rgba(201,162,75,0.3)',
             borderRadius: 16,
             padding: '48px 24px',
             textAlign: 'center',
-            background: 'rgba(201,162,60,0.03)',
+            background: 'rgba(201,162,75,0.03)',
             cursor: 'pointer',
           }}
           onClick={() => fileRef.current?.click()}
         >
           <div style={{ fontSize: 48, marginBottom: 12 }}>📷</div>
-          <div style={{ fontSize: 15, color: '#F5F1E8', fontWeight: 600, marginBottom: 8 }}>
+          <div style={{ fontSize: 15, color: 'var(--color-text-primary)', fontWeight: 600, marginBottom: 8 }}>
             上传图片找相似纹样
           </div>
-          <div style={{ fontSize: 12, color: '#6A6A6A' }}>
+          <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
             从纹样库里找最像的 3 张给你参考
           </div>
-          <div style={{ fontSize: 11, color: '#4A4A4A', marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: 'var(--color-text-dim)', marginTop: 8 }}>
             支持 JPG / PNG / WebP
           </div>
           <div
@@ -302,7 +302,7 @@ export default function PhotoMatchPage() {
               e.stopPropagation()
               trySamplePhoto()
             }}
-            style={{ fontSize: 12, color: '#C9A23C', marginTop: 14, cursor: 'pointer' }}
+            style={{ fontSize: 12, color: 'var(--color-gold-main)', marginTop: 14, cursor: 'pointer' }}
           >
             没有藏品照片？用内置纹样试试 →
           </div>
@@ -320,16 +320,16 @@ export default function PhotoMatchPage() {
       {matchState === 'crop' && (
         <div>
           <div style={{
-            fontSize: 12, color: '#8a7a4a', marginBottom: 8, letterSpacing: 1,
+            fontSize: 12, color: 'var(--color-gold-dim)', marginBottom: 8, letterSpacing: 1,
           }}>
             在图上拖框圈出纹样主体找相似，或不框直接整图搜
           </div>
 
           <div style={{
             textAlign: 'center', marginBottom: 16,
-            background: 'rgba(201,162,60,0.03)',
+            background: 'rgba(201,162,75,0.03)',
             borderRadius: 12, padding: 12,
-            border: '1px solid rgba(201,162,60,0.1)',
+            border: '1px solid rgba(201,162,75,0.1)',
           }}>
             <div style={{ position: 'relative', display: 'inline-block', lineHeight: 0 }}>
               <img
@@ -366,8 +366,8 @@ export default function PhotoMatchPage() {
                         position: 'absolute',
                         left: cropRect.x, top: cropRect.y,
                         width: cropRect.w, height: cropRect.h,
-                        border: '2px solid #D4AF6A',
-                        boxShadow: '0 0 0 1px rgba(0,0,0,0.5), 0 0 12px rgba(212,175,106,0.4)',
+                        border: '2px solid var(--color-gold-main)',
+                        boxShadow: '0 0 0 1px rgba(0,0,0,0.5), 0 0 12px rgba(201,162,75,0.4)',
                         pointerEvents: 'none',
                       }} />
                     </>
@@ -383,9 +383,9 @@ export default function PhotoMatchPage() {
               disabled={!cropIsValid}
               style={{
                 padding: '10px 20px', borderRadius: 10, fontSize: 13,
-                background: cropIsValid ? 'linear-gradient(135deg, #D4AF6A, #B8860B)' : 'rgba(255,255,255,0.04)',
-                color: cropIsValid ? '#1a1a1a' : '#5a5a5a',
-                border: '1px solid rgba(212,175,106,0.3)',
+                background: cropIsValid ? 'linear-gradient(135deg, var(--color-gold-main), #B8860B)' : 'rgba(255,255,255,0.04)',
+                color: cropIsValid ? '#1a1a1a' : 'var(--color-text-dim)',
+                border: '1px solid rgba(201,162,75,0.3)',
                 cursor: cropIsValid ? 'pointer' : 'not-allowed',
                 fontFamily: 'inherit', fontWeight: 600,
               }}
@@ -396,7 +396,7 @@ export default function PhotoMatchPage() {
               onClick={() => runIdentify(false)}
               style={{
                 padding: '10px 20px', borderRadius: 10, fontSize: 13,
-                background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+                background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
                 border: '1px solid rgba(255,255,255,0.08)',
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
@@ -405,7 +405,7 @@ export default function PhotoMatchPage() {
             </button>
             <button onClick={handleReset} style={{
               padding: '10px 20px', borderRadius: 10, fontSize: 13,
-              background: 'transparent', color: '#6A6A6A',
+              background: 'transparent', color: 'var(--color-text-secondary)',
               border: '1px solid rgba(255,255,255,0.05)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -422,10 +422,10 @@ export default function PhotoMatchPage() {
             <img src={previewUrl} alt="上传图片" style={{
               maxWidth: '100%', maxHeight: 200, borderRadius: 12,
               objectFit: 'contain', marginBottom: 20,
-              border: '1px solid rgba(201,162,60,0.15)',
+              border: '1px solid rgba(201,162,75,0.15)',
             }} />
           )}
-          <div style={{ color: '#D4AF6A', fontSize: 15, letterSpacing: 2 }}>
+          <div style={{ color: 'var(--color-gold-main)', fontSize: 15, letterSpacing: 2 }}>
             AI 正在识别纹样...
           </div>
         </div>
@@ -437,17 +437,17 @@ export default function PhotoMatchPage() {
           {/* User image */}
           <div style={{
             textAlign: 'center', marginBottom: 24,
-            padding: 16, background: 'rgba(201,162,60,0.03)',
-            borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
+            padding: 16, background: 'rgba(201,162,75,0.03)',
+            borderRadius: 12, border: '1px solid rgba(201,162,75,0.1)',
           }}>
-            <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>你上传的图片</div>
             <img src={previewUrl} alt="上传图片" style={{
               maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
             }} />
           </div>
 
           {/* Matches */}
-          <div style={{ fontSize: 14, color: '#F5F1E8', fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>
+          <div style={{ fontSize: 14, color: 'var(--color-text-primary)', fontWeight: 600, marginBottom: 12, letterSpacing: 1 }}>
             最像的纹样
           </div>
 
@@ -460,7 +460,7 @@ export default function PhotoMatchPage() {
           )}
 
           <div style={{
-            fontSize: 11, color: '#5a5a5a', textAlign: 'center',
+            fontSize: 11, color: 'var(--color-text-dim)', textAlign: 'center',
             marginTop: 12, fontStyle: 'italic',
           }}>
             本地特征匹配，结果仅供参考 · 想精确识别同一张图请上传库内原图
@@ -470,7 +470,7 @@ export default function PhotoMatchPage() {
           <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
             <button onClick={() => setMatchState('crop')} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -478,7 +478,7 @@ export default function PhotoMatchPage() {
             </button>
             <button onClick={handleReset} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -499,27 +499,27 @@ export default function PhotoMatchPage() {
         <div>
           <div style={{
             textAlign: 'center', marginBottom: 24,
-            padding: 16, background: 'rgba(201,162,60,0.03)',
-            borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
+            padding: 16, background: 'rgba(201,162,75,0.03)',
+            borderRadius: 12, border: '1px solid rgba(201,162,75,0.1)',
           }}>
-            <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>你上传的图片</div>
             <img src={previewUrl} alt="上传图片" style={{
               maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
             }} />
           </div>
 
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: 3, marginBottom: 8 }}>
               未检测到
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#D4AF6A', letterSpacing: 3 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-gold-main)', letterSpacing: 3 }}>
               中国传统纹样
             </div>
-            <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
+            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
               试试对准器物上的纹样特写重新拍摄
             </div>
             {vlm.explanation && (
-              <div style={{ fontSize: 11, color: '#5a5a5a', lineHeight: 1.8, maxWidth: 320, margin: '8px auto 0', fontStyle: 'italic' }}>
+              <div style={{ fontSize: 11, color: 'var(--color-text-dim)', lineHeight: 1.8, maxWidth: 320, margin: '8px auto 0', fontStyle: 'italic' }}>
                 AI 看到的内容：{vlm.explanation}
               </div>
             )}
@@ -528,7 +528,7 @@ export default function PhotoMatchPage() {
           <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
             <button onClick={() => setMatchState('crop')} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -536,7 +536,7 @@ export default function PhotoMatchPage() {
             </button>
             <button onClick={handleReset} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -550,10 +550,10 @@ export default function PhotoMatchPage() {
         <div>
           <div style={{
             textAlign: 'center', marginBottom: 24,
-            padding: 16, background: 'rgba(201,162,60,0.03)',
-            borderRadius: 12, border: '1px solid rgba(201,162,60,0.1)',
+            padding: 16, background: 'rgba(201,162,75,0.03)',
+            borderRadius: 12, border: '1px solid rgba(201,162,75,0.1)',
           }}>
-            <div style={{ fontSize: 12, color: '#6A6A6A', marginBottom: 8 }}>你上传的图片</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>你上传的图片</div>
             <img src={previewUrl} alt="上传图片" style={{
               maxWidth: '100%', maxHeight: 180, borderRadius: 8, objectFit: 'contain',
             }} />
@@ -561,13 +561,13 @@ export default function PhotoMatchPage() {
 
           {matchResult.source === 'exact' && matchResult.primaryMatch ? (
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>AI 识别为</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#F2D58A', letterSpacing: 4 }}>
+              <div style={{ fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: 3, marginBottom: 8 }}>AI 识别为</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--color-gold-bright)', letterSpacing: 4 }}>
                 {matchResult.primaryMatch.name}
               </div>
-              <div style={{ margin: '14px auto', width: 48, height: 1, background: 'rgba(212,175,106,0.4)' }} />
+              <div style={{ margin: '14px auto', width: 48, height: 1, background: 'rgba(201,162,75,0.4)' }} />
               {vlm.explanation && (
-                <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '0 auto 16px' }}>
+                <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: 320, margin: '0 auto 16px' }}>
                   {vlm.explanation}
                 </div>
               )}
@@ -575,7 +575,7 @@ export default function PhotoMatchPage() {
                 onClick={() => navigate(`/pattern/${matchResult.primaryMatch.id}`)}
                 style={{
                   padding: '10px 28px', borderRadius: 10, fontSize: 13,
-                  background: 'linear-gradient(135deg, #D4AF6A, #B8860B)',
+                  background: 'linear-gradient(135deg, var(--color-gold-main), #B8860B)',
                   color: '#1a1a1a', border: 'none', cursor: 'pointer',
                   fontFamily: 'inherit', fontWeight: 600,
                 }}
@@ -585,15 +585,15 @@ export default function PhotoMatchPage() {
             </div>
           ) : matchResult.source === 'fuzzy' ? (
             <div>
-              <div style={{ fontSize: 14, color: '#F5F1E8', fontWeight: 600, marginBottom: 8, letterSpacing: 1 }}>
+              <div style={{ fontSize: 14, color: 'var(--color-text-primary)', fontWeight: 600, marginBottom: 8, letterSpacing: 1 }}>
                 AI 认为可能是：{vlm.candidates.join('、')}
               </div>
               {vlm.explanation && (
-                <div style={{ fontSize: 12, color: '#8a7a4a', lineHeight: 1.8, marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: 'var(--color-gold-dim)', lineHeight: 1.8, marginBottom: 16 }}>
                   {vlm.explanation}
                 </div>
               )}
-              <div style={{ fontSize: 13, color: '#C8B896', marginBottom: 10 }}>图鉴内近似纹样（点击查看百科）</div>
+              <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 10 }}>图鉴内近似纹样（点击查看百科）</div>
               {matchResult.fuzzyMatches.map(p => (
                 <div
                   key={p.id}
@@ -613,8 +613,8 @@ export default function PhotoMatchPage() {
                     <PatternImage src={getPatternImage(p)} alt={p.name} fallbackSize={24} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#F5F1E8' }}>{p.name}</div>
-                    <div style={{ fontSize: 11, color: '#6A6A6A', marginTop: 2 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 2 }}>
                       <span className={`rarity-badge rarity-${p.rarity}`} style={{ fontSize: 10, padding: '1px 6px' }}>
                         {getRarityLabel(p.rarity)}
                       </span>
@@ -627,21 +627,21 @@ export default function PhotoMatchPage() {
           ) : (
             <div>
               <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ fontSize: 11, color: '#8a7a4a', letterSpacing: 3, marginBottom: 8 }}>
+                <div style={{ fontSize: 11, color: 'var(--color-gold-dim)', letterSpacing: 3, marginBottom: 8 }}>
                   图鉴暂未收录 · AI 识别为
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: '#D4AF6A', letterSpacing: 3 }}>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-gold-main)', letterSpacing: 3 }}>
                   {vlm.candidates.join('、') || '未能识别'}
                 </div>
                 {vlm.explanation && (
-                  <div style={{ fontSize: 13, color: '#C8B896', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
+                  <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: 320, margin: '12px auto 0' }}>
                     {vlm.explanation}
                   </div>
                 )}
               </div>
               {matches.length > 0 && (
                 <>
-                  <div style={{ fontSize: 13, color: '#C8B896', marginBottom: 10 }}>相似参考（本地匹配）</div>
+                  <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 10 }}>相似参考（本地匹配）</div>
                   {renderMatchCards(matches)}
                 </>
               )}
@@ -649,7 +649,7 @@ export default function PhotoMatchPage() {
           )}
 
           <div style={{
-            fontSize: 11, color: '#5a5a5a', textAlign: 'center',
+            fontSize: 11, color: 'var(--color-text-dim)', textAlign: 'center',
             marginTop: 12, fontStyle: 'italic',
           }}>
             AI 识别 + 库内匹配 · 拍博物馆实物效果最好
@@ -658,7 +658,7 @@ export default function PhotoMatchPage() {
           <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
             <button onClick={() => setMatchState('crop')} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>
@@ -666,7 +666,7 @@ export default function PhotoMatchPage() {
             </button>
             <button onClick={handleReset} style={{
               padding: '10px 24px', borderRadius: 10, fontSize: 13,
-              background: 'rgba(255,255,255,0.04)', color: '#D4AF6A',
+              background: 'rgba(255,255,255,0.04)', color: 'var(--color-gold-main)',
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontFamily: 'inherit',
             }}>

@@ -94,7 +94,7 @@ function GestureOverlay({ isOpen, isFist, isReady, error, hasImage }) {
       <div style={{
         background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
         padding: '8px 20px', borderRadius: 20,
-        color: '#F2D58A', fontSize: 13, textAlign: 'center',
+        color: 'var(--color-gold-bright)', fontSize: 13, textAlign: 'center',
       }}>
         {!hasImage ? '暂无创作纹样，请先前往创作' :
          error ? '摄像头不可用，用空格键控制' :
@@ -152,7 +152,7 @@ export default function Showcase() {
         href="#/home"
         style={{
           position: 'absolute', top: 16, left: 16, zIndex: 20,
-          color: '#F2D58A', textDecoration: 'none', fontSize: 14,
+          color: 'var(--color-gold-bright)', textDecoration: 'none', fontSize: 14,
           background: 'rgba(0,0,0,0.4)', padding: '6px 14px',
           borderRadius: 16, backdropFilter: 'blur(4px)',
         }}

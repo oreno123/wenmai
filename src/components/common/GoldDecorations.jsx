@@ -6,13 +6,13 @@ export function GoldThreadH({ style }) {
     <svg width="100%" height="12" style={{ display: 'block', ...style }} viewBox="0 0 400 12" preserveAspectRatio="none">
       <defs>
         <linearGradient id="gold-thread-h" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#5A420E" stopOpacity="0" />
-          <stop offset="20%" stopColor="#D4A843" />
+          <stop offset="0%" stopColor="var(--color-gold-deep)" stopOpacity="0" />
+          <stop offset="20%" stopColor="var(--color-gold-main)" />
           <stop offset="40%" stopColor="#FFF0A0" />
-          <stop offset="50%" stopColor="#F5D870" />
+          <stop offset="50%" stopColor="var(--color-gold-bright)" />
           <stop offset="60%" stopColor="#FFF0A0" />
-          <stop offset="80%" stopColor="#D4A843" />
-          <stop offset="100%" stopColor="#5A420E" stopOpacity="0" />
+          <stop offset="80%" stopColor="var(--color-gold-main)" />
+          <stop offset="100%" stopColor="var(--color-gold-deep)" stopOpacity="0" />
         </linearGradient>
       </defs>
       <line x1="0" y1="6" x2="400" y2="6" stroke="url(#gold-thread-h)" strokeWidth="0.8" opacity="0.6" />
@@ -54,17 +54,17 @@ export function CornerOrnament({ position = 'top-left', size = 40 }) {
       <path
         d="M2 2 L2 30 Q2 18 14 18 L30 18 Q18 18 18 14 L18 2"
         fill="none"
-        stroke="#D4A843"
+        stroke="var(--color-gold-main)"
         strokeWidth="1"
       />
       <path
         d="M2 2 L2 22 Q2 10 12 10 L22 10"
         fill="none"
-        stroke="#F5D870"
+        stroke="var(--color-gold-bright)"
         strokeWidth="0.5"
         opacity="0.5"
       />
-      <circle cx="4" cy="4" r="1.5" fill="#D4A843" opacity="0.6" />
+      <circle cx="4" cy="4" r="1.5" fill="var(--color-gold-main)" opacity="0.6" />
     </svg>
   )
 }
@@ -83,22 +83,22 @@ export function SpinningGoldMandala({ size = 200, opacity = 0.06, speed = 40 }) 
       <svg width="100%" height="100%" viewBox="-100 -100 200 200"
         style={{ animation: `ray-spin ${speed}s linear infinite` }}>
         {/* 外圈 */}
-        <circle cx="0" cy="0" r="90" fill="none" stroke="#D4A843" strokeWidth="0.3" opacity="0.4" />
-        <circle cx="0" cy="0" r="70" fill="none" stroke="#D4A843" strokeWidth="0.5" opacity="0.3" />
+        <circle cx="0" cy="0" r="90" fill="none" stroke="var(--color-gold-main)" strokeWidth="0.3" opacity="0.4" />
+        <circle cx="0" cy="0" r="70" fill="none" stroke="var(--color-gold-main)" strokeWidth="0.5" opacity="0.3" />
         {/* 金丝线 */}
         {[0, 30, 60, 90, 120, 150].map((angle, i) => (
           <g key={i} transform={`rotate(${angle})`}>
             <path
               d="M0,-85 Q20,-40 0,-20 Q-20,0 0,20 Q20,40 0,85"
               fill="none"
-              stroke={i % 2 === 0 ? '#D4A843' : '#F5D870'}
+              stroke={i % 2 === 0 ? 'var(--color-gold-main)' : 'var(--color-gold-bright)'}
               strokeWidth="0.4"
               opacity="0.5"
             />
           </g>
         ))}
         {/* 内圈 */}
-        <circle cx="0" cy="0" r="20" fill="none" stroke="#F5D870" strokeWidth="0.3" opacity="0.5">
+        <circle cx="0" cy="0" r="20" fill="none" stroke="var(--color-gold-bright)" strokeWidth="0.3" opacity="0.5">
           <animate attributeName="r" values="18;22;18" dur="4s" repeatCount="indefinite" />
         </circle>
       </svg>
@@ -121,7 +121,7 @@ export function GoldThreadV({ x = 0, height = '100%' }) {
       <div style={{
         width: '1px',
         height: '200%',
-        background: 'linear-gradient(180deg, transparent 0%, #5A420E 10%, #D4A843 30%, #FFF0A0 50%, #D4A843 70%, #5A420E 90%, transparent 100%)',
+        background: 'linear-gradient(180deg, transparent 0%, var(--color-gold-deep) 10%, var(--color-gold-main) 30%, #FFF0A0 50%, var(--color-gold-main) 70%, var(--color-gold-deep) 90%, transparent 100%)',
         animation: 'flow 4s linear infinite',
         backgroundSize: '100% 200%',
       }} />
@@ -145,7 +145,7 @@ export function GoldWireBorder({ children, style, ssr = false }) {
           width="calc(100% - 1px)" height="calc(100% - 1px)"
           rx="14"
           fill="none"
-          stroke="#D4A843"
+          stroke="var(--color-gold-main)"
           strokeWidth={ssr ? 1 : 0.5}
           strokeDasharray={ssr ? "100 20 40 20" : "60 40"}
           opacity={ssr ? 0.5 : 0.2}

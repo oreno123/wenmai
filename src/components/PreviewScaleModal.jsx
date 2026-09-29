@@ -159,7 +159,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
         style={{
           position: 'fixed', inset: 0, zIndex: 200,
           display: 'flex', flexDirection: 'column',
-          background: 'rgba(8,6,4,0.92)',
+          background: 'rgba(23,21,19,0.92)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           overflowY: 'auto',
@@ -176,14 +176,14 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 10, padding: '6px 16px',
-              color: '#D4AF6A', fontSize: 14, cursor: 'pointer',
+              color: 'var(--color-gold-main)', fontSize: 14, cursor: 'pointer',
               fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
             <span style={{ fontSize: 16 }}>←</span> 返回编辑
           </button>
           <span style={{
-            fontSize: 15, fontWeight: 600, color: '#F2D58A',
+            fontSize: 15, fontWeight: 600, color: 'var(--color-gold-bright)',
             letterSpacing: 2,
           }}>
             纹样预览
@@ -210,12 +210,12 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
                 maxWidth: '100%', maxHeight: '60vh',
                 background: '#F5F0E6',
                 borderRadius: 16,
-                border: '2px solid rgba(180,155,100,0.35)',
+                border: '2px solid rgba(138,111,53,0.35)',
                 boxShadow: `
-                  0 0 0 1px rgba(180,155,100,0.1),
+                  0 0 0 1px rgba(138,111,53,0.1),
                   0 4px 24px rgba(0,0,0,0.4),
-                  0 0 80px rgba(201,148,58,0.08),
-                  inset 0 0 60px rgba(180,155,100,0.06)
+                  0 0 80px rgba(201,162,75,0.08),
+                  inset 0 0 60px rgba(138,111,53,0.06)
                 `,
                 overflow: 'hidden',
                 position: 'relative',
@@ -253,7 +253,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
                   position: 'absolute',
                   ...pos,
                   width: 20, height: 20,
-                  borderColor: 'rgba(180,155,100,0.25)',
+                  borderColor: 'rgba(138,111,53,0.25)',
                   borderStyle: 'solid',
                   borderWidth: 0,
                   borderTopWidth: pos.border.includes('top') ? 1.5 : 0,
@@ -282,15 +282,15 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
             <div style={{ flex: 1, position: 'relative', height: 28, display: 'flex', alignItems: 'center' }}>
               <div style={{
                 position: 'absolute', left: 0, right: 0, height: 3,
-                background: 'rgba(180,155,100,0.15)', borderRadius: 2,
+                background: 'rgba(138,111,53,0.15)', borderRadius: 2,
               }} />
               <div style={{
                 position: 'absolute', left: 0,
                 width: `${((scale - MIN_SCALE) / (MAX_SCALE - MIN_SCALE)) * 100}%`,
                 height: 3,
-                background: 'linear-gradient(90deg, #C9943A, #F2D58A)',
+                background: 'linear-gradient(90deg, var(--color-gold-main), var(--color-gold-bright))',
                 borderRadius: 2,
-                boxShadow: '0 0 8px rgba(201,148,58,0.3)',
+                boxShadow: '0 0 8px rgba(201,162,75,0.3)',
               }} />
               <input
                 type="range"
@@ -320,9 +320,9 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
               onClick={() => setShowRotation(!showRotation)}
               style={{
                 width: 28, height: 28, borderRadius: 8,
-                background: showRotation ? 'rgba(201,148,58,0.2)' : 'rgba(255,255,255,0.04)',
-                border: showRotation ? '1px solid rgba(201,148,58,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                color: showRotation ? '#F2D58A' : '#6A6A6A',
+                background: showRotation ? 'rgba(201,162,75,0.2)' : 'rgba(255,255,255,0.04)',
+                border: showRotation ? '1px solid rgba(201,162,75,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                color: showRotation ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
                 fontSize: 13, cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
                 fontFamily: 'inherit', transition: 'all 0.2s',
@@ -375,7 +375,7 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
                 border: saved
                   ? '1px solid rgba(100,180,100,0.3)'
                   : '1px solid rgba(255,255,255,0.1)',
-                color: saved ? '#8BC387' : '#D4AF6A',
+                color: saved ? '#8BC387' : 'var(--color-gold-main)',
                 fontSize: 14, fontWeight: 600,
                 letterSpacing: 2,
                 cursor: saved ? 'default' : 'pointer',
@@ -394,8 +394,8 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
                 padding: '12px 24px',
                 borderRadius: 14,
                 background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(212,175,106,0.25)',
-                color: '#F2D58A',
+                border: '1px solid rgba(201,162,75,0.25)',
+                color: 'var(--color-gold-bright)',
                 fontSize: 14, fontWeight: 600,
                 letterSpacing: 2,
                 cursor: 'pointer',
@@ -406,21 +406,21 @@ export default function PreviewScaleModal({ imageUrl, placements, onClose }) {
               看浮雕
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(201,148,58,0.4)' }}
+              whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(201,162,75,0.4)' }}
               whileTap={{ scale: 0.97 }}
               onClick={goToShowcase}
               style={{
                 marginTop: 4,
                 padding: '12px 48px',
                 borderRadius: 14,
-                background: 'linear-gradient(145deg, #C9943A, #8B6914)',
-                border: '1px solid rgba(201,148,58,0.4)',
-                color: '#F5F1E8',
+                background: 'linear-gradient(145deg, var(--color-gold-main), var(--color-gold-dim))',
+                border: '1px solid rgba(201,162,75,0.4)',
+                color: 'var(--color-text-primary)',
                 fontSize: 16, fontWeight: 600,
                 letterSpacing: 2,
                 cursor: 'pointer',
                 fontFamily: 'inherit',
-                boxShadow: '0 2px 16px rgba(201,148,58,0.2)',
+                boxShadow: '0 2px 16px rgba(201,162,75,0.2)',
                 transition: 'box-shadow 0.3s',
               }}
             >

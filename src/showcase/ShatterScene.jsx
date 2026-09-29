@@ -220,7 +220,7 @@ function ClassicScene({ isOpen, isFist }) {
   return (
     <group>
       <ambientLight intensity={0.8} />
-      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#F2D58A" />
+      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#E3C079" />
 
       {BLOCKS.map((block, i) => (
         <mesh key={block.id} ref={(el) => meshRefs.current[i] = el}>
@@ -434,7 +434,7 @@ function UserCreationScene({ imageUrl, isOpen, isFist }) {
   return (
     <group>
       <ambientLight intensity={0.8} />
-      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#F2D58A" />
+      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#E3C079" />
 
       {fragments.map((frag, i) => (
         <VoronoiMesh
@@ -804,7 +804,7 @@ function UserPlacementScene({ placements, isOpen, isFist, allLandmarks }) {
   return (
     <group>
       <ambientLight intensity={0.8} />
-      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#F2D58A" />
+      <pointLight ref={lightRef} position={[0, 0, 5]} intensity={1.5} color="#E3C079" />
 
       {items.map((item, i) => (
         <PlacementMesh

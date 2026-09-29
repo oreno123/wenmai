@@ -85,7 +85,7 @@ function ReliefMesh({ image, metalness = 0.7, roughness = 0.35, baseColor = '#C4
         {/* Gold rim — antique plate accent */}
         <mesh position={[0, 0, 0.001]}>
           <ringGeometry args={[1.85, 1.92, 96]} />
-          <meshStandardMaterial color="#C9A23C" metalness={0.65} roughness={0.3} />
+          <meshStandardMaterial color="#C9A24B" metalness={0.65} roughness={0.3} />
         </mesh>
         {/* Glazed pattern face */}
         <mesh position={[0, 0, 0.002]}>
@@ -135,12 +135,12 @@ function Lights({ porcelain = false }) {
   // Gold relief: punchy angled light to drag highlights across the lines.
   const ambient = porcelain ? 0.38 : 0.18
   const main = porcelain ? 1.35 : 3.0
-  const mainColor = porcelain ? '#F5EAD0' : '#F2D58A'
+  const mainColor = porcelain ? '#F5EAD0' : '#E3C079'
   return (
     <>
       <ambientLight intensity={ambient} />
       <pointLight ref={mainRef} position={[4, 2, 4]} intensity={main} color={mainColor} />
-      <pointLight position={[0, -3, 2]} intensity={porcelain ? 0.35 : 0.6} color="#D4AF6A" />
+      <pointLight position={[0, -3, 2]} intensity={porcelain ? 0.35 : 0.6} color="#C9A24B" />
       <pointLight position={[-2, 0, -3]} intensity={porcelain ? 0.5 : 1.0} color="#F5E6C8" />
     </>
   )
@@ -149,7 +149,7 @@ function Lights({ porcelain = false }) {
 export default function ReliefScene({ image, metalness, roughness, baseColor, normalScale, porcelain }) {
   // Gold relief reads best on near-black; porcelain needs a warm cream backdrop
   // so the white glaze doesn't clash with a black void.
-  const bgColor = porcelain ? '#E8DCC2' : '#0A0807'
+  const bgColor = porcelain ? '#E8DCC2' : '#171513'
   return (
     <Canvas
       camera={{ position: [0, 0, 4], fov: 45 }}
