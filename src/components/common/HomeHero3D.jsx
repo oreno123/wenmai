@@ -337,7 +337,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
 
   return (
     <div
-      style={{ position: 'relative', height: '52vh', minHeight: 360, touchAction: 'pan-y', userSelect: 'none' }}
+      style={{ position: 'relative', height: '64vh', minHeight: 460, touchAction: 'pan-y', userSelect: 'none' }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={(e) => finish(e, false)}
@@ -382,7 +382,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
       )}
 
       <Canvas
-        camera={{ position: [0, 0.5, 3.6], fov: 40 }}
+        camera={{ position: [0, 0.18, 4.15], fov: 43 }}
         dpr={[1, 1.5]}
         gl={{ toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.22, alpha: true }}
         style={{ position: 'absolute', inset: 0 }}
