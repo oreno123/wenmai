@@ -1,40 +1,126 @@
 {
+  "version": 2,
+  "extraction": "cobalt-segmentation",
   "elements": [
     {
       "id": 0,
-      "label": "青花缠枝牡丹主纹",
+      "label": "青花纹样片段 01",
       "level": "main",
       "bbox": [
-        0,
-        0,
-        1,
-        1
+        1078,
+        246,
+        1470,
+        634
       ],
-      "area": 1,
+      "area": 0.01675,
       "uv": {
-        "u0": 0.0,
-        "v0": 0.0,
-        "u1": 1.0,
-        "v1": 0.72
-      }
+        "u0": 0.52637,
+        "v0": 0.12012,
+        "u1": 0.71777,
+        "v1": 0.30957
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.98
     },
     {
       "id": 1,
-      "label": "青花边饰纹带",
+      "label": "青花纹样片段 02",
+      "level": "main",
+      "bbox": [
+        830,
+        10,
+        1214,
+        550
+      ],
+      "area": 0.01565,
+      "uv": {
+        "u0": 0.40527,
+        "v0": 0.00488,
+        "u1": 0.59277,
+        "v1": 0.26855
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.98
+    },
+    {
+      "id": 2,
+      "label": "青花纹样片段 03",
+      "level": "main",
+      "bbox": [
+        1570,
+        1498,
+        1958,
+        2048
+      ],
+      "area": 0.01245,
+      "uv": {
+        "u0": 0.7666,
+        "v0": 0.73145,
+        "u1": 0.95605,
+        "v1": 1.0
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.93
+    },
+    {
+      "id": 3,
+      "label": "青花纹样片段 04",
       "level": "ground",
       "bbox": [
-        0,
-        0,
-        1,
-        1
+        178,
+        446,
+        546,
+        790
       ],
-      "area": 1,
+      "area": 0.00917,
       "uv": {
-        "u0": 0.0,
-        "v0": 0.72,
-        "u1": 1.0,
-        "v1": 1.0
-      }
+        "u0": 0.08691,
+        "v0": 0.21777,
+        "u1": 0.2666,
+        "v1": 0.38574
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.83
+    },
+    {
+      "id": 4,
+      "label": "青花纹样片段 05",
+      "level": "ground",
+      "bbox": [
+        494,
+        746,
+        790,
+        1078
+      ],
+      "area": 0.00835,
+      "uv": {
+        "u0": 0.24121,
+        "v0": 0.36426,
+        "u1": 0.38574,
+        "v1": 0.52637
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.81
+    },
+    {
+      "id": 5,
+      "label": "青花纹样片段 06",
+      "level": "ground",
+      "bbox": [
+        614,
+        114,
+        826,
+        438
+      ],
+      "area": 0.00572,
+      "uv": {
+        "u0": 0.2998,
+        "v0": 0.05566,
+        "u1": 0.40332,
+        "v1": 0.21387
+      },
+      "source": "baseColorTexture.cobalt-segmentation",
+      "confidence": 0.73
     }
   ]
 }

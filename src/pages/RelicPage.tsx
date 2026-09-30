@@ -31,6 +31,8 @@ interface ElemInfo {
   bbox: [number, number, number, number]
   area: number
   uv: { u0: number; v0: number; u1: number; v1: number }
+  source?: string
+  confidence?: number
 }
 
 interface ModelInfo {
@@ -83,6 +85,35 @@ function useManifest(url: string): ElemInfo[] {
   return elems
 }
 
+interface PatternMask {
+  width: number
+  height: number
+  data: Uint8ClampedArray
+}
+
+/** 逐像素掩膜来自模型 baseColorTexture 的钴料分割，空白瓷面不会被误提取。 */
+function usePatternMask(manifestUrl: string): PatternMask | null {
+  const [mask, setMask] = useState<PatternMask | null>(null)
+  useEffect(() => {
+    let alive = true
+    setMask(null)
+    const image = new Image()
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = image.naturalWidth
+      canvas.height = image.naturalHeight
+      const context = canvas.getContext('2d', { willReadFrequently: true })
+      if (alive && context) {
+        context.drawImage(image, 0, 0)
+        setMask({ width: canvas.width, height: canvas.height, data: context.getImageData(0, 0, canvas.width, canvas.height).data })
+      }
+    }
+    image.src = manifestUrl.replace(/manifest\.json$/, 'selection-mask.png')
+    return () => { alive = false }
+  }, [manifestUrl])
+  return mask
+}
+
 /* ------------------------------------------------------------------ */
 /* 3D 场景                                                             */
 /* ------------------------------------------------------------------ */
@@ -95,12 +126,14 @@ interface VesselProps {
   onPick: (id: number) => void
   onHover: (id: number | null) => void
   material?: ModelInfo['material']
+  patternMask: PatternMask | null
 }
 
 function pickElem(
   ev: { uv?: THREE.Vector2; face?: { a: number } | null },
   elems: ElemInfo[],
   geo: THREE.BufferGeometry | null,
+  patternMask: PatternMask | null,
 ): number | null {
   // 首选: 命中面顶点色里的元素 ID (摄影测量 UV 岛拥挤, UV 矩形会误触)
   if (ev.face && geo) {
@@ -116,6 +149,12 @@ function pickElem(
   // 兜底: UV 矩形包含
   if (!ev.uv) return null
   const imgV = 1 - ev.uv.y
+  if (patternMask) {
+    const x = Math.min(patternMask.width - 1, Math.max(0, Math.floor(ev.uv.x * patternMask.width)))
+    const y = Math.min(patternMask.height - 1, Math.max(0, Math.floor(imgV * patternMask.height)))
+    const id = patternMask.data[(y * patternMask.width + x) * 4]
+    return id > 0 ? id - 1 : null
+  }
   for (const e of elems) {
     const { u0, v0, u1, v1 } = e.uv
     if (ev.uv.x >= u0 && ev.uv.x <= u1 && imgV >= v0 && imgV <= v1) return e.id
@@ -123,7 +162,7 @@ function pickElem(
   return null
 }
 
-function Vessel({ glb, elems, picked, hovered, onPick, onHover, material }: VesselProps) {
+function Vessel({ glb, elems, picked, hovered, onPick, onHover, material, patternMask }: VesselProps) {
   const { scene } = useGLTF(glb)
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.ShaderMaterial | null>(null)
@@ -280,11 +319,11 @@ function Vessel({ glb, elems, picked, hovered, onPick, onHover, material }: Vess
 
   const handleClick = (ev: ThreeEvent<MouseEvent>) => {
     ev.stopPropagation()
-    const id = pickElem(ev, elems, bronzeGeo)
+    const id = pickElem(ev, elems, bronzeGeo, patternMask)
     if (id !== null) onPick(id)
   }
   const handleMove = (ev: ThreeEvent<PointerEvent>) => {
-    const id = pickElem(ev, elems, bronzeGeo)
+    const id = pickElem(ev, elems, bronzeGeo, patternMask)
     onHover(id)
     document.body.style.cursor = id !== null && !picked.has(id) ? 'pointer' : 'default'
   }
@@ -378,6 +417,7 @@ export default function RelicPage() {
   })
   const model = models.find((m) => m.id === modelId) ?? models[0]
   const elems = useManifest(model.manifest)
+  const patternMask = usePatternMask(model.manifest)
   const [picked, setPicked] = useState<Set<number>>(new Set())
   const [hovered, setHovered] = useState<number | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
@@ -489,6 +529,7 @@ export default function RelicPage() {
                 onPick={handlePick}
                 onHover={setHovered}
                 material={model.material}
+                patternMask={patternMask}
               />
             </Suspense>
             <EnvLight />
@@ -497,7 +538,7 @@ export default function RelicPage() {
 
           {/* 器物切换器 */}
           {models.length > 1 && (
-            <div style={{ position: 'absolute', top: 18, left: 22 }}>
+            <div style={{ position: 'absolute', top: 18, left: 22, zIndex: 3 }}>
               <button
                 onClick={() => setSwitcherOpen((v) => !v)}
                 style={{
@@ -671,7 +712,7 @@ export default function RelicPage() {
             <div>拖动旋转 · 滚轮缩放 · 点击金线纹样提取</div>
           </div>
 
-          <div style={{ position: 'absolute', bottom: 84, right: 22, display: 'flex', gap: 10 }}>
+          <div style={{ position: 'absolute', bottom: 84, right: 22, zIndex: 3, display: 'flex', gap: 10 }}>
             <button
               onClick={extractAll}
               disabled={done}
