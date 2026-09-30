@@ -1,126 +1,170 @@
 {
-  "version": 2,
-  "extraction": "cobalt-segmentation",
+  "version": 3,
+  "extraction": "mesh-surface",
+  "review": "manual-surface-windows",
+  "note": "从模型曲面展开后人工核对花叶区域，保留原始笔触；未使用生成图补绘。",
   "elements": [
     {
       "id": 0,
-      "label": "青花纹样片段 01",
+      "label": "牡丹花头 · 正面",
       "level": "main",
+      "kind": "motif",
+      "image": "surface_elem_00.png",
       "bbox": [
-        1078,
-        246,
-        1470,
-        634
+        487,
+        803,
+        722,
+        957
       ],
-      "area": 0.01675,
+      "area": 0.67477,
+      "surfaceRect": [
+        0.203,
+        0.502,
+        0.301,
+        0.598
+      ],
       "uv": {
-        "u0": 0.52637,
-        "v0": 0.12012,
-        "u1": 0.71777,
-        "v1": 0.30957
+        "u0": 0.05126953125,
+        "v0": 0.18017578125,
+        "u1": 0.3857421875,
+        "v1": 0.85302734375
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.98
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 1,
-      "label": "青花纹样片段 02",
+      "label": "牡丹花头 · 侧面",
       "level": "main",
+      "kind": "motif",
+      "image": "surface_elem_01.png",
       "bbox": [
-        830,
-        10,
-        1214,
-        550
+        324,
+        946,
+        624,
+        1141
       ],
-      "area": 0.01565,
+      "area": 0.53944,
+      "surfaceRect": [
+        0.135,
+        0.591,
+        0.26,
+        0.713
+      ],
       "uv": {
-        "u0": 0.40527,
-        "v0": 0.00488,
-        "u1": 0.59277,
-        "v1": 0.26855
+        "u0": 0.01806640625,
+        "v0": 0.18408203125,
+        "u1": 0.2646484375,
+        "v1": 0.70947265625
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.98
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 2,
-      "label": "青花纹样片段 03",
+      "label": "舒展叶片",
       "level": "main",
+      "kind": "motif",
+      "image": "surface_elem_02.png",
       "bbox": [
-        1570,
-        1498,
-        1958,
-        2048
+        211,
+        842,
+        473,
+        984
       ],
-      "area": 0.01245,
+      "area": 0.54758,
+      "surfaceRect": [
+        0.088,
+        0.526,
+        0.197,
+        0.615
+      ],
       "uv": {
-        "u0": 0.7666,
-        "v0": 0.73145,
-        "u1": 0.95605,
-        "v1": 1.0
+        "u0": 0.25,
+        "v0": 0.615234375,
+        "u1": 0.34521484375,
+        "v1": 0.970703125
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.93
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 3,
-      "label": "青花纹样片段 04",
-      "level": "ground",
+      "label": "垂叶",
+      "level": "main",
+      "kind": "motif",
+      "image": "surface_elem_03.png",
       "bbox": [
-        178,
-        446,
-        546,
-        790
+        684,
+        984,
+        785,
+        1107
       ],
-      "area": 0.00917,
+      "area": 0.52612,
+      "surfaceRect": [
+        0.285,
+        0.615,
+        0.327,
+        0.692
+      ],
       "uv": {
-        "u0": 0.08691,
-        "v0": 0.21777,
-        "u1": 0.2666,
-        "v1": 0.38574
+        "u0": 0.07421875,
+        "v0": 0.119140625,
+        "u1": 0.150390625,
+        "v1": 0.24951171875
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.83
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 4,
-      "label": "青花纹样片段 05",
-      "level": "ground",
+      "label": "缠枝花叶纹带",
+      "level": "main",
+      "kind": "panel",
+      "image": "surface_elem_04.png",
       "bbox": [
-        494,
-        746,
-        790,
-        1078
+        65,
+        702,
+        766,
+        1202
       ],
-      "area": 0.00835,
+      "area": 1.0,
+      "surfaceRect": [
+        0.027,
+        0.439,
+        0.319,
+        0.751
+      ],
       "uv": {
-        "u0": 0.24121,
-        "v0": 0.36426,
-        "u1": 0.38574,
-        "v1": 0.52637
+        "u0": 0.01611328125,
+        "v0": 0.10205078125,
+        "u1": 0.9873046875,
+        "v1": 0.994140625
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.81
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 5,
-      "label": "青花纹样片段 06",
+      "label": "几何边饰纹带",
       "level": "ground",
+      "kind": "motif",
+      "image": "surface_elem_05.png",
       "bbox": [
-        614,
-        114,
-        826,
-        438
+        216,
+        637,
+        840,
+        704
       ],
-      "area": 0.00572,
+      "area": 0.91085,
+      "surfaceRect": [
+        0.09,
+        0.398,
+        0.35,
+        0.44
+      ],
       "uv": {
-        "u0": 0.2998,
-        "v0": 0.05566,
-        "u1": 0.40332,
-        "v1": 0.21387
+        "u0": 0.2119140625,
+        "v0": 0.1015625,
+        "u1": 0.79638671875,
+        "v1": 0.8720703125
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.73
+      "source": "mesh-surface.reviewed-region"
     }
   ]
 }

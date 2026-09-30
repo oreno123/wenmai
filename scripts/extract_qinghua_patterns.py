@@ -1,130 +1,105 @@
-"""Derive selectable Qinghua pattern regions from an embedded vessel texture.
+"""Extract reviewed motifs from the GLB surface, never disconnected UV islands.
 
-The source of truth is the model's base-color texture: cobalt ink is separated from
-porcelain using a blue-excess score, joined into nearby visual regions, then emitted
-as UV-space elements and transparent cutouts. No hand-drawn UV rectangles are used.
+Recipes are visually reviewed surface windows, not automatic semantic labels.
+No missing brushwork is generated. Landscape panels retain the porcelain ground.
 """
 import argparse
 import json
-from collections import deque
 from pathlib import Path
 
-from PIL import Image, ImageFilter
+import cv2
+import numpy as np
+from PIL import Image
+
+from vessel_surface import atlas_labels, unwrap
 
 
-def cobalt_mask(image: Image.Image) -> Image.Image:
-    """Keep cobalt paint while rejecting neutral shadow and beige repair marks."""
-    rgb = image.convert('RGB')
-    pixels = list(rgb.getdata())
-    values = []
-    for red, green, blue in pixels:
-        # Cobalt remains blue-biased even where capture lighting desaturates it.
-        blue_excess = blue - (red * 0.62 + green * 0.38)
-        dark_blue = blue > red * 1.10 and blue > green * 1.01 and blue < 190
-        values.append(255 if blue_excess > 18 and dark_blue else 0)
-    mask = Image.new('L', rgb.size)
-    mask.putdata(values)
-    # Connect brush strokes without swallowing the porcelain ground.
-    return mask.filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.MinFilter(11))
+def ink_alpha(rgb, valid):
+    """Soft blue separation retains pale strokes without eroding thin stems."""
+    rgb = rgb.astype(np.float32)
+    red, green, blue = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    chroma = blue - .65 * red - .35 * green
+    light = .2126 * red + .7152 * green + .0722 * blue
+    background = np.percentile(light[valid], 90)
+    alpha = np.clip(np.maximum((chroma + 1) / 12, (background - light - 18) / 40), 0, 1)
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(((alpha > .20) & valid).astype(np.uint8), 8)
+    keep = np.zeros(count, np.uint8)
+    keep[1:] = stats[1:, cv2.CC_STAT_AREA] >= 10
+    return np.uint8(alpha * 255) * keep[labels]
 
 
-def components(mask: Image.Image, min_pixels: int):
-    width, height = mask.size
-    data = mask.load()
-    seen = bytearray(width * height)
-    result = []
-    for y in range(height):
-        for x in range(width):
-            start = y * width + x
-            if seen[start] or data[x, y] < 128:
-                continue
-            queue = deque([(x, y)])
-            seen[start] = 1
-            count = 0
-            x0 = x1 = x
-            y0 = y1 = y
-            while queue:
-                cx, cy = queue.popleft()
-                count += 1
-                x0, x1 = min(x0, cx), max(x1, cx)
-                y0, y1 = min(y0, cy), max(y1, cy)
-                for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1), (cx - 1, cy - 1), (cx + 1, cy + 1), (cx - 1, cy + 1), (cx + 1, cy - 1)):
-                    if 0 <= nx < width and 0 <= ny < height:
-                        index = ny * width + nx
-                        if not seen[index] and data[nx, ny] >= 128:
-                            seen[index] = 1
-                            queue.append((nx, ny))
-            if count >= min_pixels:
-                result.append((count, (x0, y0, x1 + 1, y1 + 1)))
-    return result
-
-
-def overlap(a, b):
-    ax0, ay0, ax1, ay1 = a
-    bx0, by0, bx1, by1 = b
-    return max(0, min(ax1, bx1) - max(ax0, bx0)) * max(0, min(ay1, by1) - max(ay0, by0))
-
-
-def extract(folder: Path, limit: int):
-    texture = Image.open(folder / 'texture.jpg').convert('RGB')
-    analysis = texture.resize((512, 512), Image.Resampling.LANCZOS)
-    joined = cobalt_mask(analysis)
-    raw = cobalt_mask(texture)
-    candidates = sorted(components(joined, 140), reverse=True)
-    chosen = []
-    for count, box in candidates:
-        area = (box[2] - box[0]) * (box[3] - box[1])
-        if area > 512 * 512 * 0.24 or area < 700:
-            continue
-        if any(overlap(box, existing[1]) / min(area, existing[0]) > 0.48 for existing in chosen):
-            continue
-        chosen.append((area, box, count))
-        if len(chosen) >= limit:
-            break
-    if not chosen:
-        raise RuntimeError(f'No cobalt regions detected in {folder / "texture.jpg"}')
-
-    sx = texture.width / 512
-    sy = texture.height / 512
+def extract(folder: Path, recipe_path: Path):
+    recipe = json.loads(recipe_path.read_text(encoding='utf-8'))
+    baked, valid, geometry = unwrap(folder / 'model.glb')
+    h, w = valid.shape
+    Image.fromarray(baked).save(folder / 'surface-preview.jpg', quality=93)
+    alpha = ink_alpha(baked, valid)
+    labels = np.zeros((h, w), np.uint8)
     elements = []
-    selection = Image.new('L', texture.size)
-    for index, (_, box, count) in enumerate(chosen):
-        x0, y0, x1, y1 = [int(value * scale) for value, scale in zip(box, (sx, sy, sx, sy))]
-        pad = 26
-        x0, y0 = max(0, x0 - pad), max(0, y0 - pad)
-        x1, y1 = min(texture.width, x1 + pad), min(texture.height, y1 + pad)
-        crop = texture.crop((x0, y0, x1, y1))
-        crop_mask = raw.crop((x0, y0, x1, y1))
-        # The click mask keeps only cobalt pixels from this component, so a blank
-        # porcelain area inside the component's bounding box cannot be extracted.
-        hit_mask = crop_mask.point(lambda value: 255 if value >= 96 else 0)
-        selection.paste(Image.new('L', crop_mask.size, index + 1), (x0, y0), hit_mask)
-        crop.putalpha(crop_mask)
-        crop.thumbnail((860, 860), Image.Resampling.LANCZOS)
-        crop.save(folder / f'elem_{index:02}.png', optimize=True)
+    for index, region in enumerate(recipe['regions']):
+        box = np.rint(np.array(region['rect']) * [w, h, w, h]).astype(int)
+        x0, y0, x1, y1 = box
+        if not (0 <= x0 < x1 <= w and 0 <= y0 < y1 <= h):
+            raise ValueError(f'Invalid surface region: {region}')
+        panel = region.get('kind') == 'panel'
+        opacity = np.uint8(valid[y0:y1, x0:x1]) * 255 if panel else alpha[y0:y1, x0:x1].copy()
+        if region.get('polygon'):
+            boundary = np.zeros(opacity.shape, np.uint8)
+            points = np.rint(np.array(region['polygon']) * [x1-x0-1, y1-y0-1]).astype(np.int32)
+            cv2.fillPoly(boundary, [points], 1)
+            opacity *= boundary
+        if region.get('isolate'):
+            core = cv2.morphologyEx(np.uint8(opacity > 48), cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+            n, parts, stats, _ = cv2.connectedComponentsWithStats(core, 8)
+            if n > 1:
+                largest = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
+                main = cv2.dilate(np.uint8(parts == largest), np.ones((5, 5), np.uint8))
+                opacity *= main
+        if np.count_nonzero(opacity > 128) < 100:
+            raise ValueError(f'No usable pigment in {region["label"]}')
+        crop = Image.fromarray(baked[y0:y1, x0:x1])
+        crop.putalpha(Image.fromarray(opacity))
+        xyz, _, _, _, _, depth = geometry
+        r = np.median(depth[y0:y1, x0:x1][np.isfinite(depth[y0:y1, x0:x1])])
+        scale_x = 2*np.pi*r / np.ptp(xyz[:, 1]) * h/w
+        crop = crop.resize((max(1, round(crop.width * scale_x)), crop.height), Image.Resampling.LANCZOS)
+        if crop.getbbox():
+            crop = crop.crop(crop.getbbox())
+        out = Image.new('RGBA', (crop.width+24, crop.height+24))
+        out.paste(crop, (12, 12))
+        out.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
+        filename = f'surface_elem_{index:02}.png'
+        out.save(folder / filename, optimize=True)
+        sub = labels[y0:y1, x0:x1]
+        # Specific motifs keep priority over larger panels containing them.
+        sub[(opacity > 48) & (sub == 0)] = index + 1
         elements.append({
-            'id': index,
-            'label': f'青花纹样片段 {index + 1:02}',
-            'level': 'main' if index < min(3, len(chosen)) else 'ground',
-            'bbox': [x0, y0, x1, y1],
-            'area': round(count / (512 * 512), 5),
-            'uv': {
-                'u0': round(x0 / texture.width, 5),
-                'v0': round(y0 / texture.height, 5),
-                'u1': round(x1 / texture.width, 5),
-                'v1': round(y1 / texture.height, 5),
-            },
-            'source': 'baseColorTexture.cobalt-segmentation',
-            'confidence': round(min(0.98, 0.55 + count / 8500), 2),
+            'id': index, 'label': region['label'], 'level': region.get('level', 'main'),
+            'kind': 'panel' if panel else 'motif', 'image': filename,
+            'bbox': box.tolist(), 'area': round(float(np.mean(opacity > 48)), 5),
+            'surfaceRect': region['rect'], 'uv': {'u0': 0, 'v0': 0, 'u1': 0, 'v1': 0},
+            'source': 'mesh-surface.reviewed-region',
         })
-    (folder / 'manifest.json').write_text(json.dumps({'version': 2, 'extraction': 'cobalt-segmentation', 'elements': elements}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    selection.save(folder / 'selection-mask.png', optimize=True)
-    print(f'{folder.name}: {len(elements)} texture-derived pattern regions')
+    selection = atlas_labels(labels, geometry)
+    for e in elements:
+        yy, xx = np.where(selection == e['id'] + 1)
+        if not len(xx):
+            raise ValueError(f'No mesh hit region for {e["label"]}')
+        e['uv'] = dict(zip(('u0', 'v0', 'u1', 'v1'), [float(xx.min()/2048), float(yy.min()/2048),
+                                                     float((xx.max()+1)/2048), float((yy.max()+1)/2048)]))
+    Image.fromarray(selection).save(folder / 'selection-mask.png', optimize=True)
+    manifest = {'version': 3, 'extraction': 'mesh-surface', 'review': 'manual-surface-windows',
+                'note': recipe['note'], 'elements': elements}
+    (folder / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    print(f'{folder.name}: {len(elements)} reviewed surface regions, IDs {np.unique(selection).tolist()}')
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('folders', nargs='+', type=Path)
-parser.add_argument('--limit', type=int, default=6)
-args = parser.parse_args()
-for target in args.folders:
-    extract(target, args.limit)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('folders', nargs='+', type=Path)
+    args = parser.parse_args()
+    for folder in args.folders:
+        recipe = Path(__file__).parent / 'surface_recipes' / f'{folder.name}.json'
+        if not recipe.exists():
+            parser.error(f'Missing reviewed surface recipe: {recipe}')
+        extract(folder, recipe)

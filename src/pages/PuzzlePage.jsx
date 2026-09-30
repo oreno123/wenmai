@@ -29,7 +29,14 @@ export default function PuzzlePage() {
   const { search } = useLocation()
   const { user } = useAuth()
   const { data, saveCreation } = useApp()
-  const [placements, setPlacements] = useState([]) // { id, x, y, size, rotation, scale }
+  // Resolve only registered extraction IDs; initialize once when entering the canvas.
+  const [entryPattern] = useState(() => {
+    const id = new URLSearchParams(search).get('pattern')
+    return id?.startsWith('relic_') ? getPatternById(id) : undefined
+  })
+  const [placements, setPlacements] = useState(() => entryPattern ? [{
+    id: entryPattern.id, x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2, size: 420, rotation: 0, scaleX: 1, scaleY: 1,
+  }] : []) // { id, x, y, size, rotation, scale }
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [dragging, setDragging] = useState(null)
   const [dragFromTray, setDragFromTray] = useState(null)
@@ -54,7 +61,7 @@ export default function PuzzlePage() {
   const [publishCoverBlob, setPublishCoverBlob] = useState(null)
   const [publishedResonance, setPublishedResonance] = useState(false)
   const publishedTimeoutRef = useRef(null)
-  const [extraPatterns, setExtraPatterns] = useState([])    // fork 引入的 pattern（绕过 library 过滤）
+  const [extraPatterns, setExtraPatterns] = useState(() => entryPattern ? [entryPattern] : [])
 
   // 用户已收集的纹样（library + fork 引入的 extras），不含 AI 元素
   const libPatterns = useMemo(() => {
@@ -131,8 +138,15 @@ export default function PuzzlePage() {
         if (pat?.type === '角花') {
           processSrc = sliceTopLeftQuadrant(img)
         }
+        if (p.id.startsWith('relic_')) {
+          // Already extracted RGBA: preserve original cobalt colours and aspect.
+          const square = document.createElement('canvas')
+          square.width = square.height = Math.max(img.naturalWidth, img.naturalHeight)
+          square.getContext('2d').drawImage(img, (square.width-img.naturalWidth)/2, (square.height-img.naturalHeight)/2)
+          processSrc = square
+        }
         setLoadedImages(prev => ({ ...prev, [p.id]: processSrc }))
-        const block = createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua', mode: 'line' })
+        const block = p.id.startsWith('relic_') ? processSrc : createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua', mode: 'line' })
         setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
         // Compute shape mask + contour + flexibility flag for collision/snapping/deformation
         try {

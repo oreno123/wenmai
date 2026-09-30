@@ -1,126 +1,89 @@
 {
-  "version": 2,
-  "extraction": "cobalt-segmentation",
+  "version": 3,
+  "extraction": "mesh-surface",
+  "review": "manual-surface-windows",
+  "note": "此模型器身为山水画面，底图存在模糊；保留连续山水展片，不标作花叶元素。",
   "elements": [
     {
       "id": 0,
-      "label": "青花纹样片段 01",
+      "label": "器腹山水 · 连续展片",
       "level": "main",
+      "kind": "panel",
+      "image": "surface_elem_00.png",
       "bbox": [
-        242,
-        46,
-        562,
-        358
+        84,
+        552,
+        1224,
+        1509
       ],
-      "area": 0.00636,
+      "area": 1.0,
+      "surfaceRect": [
+        0.035,
+        0.345,
+        0.51,
+        0.943
+      ],
       "uv": {
-        "u0": 0.11816,
-        "v0": 0.02246,
-        "u1": 0.27441,
-        "v1": 0.1748
+        "u0": 0.00048828125,
+        "v0": 0.0029296875,
+        "u1": 0.9970703125,
+        "v1": 0.99951171875
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.75
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 1,
-      "label": "青花纹样片段 02",
+      "label": "器颈山水 · 连续展片",
       "level": "main",
+      "kind": "panel",
+      "image": "surface_elem_01.png",
       "bbox": [
-        218,
-        242,
-        690,
-        494
+        744,
+        38,
+        1464,
+        349
       ],
-      "area": 0.00467,
+      "area": 1.0,
+      "surfaceRect": [
+        0.31,
+        0.024,
+        0.61,
+        0.218
+      ],
       "uv": {
-        "u0": 0.10645,
-        "v0": 0.11816,
-        "u1": 0.33691,
-        "v1": 0.24121
+        "u0": 0.01025390625,
+        "v0": 0.06787109375,
+        "u1": 0.974609375,
+        "v1": 0.98974609375
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.69
+      "source": "mesh-surface.reviewed-region"
     },
     {
       "id": 2,
-      "label": "青花纹样片段 03",
-      "level": "main",
-      "bbox": [
-        730,
-        1866,
-        958,
-        2048
-      ],
-      "area": 0.00439,
-      "uv": {
-        "u0": 0.35645,
-        "v0": 0.91113,
-        "u1": 0.46777,
-        "v1": 1.0
-      },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.69
-    },
-    {
-      "id": 3,
-      "label": "青花纹样片段 04",
+      "label": "肩部边饰纹带",
       "level": "ground",
+      "kind": "motif",
+      "image": "surface_elem_02.png",
       "bbox": [
-        0,
-        0,
-        206,
-        282
+        60,
+        478,
+        876,
+        526
       ],
-      "area": 0.00378,
-      "uv": {
-        "u0": 0.0,
-        "v0": 0.0,
-        "u1": 0.10059,
-        "v1": 0.1377
-      },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.67
-    },
-    {
-      "id": 4,
-      "label": "青花纹样片段 05",
-      "level": "ground",
-      "bbox": [
-        1118,
-        1074,
-        1298,
-        1378
+      "area": 0.57662,
+      "surfaceRect": [
+        0.025,
+        0.299,
+        0.365,
+        0.329
       ],
-      "area": 0.00356,
       "uv": {
-        "u0": 0.5459,
-        "v0": 0.52441,
-        "u1": 0.63379,
-        "v1": 0.67285
+        "u0": 0.029296875,
+        "v0": 0.03125,
+        "u1": 0.81640625,
+        "v1": 0.61767578125
       },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.66
-    },
-    {
-      "id": 5,
-      "label": "青花纹样片段 06",
-      "level": "ground",
-      "bbox": [
-        1650,
-        398,
-        1834,
-        674
-      ],
-      "area": 0.00298,
-      "uv": {
-        "u0": 0.80566,
-        "v0": 0.19434,
-        "u1": 0.89551,
-        "v1": 0.3291
-      },
-      "source": "baseColorTexture.cobalt-segmentation",
-      "confidence": 0.64
+      "source": "mesh-surface.reviewed-region"
     }
   ]
 }

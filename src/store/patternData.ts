@@ -2,6 +2,7 @@ import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/procedu
 import { RARITY_WEIGHTS, PITY_THRESHOLD, SOFT_PITY_START } from '../constants'
 import { QINGHUA_PATTERNS } from '../data/qinghuaPatterns'
 import { AI_ASSETS, AiAsset } from '../data/aiAssets'
+import { RELIC_PATTERNS } from '../data/relicPatterns'
 
 // ── Types ──────────────────────────────────────────────
 
@@ -189,7 +190,7 @@ const SERIES_INFO: Record<SeriesId, SeriesInfo> = {
 const _svgCache = new Map<string, string>()
 
 export function getPatternById(id: string): Pattern | undefined {
-  return PATTERN_LIBRARY.find(p => p.id === id) || AI_PATTERNS.find(p => p.id === id)
+  return PATTERN_LIBRARY.find(p => p.id === id) || AI_PATTERNS.find(p => p.id === id) || RELIC_PATTERNS.find(p => p.id === id)
 }
 
 // 获取全部 AI 元素 Pattern（不入抽卡池，仅用于拼贴素材库）

@@ -33,6 +33,8 @@ interface ElemInfo {
   uv: { u0: number; v0: number; u1: number; v1: number }
   source?: string
   confidence?: number
+  image?: string
+  kind?: 'motif' | 'panel'
 }
 
 interface ModelInfo {
@@ -91,13 +93,14 @@ interface PatternMask {
   data: Uint8ClampedArray
 }
 
-/** 逐像素掩膜来自模型 baseColorTexture 的钴料分割，空白瓷面不会被误提取。 */
+/** 掩膜由模型曲面区域反投影生成；青铜器兼容原顶点标注。 */
 function usePatternMask(manifestUrl: string): PatternMask | null {
   const [mask, setMask] = useState<PatternMask | null>(null)
   useEffect(() => {
     let alive = true
     setMask(null)
     const image = new Image()
+    image.onerror = () => { if (alive) setMask(null) }
     image.onload = () => {
       const canvas = document.createElement('canvas')
       canvas.width = image.naturalWidth
@@ -155,6 +158,9 @@ function pickElem(
     const id = patternMask.data[(y * patternMask.width + x) * 4]
     return id > 0 ? id - 1 : null
   }
+  // Surface regions cross many atlas islands: a rectangle fallback would
+  // select unrelated porcelain while the exact mask is still loading.
+  if (elems.some((e) => e.source === 'mesh-surface.reviewed-region')) return null
   for (const e of elems) {
     const { u0, v0, u1, v1 } = e.uv
     if (ev.uv.x >= u0 && ev.uv.x <= u1 && imgV >= v0 && imgV <= v1) return e.id
@@ -422,6 +428,10 @@ export default function RelicPage() {
   const [hovered, setHovered] = useState<number | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
   const [switcherOpen, setSwitcherOpen] = useState(false)
+  const extractionTimers = useRef<number[]>([])
+  useEffect(() => () => { extractionTimers.current.forEach(clearTimeout) }, [modelId])
+
+  const elementImage = (e: ElemInfo) => `${model.manifest.replace(/[^/]*$/, '')}${e.image ?? `elem_${String(e.id).padStart(2, '0')}.png`}`
 
   const switchModel = (id: string) => {
     if (id === modelId) {
@@ -446,7 +456,8 @@ export default function RelicPage() {
   }
 
   const extractAll = () => {
-    elems.forEach((e, i) => window.setTimeout(() => handlePick(e.id), i * 240))
+    extractionTimers.current.forEach(clearTimeout)
+    extractionTimers.current = elems.map((e, i) => window.setTimeout(() => handlePick(e.id), i * 240))
   }
 
   // 截图/测试钩子: #/relic-autoextract
@@ -460,6 +471,7 @@ export default function RelicPage() {
   }, [elems])
 
   const reset = () => {
+    extractionTimers.current.forEach(clearTimeout)
     setPicked(new Set())
     setHovered(null)
   }
@@ -709,7 +721,7 @@ export default function RelicPage() {
                 地纹
               </span>
             </div>
-            <div>拖动旋转 · 滚轮缩放 · 点击金线纹样提取</div>
+            <div>拖动旋转 · 滚轮缩放 · 点击器身纹样提取</div>
           </div>
 
           <div style={{ position: 'absolute', bottom: 84, right: 22, zIndex: 3, display: 'flex', gap: 10 }}>
@@ -794,8 +806,10 @@ export default function RelicPage() {
           <AnimatePresence>
             {elems.map((e) =>
               picked.has(e.id) ? (
-                <motion.div
+                <motion.button
                   key={e.id}
+                  type="button"
+                  aria-label={`${e.label ?? `元素 ${e.id}`}，送往拼贴画布`}
                   initial={{ opacity: 0, x: 60, scale: 0.8 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ type: 'spring', stiffness: 260, damping: 22 }}
@@ -811,8 +825,11 @@ export default function RelicPage() {
                     gap: 13,
                     alignItems: 'center',
                     cursor: 'pointer',
+                    width: '100%',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
                   }}
-                  onClick={() => navigate('/puzzle')}
+                  onClick={() => navigate(e.image ? `/puzzle?pattern=relic_${model.id}_${e.id}` : '/puzzle')}
                 >
                   {/* 浅色衬底: 锈色纹样在米色底上更清晰 */}
                   <div
@@ -829,8 +846,8 @@ export default function RelicPage() {
                     }}
                   >
                     <img
-                      src={`${model.manifest.replace(/[^/]*$/, '')}elem_${String(e.id).padStart(2, '0')}.png`}
-                      alt={`元素 ${e.id}`}
+                      src={elementImage(e)}
+                      alt={e.label ?? `元素 ${e.id}`}
                       style={{
                         maxWidth: 78,
                         maxHeight: 78,
@@ -854,7 +871,7 @@ export default function RelicPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {e.level === 'ground' ? '地纹' : '主纹'}
+                        {e.kind === 'panel' ? '展片' : e.level === 'ground' ? '边饰' : '主纹'}
                       </span>
                     </div>
                     <div style={{ fontSize: 11.5, opacity: 0.55, marginTop: 4, lineHeight: 1.6 }}>
@@ -863,7 +880,7 @@ export default function RelicPage() {
                       点击送往拼贴画布 →
                     </div>
                   </div>
-                </motion.div>
+                </motion.button>
               ) : null,
             )}
           </AnimatePresence>
@@ -880,7 +897,7 @@ export default function RelicPage() {
                 lineHeight: 2,
               }}
             >
-              点击 3D 曲面上的金线纹样
+              点击器身上的纹样区域
               <br />
               或使用「一键提取全部」
               <br />
@@ -899,7 +916,9 @@ export default function RelicPage() {
             }}
           >
             {model.material === 'qinghua'
-              ? '提取范围：以当前真实器物模型可见的主纹与边饰纹带为准，不补造未采集的器身区域。'
+              ? model.id === 'qinghua_second'
+                ? '器身山水按连续画面展开，保留瓷底。原模型贴图部分模糊，展片保留其原貌。'
+                : '纹样来自模型曲面展开，并经人工核对范围。花叶可独立拼贴，展片保留连续画面与瓷底。'
               : '流水线：柱面展开 (θ,y) → 浮雕残差定位扉棱 → 三面板纹带分割 → 顶点色烘焙。'}
           </div>
         </aside>
