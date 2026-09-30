@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate, useLocation } from '../components/common/Router'
 import { motion, AnimatePresence } from 'framer-motion'
+import XingheStarRiver from '../components/xinghe/XingheStarRiver'
 
 /* AI 纹样库: 3D 青铜器扫描 -> 几何提取 -> AI 精修的可上线纹样 (public/relic/ai) */
+/* ?view=xinghe 切换到星河飞行视图，同一路由内切换，不新增页面 */
 
 export default function AiPatternsPage() {
   const navigate = useNavigate()
+  const { search } = useLocation()
+  const view = new URLSearchParams(search).get('view') || 'list'
   const [data, setData] = useState([])
   const [pick, setPick] = useState(null)
   const [status, setStatus] = useState('loading')
@@ -51,6 +55,8 @@ export default function AiPatternsPage() {
       Math.max(...b.cards.map(c => c.score)) - Math.max(...a.cards.map(c => c.score))),
     [data])
 
+  if (view === 'xinghe') return <XingheStarRiver onBack={() => navigate('/ai-patterns')} />
+
   return (
     <div style={{ padding: '14px 16px', paddingBottom: '80px', maxWidth: 1080, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
@@ -60,6 +66,12 @@ export default function AiPatternsPage() {
           fontFamily: 'Noto Serif SC, serif', fontSize: 22, fontWeight: 600,
           color: 'var(--color-gold-bright)', letterSpacing: '0.15em', margin: 0,
         }}>AI 纹样库</h1>
+        <button type="button" onClick={() => navigate('/ai-patterns?view=xinghe')}
+          style={{
+            marginLeft: 'auto', alignSelf: 'center', border: '1px solid rgba(201,162,75,0.45)',
+            borderRadius: 6, padding: '6px 14px', background: 'transparent', color: 'var(--color-gold-bright)',
+            fontSize: 12.5, letterSpacing: '0.12em', cursor: 'pointer', fontFamily: 'inherit',
+          }}>星河</button>
       </div>
       <p style={{ color: 'var(--color-text-dim)', fontSize: 12, margin: '0 0 22px', letterSpacing: '0.05em' }}>
         {status === 'ready'

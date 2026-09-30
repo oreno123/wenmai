@@ -27,6 +27,7 @@ const WorkDetailPage = lazy(() => import('./pages/WorkDetailPage'))
 const AdminReviewPage = lazy(() => import('./pages/AdminReviewPage'))
 const RelicPage = lazy(() => import('./pages/RelicPage'))
 const AiPatternsPage = lazy(() => import('./pages/AiPatternsPage'))
+const RelicPatternsPage = lazy(() => import('./pages/RelicPatternsPage'))
 
 function PageLoader() {
   return (
@@ -62,6 +63,7 @@ function Pages() {
   else if (pathname === '/admin') Page = AdminReviewPage
   else if (pathname === '/relic') Page = RelicPage
   else if (pathname === '/ai-patterns') Page = AiPatternsPage
+  else if (pathname === '/relic-patterns') Page = RelicPatternsPage
   else if (pathname === '/landing') Page = Landing
   else Page = SplashPage
 

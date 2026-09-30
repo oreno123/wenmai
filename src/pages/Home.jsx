@@ -642,6 +642,7 @@ export default function Home() {
               { icon: 'compose', label: '自由拼', path: '/puzzle' },
               { icon: 'puzzle', label: '经典拼图', path: '/jigsaw' },
               { icon: 'ink', label: 'AI 纹样库', path: '/ai-patterns' },
+              { icon: 'gallery', label: '文物纹样库', path: '/relic-patterns' },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} onClick={() => item.path && navigate(item.path)}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0, cursor: item.path ? 'pointer' : 'default' }}>
