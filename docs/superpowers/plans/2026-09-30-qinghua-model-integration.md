@@ -29,7 +29,7 @@ python scripts/compress_glb_textures.py C:\Users\lenovo\Downloads\e384427da9f179
 python scripts/compress_glb_textures.py C:\Users\lenovo\Downloads\93113cd6c63cf761de15cca8b63626a0.glb public\relic\m\qinghua_second\model.glb
 ```
 
-Expected: 两个输出均小于源文件，仍包含 1 mesh、3 textures 和 1 animation。
+Expected: 两个输出均小于源文件，仍包含 1 mesh 和 3 textures。
 
 - [ ] **Step 3: 提取基础纹理作为器型缩略图和卡片来源**
 

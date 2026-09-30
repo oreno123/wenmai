@@ -11,12 +11,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 /* ------------------------------------------------------------------ */
 
 const DEFAULT_MODEL: ModelInfo = {
-  id: 'shang_gui',
-  name: '青铜簋',
-  zh: '簋',
-  dynasty: '商 · 公元前12–11世纪',
-  glb: '/relic/shang_gui.glb?v=2',
-  manifest: '/relic/manifest.json',
+  id: 'qinghua_peony',
+  name: '缠枝牡丹纹青花瓶',
+  zh: '青',
+  dynasty: '真实器物三维采集',
+  glb: '/relic/m/qinghua_peony/model.glb',
+  manifest: '/relic/m/qinghua_peony/manifest.json',
+  thumb: '/relic/m/qinghua_peony/thumb.jpg',
+  material: 'qinghua',
 }
 const MAX_ELEMS = 32
 /** 器物底面落点 (世界 y), 接触阴影放这附近 */
@@ -39,6 +41,7 @@ interface ModelInfo {
   glb: string
   manifest: string
   thumb?: string | null
+  material?: 'qinghua' | 'bronze'
 }
 
 function useModelIndex(): ModelInfo[] {
@@ -91,6 +94,7 @@ interface VesselProps {
   hovered: number | null
   onPick: (id: number) => void
   onHover: (id: number | null) => void
+  material?: ModelInfo['material']
 }
 
 function pickElem(
@@ -119,7 +123,7 @@ function pickElem(
   return null
 }
 
-function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
+function Vessel({ glb, elems, picked, hovered, onPick, onHover, material }: VesselProps) {
   const { scene } = useGLTF(glb)
   const groupRef = useRef<THREE.Group>(null)
   const matRef = useRef<THREE.ShaderMaterial | null>(null)
@@ -159,16 +163,16 @@ function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
     // 铜锈包浆是介质表面: 低金属度 + 中粗糙度, 靠环境贴图出反射而不是直射高光
     const mat = new THREE.MeshStandardMaterial({
       color: photo ? '#ffffff' : '#c99a5f',
-      metalness: photo ? 0.24 : 0.72,
-      roughness: photo ? 0.52 : 0.42,
-      emissive: new THREE.Color(photo ? '#1a1208' : '#3a2a12'),
-      emissiveIntensity: photo ? 0.12 : 0.55,
+      metalness: photo ? (material === 'qinghua' ? 0.04 : 0.24) : 0.72,
+      roughness: photo ? (material === 'qinghua' ? 0.3 : 0.52) : 0.42,
+      emissive: new THREE.Color(photo ? (material === 'qinghua' ? '#091521' : '#1a1208') : '#3a2a12'),
+      emissiveIntensity: photo ? (material === 'qinghua' ? 0.05 : 0.12) : 0.55,
       map: src?.map ?? undefined,
       normalMap: src?.normalMap ?? undefined,
     })
     mat.envMapIntensity = 0.85
     return { bronzeGeo: geo, baseMat: mat }
-  }, [bodyMesh])
+  }, [bodyMesh, material])
 
   // 纹样信息烘焙在 GLB 顶点色 (R=id+1, G=描边), 逐元素淡出用 uniform 数组。
   // 视觉走「错金银」: 常态只留金线 + 极淡填充随呼吸脉动, hover 亮起, 提取后淡出。
@@ -176,9 +180,9 @@ function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
     const mat = new THREE.ShaderMaterial({
       uniforms: {
         uOp: { value: new Array(MAX_ELEMS).fill(1) },
-        uMainColor: { value: new THREE.Color('#f0c060') },
-        uGroundColor: { value: new THREE.Color('#5ec8ae') },
-        uEdgeColor: { value: new THREE.Color('#fff3c9') },
+        uMainColor: { value: new THREE.Color(material === 'qinghua' ? '#4e8aca' : '#f0c060') },
+        uGroundColor: { value: new THREE.Color(material === 'qinghua' ? '#9dc5e8' : '#5ec8ae') },
+        uEdgeColor: { value: new THREE.Color(material === 'qinghua' ? '#eff7ff' : '#fff3c9') },
         uNMain: { value: MAX_ELEMS },
         uTime: { value: 0 },
         uHoverId: { value: -1 },
@@ -240,7 +244,7 @@ function Vessel({ glb, elems, picked, hovered, onPick, onHover }: VesselProps) {
       depthWrite: false,
     })
     return mat
-  }, [])
+  }, [material])
 
   matRef.current = overlayMat
 
@@ -446,8 +450,7 @@ export default function RelicPage() {
           3D 文物纹样提取
         </h1>
         <span style={{ fontSize: 12.5, opacity: 0.7, letterSpacing: 1 }}>
-          {model.name}{model.dynasty ? ` · ${model.dynasty}` : ''} · 真实扫描 · 纹样基因拆解 ——
-          金线所至，皆是沉睡的纹样
+          {model.name}{model.dynasty ? ` · ${model.dynasty}` : ''} · 纹样基因拆解
         </span>
         <button
           onClick={() => navigate('/home')}
@@ -485,6 +488,7 @@ export default function RelicPage() {
                 hovered={hovered}
                 onPick={handlePick}
                 onHover={setHovered}
+                material={model.material}
               />
             </Suspense>
             <EnvLight />
@@ -528,7 +532,7 @@ export default function RelicPage() {
                   {model.zh ?? model.name.slice(0, 1)}
                 </span>
                 {model.name}
-                <span style={{ opacity: 0.5, fontSize: 11 }}>{models.length} 件器物 {switcherOpen ? '▴' : '▾'}</span>
+                <span style={{ opacity: 0.7, fontSize: 11 }}>{switcherOpen ? '收起器物库 ▴' : `切换器物 · ${models.length} 件 ▾`}</span>
               </button>
               {switcherOpen && (
                 <div
@@ -853,8 +857,9 @@ export default function RelicPage() {
               paddingTop: 12,
             }}
           >
-            流水线：柱面展开 (θ,y) → 浮雕残差定位扉棱 → 三面板纹带分割 → 顶点色烘焙。
-            几何与贴图：明尼阿波利斯艺术博物馆藏商代青铜簋摄影测量扫描件（CC0）。
+            {model.material === 'qinghua'
+              ? '提取范围：以当前真实器物模型可见的主纹与边饰纹带为准，不补造未采集的器身区域。'
+              : '流水线：柱面展开 (θ,y) → 浮雕残差定位扉棱 → 三面板纹带分割 → 顶点色烘焙。'}
           </div>
         </aside>
       </div>

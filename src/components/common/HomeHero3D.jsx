@@ -6,7 +6,7 @@ import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
 import ResonanceEffect from './ResonanceEffect'
 
-/* ── 镇馆五鼎（全本地 rawfile，秒开）── */
+/* ── 镇馆器物：青花为首，青铜为考古扫描组 ── */
 /* tune：摄影测量 GLB 材质缺 metal/rough（glTF 默认 1.0/1.0=全金属全粗糙→贴图变黑绿），
    必须显式覆盖。绿锈=矿物非金属，低 metal 让贴图漫反射出来；错金银鼎保金属度让金银纹闪 */
 /* 鸿蒙只内置兽纹鼎；其余模型必须走可访问的线上静态站，不能落到 rawfile。 */
@@ -19,6 +19,8 @@ const thumbUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
   ? `/relic/m/${id}/thumb.png`
   : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/thumb.png`
 const DINGS = [
+  { id: 'qinghua_peony', name: '缠枝牡丹纹青花瓶', dynasty: '真实器物三维采集', glb: '/relic/m/qinghua_peony/model.glb', thumb: '/relic/m/qinghua_peony/thumb.jpg', tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
+  { id: 'qinghua_second', name: '青花纹样瓶', dynasty: '真实器物三维采集', glb: '/relic/m/qinghua_second/model.glb', thumb: '/relic/m/qinghua_second/thumb.jpg', tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
   { id: 'ding_warring', name: '错金银鼎', dynasty: '战国 · 前5世纪', glb: modelUrl('ding_warring'), thumb: thumbUrl('ding_warring'), tune: { metal: 0.55, rough: 0.5 } },
   { id: 'ding_shang', name: '兽纹鼎', dynasty: '商 · 前12世纪', glb: modelUrl('ding_shang'), thumb: thumbUrl('ding_shang'), tune: { metal: 0.3, rough: 0.62 } },
   { id: 'ding_west_zhou', name: '大克鼎', dynasty: '西周中期 · 孝王时期', glb: modelUrl('ding_west_zhou'), thumb: thumbUrl('ding_west_zhou'), tune: { metal: 0.3, rough: 0.62 } },
@@ -168,7 +170,7 @@ function EnvRig() {
 }
 
 /* 默认错金银鼎的首屏扫描：不等 GLB，先用 Canvas 2D 点云占住舞台。 */
-function DingPointCloudIntro({ modelReady, onComplete }) {
+function DingPointCloudIntro({ modelReady, onComplete, bottle = false }) {
   const canvasRef = useRef(null)
   const modelReadyRef = useRef(modelReady)
   const completeRef = useRef(onComplete)
@@ -190,7 +192,9 @@ function DingPointCloudIntro({ modelReady, onComplete }) {
     }
     const points = Array.from({ length: 320 }, (_, index) => {
       const y = random()
-      const half = y < 0.13 ? 0.13
+      const half = bottle
+        ? (y < 0.12 ? 0.18 : y < 0.35 ? 0.11 : y < 0.46 ? 0.22 : y < 0.8 ? 0.44 - Math.abs(y - 0.62) * 0.12 : 0.26 - (y - 0.8) * 0.7)
+        : y < 0.13 ? 0.13
         : y < 0.24 ? 0.25
           : y < 0.72 ? 0.44 - Math.abs(y - 0.48) * 0.15
             : 0.3 - (y - 0.72) * 0.5
@@ -228,16 +232,16 @@ function DingPointCloudIntro({ modelReady, onComplete }) {
         const x = (point.startX + (point.x - point.startX) * ease + drift) * width
         const y = (point.startY + (point.y - point.startY) * ease) * height
         const alpha = (0.62 + Math.sin(elapsed / 250 + point.phase) * 0.22) * (1 - fade)
-        ctx.fillStyle = `rgba(242, 204, 112, ${alpha})`
+        ctx.fillStyle = `rgba(${bottle ? '121, 170, 211' : '242, 204, 112'}, ${alpha})`
         ctx.beginPath()
         ctx.arc(x, y, point.r, 0, Math.PI * 2)
         ctx.fill()
       })
       const scanY = (0.18 + ((elapsed % 2200) / 2200) * 0.66) * height
       const scan = ctx.createLinearGradient(0, scanY - 14, 0, scanY + 14)
-      scan.addColorStop(0, 'rgba(236,190,82,0)')
-      scan.addColorStop(0.5, `rgba(255,224,145,${0.78 * (1 - fade)})`)
-      scan.addColorStop(1, 'rgba(236,190,82,0)')
+      scan.addColorStop(0, bottle ? 'rgba(91,147,197,0)' : 'rgba(236,190,82,0)')
+      scan.addColorStop(0.5, bottle ? `rgba(203,229,246,${0.78 * (1 - fade)})` : `rgba(255,224,145,${0.78 * (1 - fade)})`)
+      scan.addColorStop(1, bottle ? 'rgba(91,147,197,0)' : 'rgba(236,190,82,0)')
       ctx.fillStyle = scan
       ctx.fillRect(width * 0.16, scanY - 14, width * 0.68, 28)
       if (fade >= 1 && !done) {
@@ -362,7 +366,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
             pointerEvents: 'none', zIndex: 2,
           }}
         >
-          鼎 然 入 场
+          {ding.material === 'qinghua' ? '青 花 入 场' : '鼎 然 入 场'}
         </motion.div>
       )}
       {!loaded && (
@@ -390,7 +394,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         <EnvRig />
       </Canvas>
       {idx === 0 && !introComplete && (
-        <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} />
+        <DingPointCloudIntro modelReady={loaded} onComplete={() => setIntroComplete(true)} bottle={ding.material === 'qinghua'} />
       )}
       {resonanceKey > 0 && <ResonanceEffect key={resonanceKey} active />}
 
@@ -401,7 +405,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
             <button onClick={() => setShowArtifactInfo(false)} aria-label="关闭器物说明" style={{ position: 'absolute', top: 8, right: 10, background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', fontSize: 16 }}>×</button>
             <div style={{ color: '#E3C079', fontFamily: 'Noto Serif SC, serif', fontSize: 17, letterSpacing: '0.12em' }}>{ding.name}</div>
             <div style={{ color: 'var(--color-text-secondary)', fontSize: 11, marginTop: 5, lineHeight: 1.7 }}>{ding.dynasty} · 轻触器身，旋转观看纹饰与器形</div>
-            <button onClick={() => navigate('/relic')} style={{ marginTop: 10, padding: '8px 13px', borderRadius: 5, background: 'var(--color-gold-main)', color: 'var(--color-bg-base)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, letterSpacing: '0.12em' }}>查看器物详览</button>
+            <button onClick={() => navigate(`/relic?m=${ding.id}`)} style={{ marginTop: 10, padding: '8px 13px', borderRadius: 5, background: 'var(--color-gold-main)', color: 'var(--color-bg-base)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, letterSpacing: '0.12em' }}>查看器物详览</button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -464,7 +468,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         padding: '0 20px 18px',
       }}>
         <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'rgba(201,162,75,0.55)' }}>
-          ‹ 滑动换鼎 · 上手转它 ›
+          ‹ 滑动换器 · 上手转它 ›
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {DINGS.map((d, i) => (
