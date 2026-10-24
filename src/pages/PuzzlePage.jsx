@@ -122,52 +122,110 @@ export default function PuzzlePage() {
     return () => { cancelled = true }
   }, [search])
 
-  // Preload images + pre-render outlined blocks for owned patterns only
-  useEffect(() => {
-    myPatterns.forEach(p => {
-      if (loadedImages[p.id]) return
-      const img = new Image()
-      img.src = getPatternImage(p)
-      img.onload = () => {
-        // For 角花 patterns the source image is a full piece with motifs
-        // in two diagonal corners connected by a thin ring. Slice off the
-        // top-left quadrant so we get a single corner; the four suggested
-        // positions rotate this slice to fill all four corners symmetrically.
-        const pat = getPatternById(p.id)
-        let processSrc = img
-        if (pat?.type === '角花') {
-          processSrc = sliceTopLeftQuadrant(img)
-        }
-        if (p.id.startsWith('relic_')) {
-          // Already extracted RGBA: preserve original cobalt colours and aspect.
-          const square = document.createElement('canvas')
-          square.width = square.height = Math.max(img.naturalWidth, img.naturalHeight)
-          square.getContext('2d').drawImage(img, (square.width-img.naturalWidth)/2, (square.height-img.naturalHeight)/2)
-          processSrc = square
-        }
-        setLoadedImages(prev => ({ ...prev, [p.id]: processSrc }))
-        const block = p.id.startsWith('relic_') ? processSrc : createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua', mode: 'line' })
-        setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
-        // Compute shape mask + contour + flexibility flag for collision/snapping/deformation
-        try {
-          const shape = extractShapeData(processSrc, { clearCorners: p.series !== 'qinghua' })
-          const contour = extractContour(shape, 16)
-          const pat = getPatternById(p.id)
-          const flexible = pat ? isFlexiblePattern(pat.type) : false
-          shapeCache.current[p.id] = { ...shape, contour, flexible }
-        } catch (e) {
-          // Shape extraction can fail on degenerate images; fall back to no
-          // collision data (block will be pass-through for collision tests)
-        }
-        // Also expose a dataURL so the tray thumbnail (an <img>) can show
-        // the shape-stamped version, not the original square image.
-        try {
-          const url = block.toDataURL('image/png')
-          setOutlinedUrls(prev => ({ ...prev, [p.id]: url }))
-        } catch {}
+  // Preload images + pre-render outlined blocks for owned patterns only.
+  // AI 素材 200+ 张、每张 1024² 约 1.4MB（合计 ~290MB）。挂载时全量同步跑完会
+  // 用解码 + 描边 + 形状提取 + PNG 重编码把主线程占满几十秒，首屏卡死（fork
+  // 横幅「复 用 自 …」迟迟不出现）。所以：
+  //   1. 每个 id 只处理一次——ref 守卫。原先 effect 依赖 loadedImages 又在内部
+  //      setLoadedImages，每次加载完成都重跑并给所有未完成项重新 new Image，
+  //      同一张图被反复重活处理，请求与 CPU 双爆。
+  //   2. 优先处理这一屏真正用得到的（画布已摆放的 + 托盘正在筛出的），
+  //      其余素材等帧间空闲再补，不阻塞交互。
+  const loadingIdsRef = useRef(new Set())
+
+  const processPattern = useCallback((p) => {
+    if (loadingIdsRef.current.has(p.id)) return
+    loadingIdsRef.current.add(p.id)
+    const img = new Image()
+    // 曲面提取纹样在 App 里走线上站绝对地址；不开 CORS，后面 extractShapeData 的 getImageData 会抛 SecurityError
+    img.crossOrigin = 'anonymous'
+    img.onerror = () => { loadingIdsRef.current.delete(p.id) }
+    img.onload = () => {
+      // For 角花 patterns the source image is a full piece with motifs
+      // in two diagonal corners connected by a thin ring. Slice off the
+      // top-left quadrant so we get a single corner; the four suggested
+      // positions rotate this slice to fill all four corners symmetrically.
+      const pat = getPatternById(p.id)
+      let processSrc = img
+      if (pat?.type === '角花') {
+        processSrc = sliceTopLeftQuadrant(img)
       }
-    })
-  }, [myPatterns, loadedImages])
+      if (p.id.startsWith('relic_')) {
+        // Already extracted RGBA: preserve original cobalt colours and aspect.
+        const square = document.createElement('canvas')
+        square.width = square.height = Math.max(img.naturalWidth, img.naturalHeight)
+        square.getContext('2d').drawImage(img, (square.width-img.naturalWidth)/2, (square.height-img.naturalHeight)/2)
+        processSrc = square
+      }
+      setLoadedImages(prev => ({ ...prev, [p.id]: processSrc }))
+      const block = p.id.startsWith('relic_') ? processSrc : createOutlinedBlock(processSrc, { clearCorners: p.series !== 'qinghua', mode: 'line' })
+      setOutlinedBlocks(prev => ({ ...prev, [p.id]: block }))
+      // Compute shape mask + contour + flexibility flag for collision/snapping/deformation
+      try {
+        const shape = extractShapeData(processSrc, { clearCorners: p.series !== 'qinghua' })
+        const contour = extractContour(shape, 16)
+        const flexible = pat ? isFlexiblePattern(pat.type) : false
+        shapeCache.current[p.id] = { ...shape, contour, flexible }
+      } catch (e) {
+        // Shape extraction can fail on degenerate images; fall back to no
+        // collision data (block will be pass-through for collision tests)
+      }
+      // Also expose a dataURL so the tray thumbnail (an <img>) can show
+      // the shape-stamped version, not the original square image.
+      // 缩略图只有 48px，直接对 1024² 原 canvas 做 PNG 编码每张要几十上百毫秒，
+      // 先缩到 128px 再编码，肉眼无差但快两个数量级。
+      try {
+        const sw = block.naturalWidth || block.width || 1
+        const sh = block.naturalHeight || block.height || 1
+        const k = Math.min(1, 128 / Math.max(sw, sh))
+        const thumb = document.createElement('canvas')
+        thumb.width = Math.max(1, Math.round(sw * k))
+        thumb.height = Math.max(1, Math.round(sh * k))
+        thumb.getContext('2d').drawImage(block, 0, 0, thumb.width, thumb.height)
+        const url = thumb.toDataURL('image/png')
+        setOutlinedUrls(prev => ({ ...prev, [p.id]: url }))
+      } catch {}
+    }
+    img.src = getPatternImage(p)
+  }, [])
+
+  useEffect(() => {
+    // 按用到的可能性排队，全部走帧间空闲，挂载那一帧不做任何重活：
+    //   1. 画布上已摆放的（不处理就画不出来，最急）
+    //   2. 托盘正在显示的这一屏
+    //   3. 其余「本命」素材（libPatterns 已含 fork 注入的 extras）
+    // AI 目录（203 张 × 1.4MB ≈ 290MB）刻意不入队——默认托盘根本不显示它，
+    // 只有用户切到「AI 元素」筛选或模板真的摆上去时，它才会经 1/2 进入队列。
+    const queue = []
+    const seen = new Set()
+    const push = (p) => {
+      if (!p || seen.has(p.id) || loadingIdsRef.current.has(p.id)) return
+      seen.add(p.id)
+      queue.push(p)
+    }
+    placements.forEach(pl => push(pl.id ? getPatternById(pl.id) : null))
+    filteredElements.forEach(push)
+    libPatterns.forEach(push)
+
+    let cancelled = false
+    let i = 0
+    const schedule = window.requestIdleCallback
+      ? (cb) => window.requestIdleCallback(cb, { timeout: 400 })
+      : (cb) => setTimeout(cb, 16)
+    const pump = () => {
+      if (cancelled) return
+      const t0 = performance.now()
+      let started = 0
+      // 每次最多起 2 张、约 8ms：起太多 onload 会挤在同一帧里一起做重活
+      while (i < queue.length && started < 2 && performance.now() - t0 < 8) {
+        processPattern(queue[i++])
+        started++
+      }
+      if (i < queue.length) schedule(pump)
+    }
+    if (queue.length) schedule(pump)
+    return () => { cancelled = true }
+  }, [placements, filteredElements, libPatterns, processPattern])
 
   // ── Drawing ──────────────────────────────────────────
 
