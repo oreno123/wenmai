@@ -167,15 +167,6 @@
       "thumb": "/relic/m/jia/thumb.png"
     },
     {
-      "id": "liding",
-      "name": "鬲鼎",
-      "zh": "鬲",
-      "dynasty": "商末周初 · 前12–11世纪",
-      "glb": "/relic/m/liding/model.glb",
-      "manifest": "/relic/m/liding/manifest.json",
-      "thumb": "/relic/m/liding/thumb.png"
-    },
-    {
       "id": "owl_zun",
       "name": "鸮尊",
       "zh": "尊",
