@@ -5,6 +5,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
 import ResonanceEffect from './ResonanceEffect'
+import ErrorBoundary from './ErrorBoundary'
 
 /* ── 镇馆器物：青花为首，青铜为考古扫描组 ── */
 /* tune：摄影测量 GLB 材质缺 metal/rough（glTF 默认 1.0/1.0=全金属全粗糙→贴图变黑绿），
@@ -15,12 +16,12 @@ const CLOUD_BASE = 'https://wenmai.ruoziqing.cn'
 const modelUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
   ? `/relic/m/${id}/model.glb`
   : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/model.glb`
-const thumbUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
-  ? `/relic/m/${id}/thumb.png`
-  : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/thumb.png`
+const thumbUrl = (id, ext = 'png') => HARMONY_ORIGIN && id === 'ding_shang'
+  ? `/relic/m/${id}/thumb.${ext}`
+  : `${HARMONY_ORIGIN || location.hostname === 'wenmai.ruoziqing.cn' ? CLOUD_BASE : ''}/relic/m/${id}/thumb.${ext}`
 const DINGS = [
-  { id: 'qinghua_peony', name: '缠枝牡丹纹青花瓶', dynasty: '真实器物三维采集', glb: '/relic/m/qinghua_peony/model.glb', thumb: '/relic/m/qinghua_peony/thumb.jpg', tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
-  { id: 'qinghua_second', name: '青花纹样瓶', dynasty: '真实器物三维采集', glb: '/relic/m/qinghua_second/model.glb', thumb: '/relic/m/qinghua_second/thumb.jpg', tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
+  { id: 'qinghua_peony', name: '缠枝牡丹纹青花瓶', dynasty: '真实器物三维采集', glb: modelUrl('qinghua_peony'), thumb: thumbUrl('qinghua_peony', 'jpg'), tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
+  { id: 'qinghua_second', name: '青花纹样瓶', dynasty: '真实器物三维采集', glb: modelUrl('qinghua_second'), thumb: thumbUrl('qinghua_second', 'jpg'), tune: { metal: 0.04, rough: 0.3 }, material: 'qinghua' },
   { id: 'ding_warring', name: '错金银鼎', dynasty: '战国 · 前5世纪', glb: modelUrl('ding_warring'), thumb: thumbUrl('ding_warring'), tune: { metal: 0.55, rough: 0.5 } },
   { id: 'ding_shang', name: '兽纹鼎', dynasty: '商 · 前12世纪', glb: modelUrl('ding_shang'), thumb: thumbUrl('ding_shang'), tune: { metal: 0.3, rough: 0.62 } },
   { id: 'ding_west_zhou', name: '大克鼎', dynasty: '西周中期 · 孝王时期', glb: modelUrl('ding_west_zhou'), thumb: thumbUrl('ding_west_zhou'), tune: { metal: 0.3, rough: 0.62 } },
@@ -336,6 +337,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
   }
 
   return (
+    <ErrorBoundary fallback={fallback}>
     <div
       style={{ position: 'relative', height: '64vh', minHeight: 460, touchAction: 'pan-y', userSelect: 'none' }}
       onPointerDown={onPointerDown}
@@ -506,6 +508,7 @@ export default function HomeHero3D({ navigate, fallback, onModelReady }) {
         </motion.button>
       </div>
     </div>
+    </ErrorBoundary>
   )
 }
 

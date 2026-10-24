@@ -23,6 +23,8 @@ export default class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      // 局部降级：调用方给了 fallback 就只替换自己那一块，不接管整页
+      if (this.props.fallback) return this.props.fallback
       return (
         <div style={{
           display: 'flex', flexDirection: 'column',

@@ -15,9 +15,11 @@ const DEFAULT_MODEL: ModelInfo = {
   name: '缠枝牡丹纹青花瓶',
   zh: '青',
   dynasty: '真实器物三维采集',
-  glb: '/relic/m/qinghua_peony/model.glb',
-  manifest: '/relic/m/qinghua_peony/manifest.json',
-  thumb: '/relic/m/qinghua_peony/thumb.jpg',
+  // 首屏占位：qinghua_peony 不在鸿蒙 rawfile 里，必须走线上站绝对地址，
+  // 否则 App 内这一帧的 404 会直接把整页顶进 ErrorBoundary。
+  glb: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/model.glb',
+  manifest: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/manifest.json',
+  thumb: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/thumb.jpg',
   material: 'qinghua',
 }
 const MAX_ELEMS = 32
@@ -100,6 +102,8 @@ function usePatternMask(manifestUrl: string): PatternMask | null {
     let alive = true
     setMask(null)
     const image = new Image()
+    // 掩膜可能来自线上站（App 里 manifest 是绝对地址），不声明 CORS 会让画布被污染，getImageData 直接抛 SecurityError
+    image.crossOrigin = 'anonymous'
     image.onerror = () => { if (alive) setMask(null) }
     image.onload = () => {
       const canvas = document.createElement('canvas')
