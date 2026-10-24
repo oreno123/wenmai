@@ -21,6 +21,26 @@
       "material": "qinghua"
     },
     {
+      "id": "cizhou_blackwhite",
+      "name": "磁州窑白地黑花",
+      "zh": "瓶",
+      "dynasty": "宋代",
+      "glb": "/relic/m/cizhou_blackwhite/model.glb",
+      "manifest": "/relic/m/cizhou_blackwhite/manifest.json",
+      "thumb": "/relic/m/cizhou_blackwhite/thumb.jpg",
+      "material": "qinghua"
+    },
+    {
+      "id": "dingyao_carved",
+      "name": "定窑刻花",
+      "zh": "钵",
+      "dynasty": "明代",
+      "glb": "/relic/m/dingyao_carved/model.glb",
+      "manifest": "/relic/m/dingyao_carved/manifest.json",
+      "thumb": "/relic/m/dingyao_carved/thumb.jpg",
+      "material": "qinghua"
+    },
+    {
       "id": "shang_gui",
       "name": "青铜簋",
       "zh": "簋",

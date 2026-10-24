@@ -33,3 +33,10 @@ __pycache__/
 # Claude Code 本地状态 / 鸿蒙构建产物
 .claude/
 dist_harmony/
+
+# 器物模型的带贴图原档（40MB+，线上用压缩 model.glb 即可）与备份残留
+public/relic/m/*/model-textured.glb
+public/relic/m/*/normal-preview.jpg
+*.bak-0930
+public/relic/index.json.bak-0930
+.model-archive/
