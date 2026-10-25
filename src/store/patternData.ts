@@ -19,6 +19,7 @@ export type SeriesId =
   | 'tile'
   | 'shanjing'
   | 'qinghua'
+  | 'bronze'
   | 'ai'
 
 export interface Pattern {
@@ -183,6 +184,7 @@ const SERIES_INFO: Record<SeriesId, SeriesInfo> = {
   tile: { name: '四方连续', description: '无限延展的纹样世界', color: '#B0C4DE' },
   shanjing: { name: '山海经', description: '上古神兽，千年纹影', color: '#C41E3A' },
   qinghua: { name: '青花瓷纹', description: '335款青花瓷纹样，蓝白之间尽显东方雅韵', color: '#1E4D8C' },
+  bronze: { name: '青铜纹样', description: '馆藏青铜器三维扫描表面提取的真实纹样', color: '#6E8B6E' },
   ai: { name: 'AI 元素库', description: 'AI 生成的开放纹样元素，可直接拼贴', color: '#9b59b6' },
 }
 
