@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { motion, AnimatePresence } from 'framer-motion'
-import { RELIC_PATTERNS } from '../data/relicPatterns'
+import { RELIC_PATTERNS, ASSET_BASE } from '../data/relicPatterns'
 import { cardNote, vesselNote } from '../data/relicNotes'
 
 /* 文物纹样库: 把已提取的纹样集中展示。
    曲面提取 = 模型几何展开后按配方人工核对切出的元素（可送拼贴）
    AI 精选 = 博物馆 3D 扫描几何提取 + AI 精修（可下载，不入拼贴池） */
 
-const ERA_ORDER = ['商', '西周', '春秋', '战国', '汉', '宋', '明']
+const ERA_ORDER = ['商', '西周', '春秋', '战国', '汉', '唐', '宋', '元', '明', '清', '近代', '现代']
 
 // dynasty 字段格式不一（"商 · 前12–11世纪" / "商末周初" / "东汉"…），归一到朝代大类。
 const eraOf = (dynasty) => {
@@ -26,6 +26,7 @@ export default function RelicPatternsPage() {
   const navigate = useNavigate()
   const [models, setModels] = useState([])
   const [vessels, setVessels] = useState([])
+  const [books, setBooks] = useState([])
   const [status, setStatus] = useState('loading')
   const [source, setSource] = useState('all')
   const [era, setEra] = useState('')
@@ -36,10 +37,11 @@ export default function RelicPatternsPage() {
     const controller = new AbortController()
     const get = (path) => fetch(`${BASE}${path}`, { signal: controller.signal })
       .then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json() })
-    Promise.all([get('relic/index.json'), get('relic/ai/manifest.json')])
-      .then(([idx, ai]) => {
+    Promise.all([get('relic/index.json'), get('relic/ai/manifest.json'), get('book/index.json')])
+      .then(([idx, ai, bk]) => {
         setModels(idx.models || [])
         setVessels(ai || [])
+        setBooks(Array.isArray(bk) ? bk : [])
         setStatus('ready')
       })
       .catch(err => { if (err.name !== 'AbortError') setStatus('error') })
@@ -63,6 +65,9 @@ export default function RelicPatternsPage() {
   const aiCards = useMemo(
     () => vessels.flatMap(v => v.cards.map(c => ({ ...c, vessel: v }))), [vessels])
 
+  const bookCards = useMemo(
+    () => books.flatMap(b => b.cards.map(c => ({ ...c, book: b }))), [books])
+
   const ql = q.trim().toLowerCase()
   const hit = (...parts) => !ql || parts.filter(Boolean).join(' ').toLowerCase().includes(ql)
 
@@ -77,8 +82,12 @@ export default function RelicPatternsPage() {
       const e = eraOf(v.dynasty)
       if (e) counts.set(e, (counts.get(e) || 0) + v.cards.length)
     }
+    for (const c of bookCards) {
+      const e = eraOf(c.era)
+      if (e) counts.set(e, (counts.get(e) || 0) + 1)
+    }
     return ERA_ORDER.filter(e => counts.has(e)).map(e => ({ era: e, n: counts.get(e) }))
-  }, [groups, vessels])
+  }, [groups, vessels, bookCards])
 
   const shownGroups = groups
     .map(g => ({
@@ -86,16 +95,28 @@ export default function RelicPatternsPage() {
       items: g.items.filter(p => hit(p.name, p.type, g.model?.name, g.model?.dynasty, p.series)),
     }))
     .filter(g => g.items.length && (!era || eraOf(g.model?.dynasty) === era))
-  const shownAi = source === 'extract' ? [] : aiCards.filter(c =>
+  const shownAi = source === 'extract' || source === 'book' ? [] : aiCards.filter(c =>
     (!era || eraOf(c.vessel.dynasty) === era) &&
     hit(c.name, c.sub, c.desc, c.vessel.name, c.vessel.dynasty))
   const shownAiVessels = vessels
     .filter(v => !era || eraOf(v.dynasty) === era)
 
+  const shownBooks = (source === 'all' || source === 'book') ? books
+    .map(b => ({
+      ...b,
+      cards: b.cards.filter(c => (!era || eraOf(c.era) === era) &&
+        hit(c.name, c.era, c.family, c.carrier, c.note, b.title)),
+    }))
+    .filter(b => b.cards.length) : []
+
   const extractCount = groups.reduce((s, g) => s + g.items.length, 0)
   const bronzeCount = groups.filter(g => g.items[0]?.series === 'bronze').reduce((s, g) => s + g.items.length, 0)
   const shownExtract = shownGroups.reduce((s, g) => s + g.items.length, 0)
-  const total = source === 'extract' ? shownExtract : source === 'ai' ? shownAi.length : shownExtract + shownAi.length
+  const shownBook = shownBooks.reduce((s, b) => s + b.cards.length, 0)
+  const total = source === 'extract' ? shownExtract
+    : source === 'ai' ? shownAi.length
+    : source === 'book' ? shownBook
+    : shownExtract + shownAi.length + shownBook
 
   const chip = (id, label, n) => (
     <button key={id} type="button" onClick={() => setSource(id)}
@@ -136,13 +157,14 @@ export default function RelicPatternsPage() {
       </div>
       <p style={{ color: 'var(--color-text-dim)', fontSize: 12, margin: '0 0 18px', letterSpacing: '0.05em' }}>
         {status === 'ready'
-          ? `曲面提取 ${extractCount}（青铜 ${bronzeCount} · 瓷器 ${extractCount - bronzeCount}）· AI 精选 ${aiCards.length} · 博物馆器物三维扫描`
+          ? `曲面提取 ${extractCount}（青铜 ${bronzeCount} · 瓷器 ${extractCount - bronzeCount}）· 图录提取 ${bookCards.length} · AI 精选 ${aiCards.length} · 博物馆器物三维扫描`
           : '博物馆器物三维扫描'}
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-        {chip('all', '全部', extractCount + aiCards.length)}
+        {chip('all', '全部', extractCount + bookCards.length + aiCards.length)}
         {chip('extract', '曲面提取', extractCount)}
+        {chip('book', '图录提取', bookCards.length)}
         {chip('ai', 'AI 精选', aiCards.length)}
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="搜索纹样 / 器物 / 朝代"
           style={{
@@ -192,7 +214,7 @@ export default function RelicPatternsPage() {
         </div>
       )}
 
-      {status === 'ready' && source !== 'ai' && shownGroups.map(g => (
+      {status === 'ready' && (source === 'all' || source === 'extract') && shownGroups.map(g => (
         <section key={g.id} style={{ marginBottom: 30 }}>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: 8,
@@ -228,7 +250,44 @@ export default function RelicPatternsPage() {
         </section>
       ))}
 
-      {status === 'ready' && source !== 'extract' && shownAiVessels
+      {status === 'ready' && (source === 'all' || source === 'book') && shownBooks.map(b => (
+        <section key={b.key} style={{ marginBottom: 30 }}>
+          <div style={{
+            display: 'flex', alignItems: 'baseline', gap: 8,
+            borderBottom: '1px solid var(--color-border-gold)', paddingBottom: 7, marginBottom: 12,
+          }}>
+            <h2 style={{
+              fontFamily: 'Noto Serif SC, serif', fontSize: 16, fontWeight: 600,
+              color: '#E8D9B0', letterSpacing: '0.12em', margin: 0,
+            }}>{b.title}</h2>
+            <span style={{ color: '#5C5445', fontSize: 11, letterSpacing: '0.08em' }}>纹样图谱</span>
+            <span style={{ marginLeft: 'auto', color: '#5C5445', fontSize: 11 }}>{b.cards.length} 张</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
+            {b.cards.map(c => (
+              <motion.div key={c.id} whileHover={{ y: -3 }}
+                onClick={() => setPick({
+                  kind: 'book', img: `${ASSET_BASE}/book/${c.file}`, title: c.name,
+                  sub: `${b.title}${c.era ? ` · ${c.era}` : ''}`, desc: c.note,
+                  carrier: c.carrier, webp: c.file, svg: c.svg,
+                })}>
+                <div style={cardBox}>
+                  <img src={`${ASSET_BASE}/book/${c.file}`} alt={c.name} loading="lazy"
+                    style={{ width: '100%', display: 'block', borderRadius: 4, background: 'rgba(255,255,255,0.03)' }} />
+                  <div style={{ color: 'var(--color-text-primary)', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600, marginTop: 6 }}>
+                    {c.name}
+                  </div>
+                  <div style={{ color: '#8A7D68', fontSize: 9.5, marginTop: 2 }}>
+                    {[c.family, c.era].filter(Boolean).join(' · ')}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {status === 'ready' && (source === 'all' || source === 'ai') && shownAiVessels
         .map(v => ({ v, cards: v.cards.filter(c => hit(c.name, c.sub, c.desc, v.name, v.dynasty)) }))
         .filter(({ cards }) => cards.length)
         .map(({ v, cards }) => (
@@ -295,6 +354,7 @@ export default function RelicPatternsPage() {
                   </div>
                   <div style={{ fontSize: 11, color: '#8A7D68', marginTop: 2 }}>{pick.sub}</div>
                   {pick.desc && <div style={{ fontSize: 11, color: '#6B5F4D', marginTop: 4 }}>{pick.desc}</div>}
+                  {pick.carrier && <div style={{ fontSize: 11, color: '#8A7D68', marginTop: 4 }}>载体 · {pick.carrier}</div>}
                   {pick.kind === 'extract' && (() => {
                     const note = cardNote(pick.pattern.id)
                     if (!note) return null
@@ -324,6 +384,12 @@ export default function RelicPatternsPage() {
                     <button type="button" onClick={() => navigate(`/puzzle?pattern=${encodeURIComponent(pick.pattern.id)}`)}
                       style={actionLink}>送往拼贴</button>
                     <a href={pick.img} download style={actionLink}>下载 PNG</a>
+                  </>
+                )}
+                {pick.kind === 'book' && (
+                  <>
+                    <a href={pick.img} download style={actionLink}>下载 PNG</a>
+                    {pick.svg && <a href={`${ASSET_BASE}/book/${pick.svg}`} download style={actionLink}>下载 SVG</a>}
                   </>
                 )}
                 {pick.kind === 'ai' && (

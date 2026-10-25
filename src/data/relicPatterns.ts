@@ -6,7 +6,7 @@ import shangGui from '../../public/relic/m/shang_gui/manifest.json'
 
 // 鸿蒙 App 的页面 origin 是 http://localhost，rawfile 里只内置了 4 件器物的模型，
 // 青花展开图必须走线上站；桌面 dev 与线上站同源，保持相对路径。
-const ASSET_BASE = typeof location !== 'undefined' && location.hostname === 'localhost'
+export const ASSET_BASE = typeof location !== 'undefined' && location.hostname === 'localhost'
   ? 'https://wenmai.ruoziqing.cn'
   : ''
 
