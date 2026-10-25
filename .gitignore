@@ -40,3 +40,4 @@ public/relic/m/*/normal-preview.jpg
 *.bak-0930
 public/relic/index.json.bak-0930
 .model-archive/
+.model-archive/

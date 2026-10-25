@@ -2,11 +2,23 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '../components/common/Router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RELIC_PATTERNS } from '../data/relicPatterns'
+import { cardNote, vesselNote } from '../data/relicNotes'
 
 /* 文物纹样库: 把已提取的纹样集中展示。
    曲面提取 = 模型几何展开后按配方人工核对切出的元素（可送拼贴）
-   AI 精选 = 博物馆 3D 扫描几何提取 + AI 精修（可下载，不入拼贴池）
-   青铜区域 = 声明了但未渲染成图，只给入口，不造假卡片 */
+   AI 精选 = 博物馆 3D 扫描几何提取 + AI 精修（可下载，不入拼贴池） */
+
+const ERA_ORDER = ['商', '西周', '春秋', '战国', '汉', '宋', '明']
+
+// dynasty 字段格式不一（"商 · 前12–11世纪" / "商末周初" / "东汉"…），归一到朝代大类。
+const eraOf = (dynasty) => {
+  if (!dynasty) return ''
+  if (dynasty.startsWith('商末周初')) return '商'
+  for (const era of ERA_ORDER) {
+    if (dynasty.startsWith(era) || dynasty.includes(era)) return era === '汉' ? '汉' : era
+  }
+  return ''
+}
 
 const BASE = import.meta.env.BASE_URL
 
@@ -16,6 +28,7 @@ export default function RelicPatternsPage() {
   const [vessels, setVessels] = useState([])
   const [status, setStatus] = useState('loading')
   const [source, setSource] = useState('all')
+  const [era, setEra] = useState('')
   const [q, setQ] = useState('')
   const [pick, setPick] = useState(null)
 
@@ -53,17 +66,36 @@ export default function RelicPatternsPage() {
   const ql = q.trim().toLowerCase()
   const hit = (...parts) => !ql || parts.filter(Boolean).join(' ').toLowerCase().includes(ql)
 
+  const eraPool = useMemo(() => {
+    // chip 数字与列表「项」同口径：按卡计，不按器计
+    const counts = new Map()
+    for (const g of groups) {
+      const e = eraOf(g.model?.dynasty)
+      if (e) counts.set(e, (counts.get(e) || 0) + g.items.length)
+    }
+    for (const v of vessels) {
+      const e = eraOf(v.dynasty)
+      if (e) counts.set(e, (counts.get(e) || 0) + v.cards.length)
+    }
+    return ERA_ORDER.filter(e => counts.has(e)).map(e => ({ era: e, n: counts.get(e) }))
+  }, [groups, vessels])
+
   const shownGroups = groups
     .map(g => ({
       ...g,
       items: g.items.filter(p => hit(p.name, p.type, g.model?.name, g.model?.dynasty, p.series)),
     }))
-    .filter(g => g.items.length)
+    .filter(g => g.items.length && (!era || eraOf(g.model?.dynasty) === era))
   const shownAi = source === 'extract' ? [] : aiCards.filter(c =>
+    (!era || eraOf(c.vessel.dynasty) === era) &&
     hit(c.name, c.sub, c.desc, c.vessel.name, c.vessel.dynasty))
+  const shownAiVessels = vessels
+    .filter(v => !era || eraOf(v.dynasty) === era)
 
   const extractCount = groups.reduce((s, g) => s + g.items.length, 0)
-  const total = source === 'extract' ? extractCount : source === 'ai' ? aiCards.length : extractCount + aiCards.length
+  const bronzeCount = groups.filter(g => g.items[0]?.series === 'bronze').reduce((s, g) => s + g.items.length, 0)
+  const shownExtract = shownGroups.reduce((s, g) => s + g.items.length, 0)
+  const total = source === 'extract' ? shownExtract : source === 'ai' ? shownAi.length : shownExtract + shownAi.length
 
   const chip = (id, label, n) => (
     <button key={id} type="button" onClick={() => setSource(id)}
@@ -104,7 +136,7 @@ export default function RelicPatternsPage() {
       </div>
       <p style={{ color: 'var(--color-text-dim)', fontSize: 12, margin: '0 0 18px', letterSpacing: '0.05em' }}>
         {status === 'ready'
-          ? `${extractCount} 张曲面提取 · ${aiCards.length} 张 AI 精选 · 博物馆器物三维扫描`
+          ? `曲面提取 ${extractCount}（青铜 ${bronzeCount} · 瓷器 ${extractCount - bronzeCount}）· AI 精选 ${aiCards.length} · 博物馆器物三维扫描`
           : '博物馆器物三维扫描'}
       </p>
 
@@ -119,6 +151,30 @@ export default function RelicPatternsPage() {
             fontSize: 12.5, fontFamily: 'inherit', outline: 'none',
           }} />
       </div>
+
+      {status === 'ready' && eraPool.length > 1 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10, alignItems: 'center' }}>
+          <span style={{ color: '#5C5445', fontSize: 11, letterSpacing: '0.08em' }}>朝代</span>
+          <button key="era-all" type="button" onClick={() => setEra('')}
+            style={{
+              border: `1px solid ${era === '' ? 'var(--color-gold-main)' : 'rgba(201,162,75,0.28)'}`,
+              background: era === '' ? 'rgba(201,162,75,0.14)' : 'transparent',
+              color: era === '' ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+              borderRadius: 6, padding: '4px 11px', fontSize: 12, letterSpacing: '0.1em',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>不限</button>
+          {eraPool.map(({ era: e, n }) => (
+            <button key={e} type="button" onClick={() => setEra(era === e ? '' : e)}
+              style={{
+                border: `1px solid ${era === e ? 'var(--color-gold-main)' : 'rgba(201,162,75,0.28)'}`,
+                background: era === e ? 'rgba(201,162,75,0.14)' : 'transparent',
+                color: era === e ? 'var(--color-gold-bright)' : 'var(--color-text-secondary)',
+                borderRadius: 6, padding: '4px 11px', fontSize: 12, letterSpacing: '0.1em',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>{e} {n}</button>
+          ))}
+        </div>
+      )}
       <div style={{ color: 'var(--color-text-dim)', fontSize: 11, marginBottom: 20, letterSpacing: '0.08em' }}>
         {status === 'ready' ? `${total} 项` : ''}
       </div>
@@ -150,24 +206,29 @@ export default function RelicPatternsPage() {
             <span style={{ marginLeft: 'auto', color: '#5C5445', fontSize: 11 }}>{g.items.length} 张</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
-            {g.items.map(p => (
-              <motion.div key={p.id} whileHover={{ y: -3 }}
-                onClick={() => setPick({ kind: 'extract', img: p.image, title: p.name, sub: `${g.model?.name || ''} · ${p.type}`, pattern: p })}>
-                <div style={cardBox}>
-                  <img src={p.image} alt={p.name} loading="lazy"
-                    style={{ width: '100%', display: 'block', borderRadius: 4, background: 'rgba(255,255,255,0.03)' }} />
-                  <div style={{ color: 'var(--color-text-primary)', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600, marginTop: 6 }}>
-                    {p.name}
+            {g.items.map(p => {
+              const note = cardNote(p.id)
+              return (
+                <motion.div key={p.id} whileHover={{ y: -3 }}
+                  onClick={() => setPick({ kind: 'extract', img: p.image, title: note?.name || p.name, sub: `${g.model?.name || ''} · ${g.model?.dynasty || ''}`, pattern: p })}>
+                  <div style={cardBox}>
+                    <img src={p.image} alt={p.name} loading="lazy"
+                      style={{ width: '100%', display: 'block', borderRadius: 4, background: 'rgba(255,255,255,0.03)' }} />
+                    <div style={{ color: 'var(--color-text-primary)', fontSize: 11, fontFamily: 'Noto Serif SC, serif', fontWeight: 600, marginTop: 6 }}>
+                      {note?.name || p.name}
+                    </div>
+                    <div style={{ color: '#8A7D68', fontSize: 9.5, marginTop: 2 }}>
+                      {p.type}{note && note.name !== p.name ? ` · 原标注 ${p.name}` : ''}
+                    </div>
                   </div>
-                  <div style={{ color: '#8A7D68', fontSize: 9.5, marginTop: 2 }}>{p.type}</div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              )
+            })}
           </div>
         </section>
       ))}
 
-      {status === 'ready' && source !== 'extract' && vessels
+      {status === 'ready' && source !== 'extract' && shownAiVessels
         .map(v => ({ v, cards: v.cards.filter(c => hit(c.name, c.sub, c.desc, v.name, v.dynasty)) }))
         .filter(({ cards }) => cards.length)
         .map(({ v, cards }) => (
@@ -207,19 +268,10 @@ export default function RelicPatternsPage() {
           </section>
         ))}
 
-      {status === 'ready' && source === 'all' && (
-        <section style={{
-          border: '1px dashed rgba(201,162,75,0.28)', borderRadius: 12, padding: '18px 20px', marginBottom: 30,
-        }}>
-          <div style={{ fontFamily: 'Noto Serif SC, serif', fontSize: 15, color: '#E8D9B0', letterSpacing: '0.12em', marginBottom: 6 }}>
-            青铜纹样区域
-          </div>
-          <div style={{ color: 'var(--color-text-dim)', fontSize: 12, lineHeight: 1.8, marginBottom: 12 }}>
-            青铜器的纹样区域按语义顶点色与 UV 掩膜划分，目前只在三维器物上进行命中与讲解，
-            尚未渲染成独立图版，因此不在这里列卡。
-          </div>
-          <button type="button" onClick={() => navigate('/relic')} style={actionLink}>前往 3D 提取页</button>
-        </section>
+      {status === 'ready' && total === 0 && (
+        <div style={{ padding: '42px 20px', textAlign: 'center', color: 'var(--color-text-dim)', fontSize: 12.5 }}>
+          没有匹配的纹样，换个朝代或关键词试试
+        </div>
       )}
 
       <AnimatePresence>
@@ -243,6 +295,29 @@ export default function RelicPatternsPage() {
                   </div>
                   <div style={{ fontSize: 11, color: '#8A7D68', marginTop: 2 }}>{pick.sub}</div>
                   {pick.desc && <div style={{ fontSize: 11, color: '#6B5F4D', marginTop: 4 }}>{pick.desc}</div>}
+                  {pick.kind === 'extract' && (() => {
+                    const note = cardNote(pick.pattern.id)
+                    if (!note) return null
+                    return (
+                      <div style={{ marginTop: 6, display: 'grid', gap: 4 }}>
+                        {note.name !== pick.pattern.name && (
+                          <div style={{ fontSize: 10.5, color: '#8A7D68' }}>原位置标注 · {pick.pattern.name}</div>
+                        )}
+                        {note.note && (
+                          <div style={{ fontSize: 11.5, color: 'var(--color-text-secondary)', lineHeight: 1.75 }}>{note.note}</div>
+                        )}
+                      </div>
+                    )
+                  })()}
+                  {pick.kind === 'extract' && (() => {
+                    const m = /^relic_(.+)_(\d+)$/.exec(pick.pattern.id)
+                    const vNote = m ? vesselNote(m[1]) : ''
+                    return vNote ? (
+                      <div style={{ fontSize: 11, color: '#6B5F4D', marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(201,162,75,0.16)', lineHeight: 1.7 }}>
+                        {vNote}
+                      </div>
+                    ) : null
+                  })()}
                 </div>
                 {pick.kind === 'extract' && (
                   <>
