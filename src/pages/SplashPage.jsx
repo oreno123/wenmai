@@ -2,12 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../shaders/cloudTrain'
 import { useNavigate } from '../components/common/Router'
-import { useAuth } from '../lib/auth'
 
 export default function SplashPage() {
   const containerRef = useRef(null)
   const navigate = useNavigate()
-  const { user } = useAuth()
   const [fading, setFading] = useState(false)
 
   useEffect(() => {
@@ -120,9 +118,9 @@ export default function SplashPage() {
 
   const enter = () => {
     setFading(true)
-    // Send logged-out users to auth first so they understand the project
-    // has an account system; logged-in users skip straight to Home.
-    setTimeout(() => navigate(user ? '/home' : '/auth'), 800)
+    // All visitors land on Home; the login entry lives in the Home header
+    // so browsing is never gated behind the auth wall.
+    setTimeout(() => navigate('/home', { replace: true }), 800)
   }
 
   return (

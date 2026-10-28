@@ -22,8 +22,9 @@ export function RouterProvider({ children }) {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  const navigate = useCallback((path) => {
-    window.location.hash = path
+  const navigate = useCallback((path, opts) => {
+    if (opts && opts.replace) window.location.replace(`#${path}`)
+    else window.location.hash = path
     setLoc(parseHash())
   }, [])
 

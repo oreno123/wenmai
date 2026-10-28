@@ -42,6 +42,34 @@ function PageLoader() {
   )
 }
 
+function NotFound({ pathname }) {
+  const { navigate } = useLocation()
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 18,
+      background: 'var(--bg-primary, #0C0A0E)',
+      fontFamily: 'Noto Serif SC, serif',
+    }}>
+      <div style={{ fontSize: 56, color: 'rgba(201,162,75,0.85)', letterSpacing: 12 }}>纹</div>
+      <div style={{ color: 'var(--color-text-secondary, #9a8c74)', fontSize: 13, letterSpacing: 3 }}>
+        这条路径没有纹样 · {pathname}
+      </div>
+      <button
+        onClick={() => navigate('/home')}
+        style={{
+          padding: '10px 34px', borderRadius: 999, fontSize: 13, letterSpacing: 6,
+          fontFamily: 'inherit', cursor: 'pointer',
+          background: 'linear-gradient(145deg, var(--color-gold-main, #C9A24B), var(--color-gold-dim, #8a6d33))',
+          color: 'var(--color-text-primary, #f5edd8)', border: 'none',
+        }}
+      >
+        回首页
+      </button>
+    </div>
+  )
+}
+
 function Pages() {
   const { pathname } = useLocation()
   let Page
@@ -65,7 +93,8 @@ function Pages() {
   else if (pathname === '/ai-patterns') Page = AiPatternsPage
   else if (pathname === '/relic-patterns') Page = RelicPatternsPage
   else if (pathname === '/landing') Page = Landing
-  else Page = SplashPage
+  else if (pathname === '/' || pathname === '') Page = SplashPage
+  else Page = () => <NotFound pathname={pathname} />
 
   return (
     <Suspense fallback={<PageLoader />}>

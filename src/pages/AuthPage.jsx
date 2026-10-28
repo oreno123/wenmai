@@ -357,6 +357,18 @@ export default function AuthPage() {
               {mode === 'login' ? '去注册' : '去登录'}
             </span>
           </div>
+
+          <div style={{
+            textAlign: 'center', marginTop: 14, fontSize: 11, color: ink[500],
+            fontFamily: 'Noto Serif SC, serif', letterSpacing: '0.08em',
+          }}>
+            <span
+              onClick={() => navigate('/home')}
+              style={{ cursor: 'pointer', borderBottom: '1px solid rgba(216,205,186,0.25)', paddingBottom: 1 }}
+            >
+              暂不登录，先去逛逛 →
+            </span>
+          </div>
         </motion.div>
 
         {/* ───── Footer hint ───── */}
