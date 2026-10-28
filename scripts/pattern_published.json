@@ -1,0 +1,209 @@
+{
+  "email": "collection@wenmai.art",
+  "username": "纹样合集",
+  "password": "qPO0VdzIKhA2u6YL",
+  "uid": "4c55bf31-46a4-4882-9daa-056aa1f11e4a",
+  "works": [
+    {
+      "id": "606ce07a-04b5-4a8c-961d-4f78a654da38",
+      "title": "莲瓣承唐",
+      "pattern": "lianban-1",
+      "file": "lianban_tang.png",
+      "series": "唐草",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/606ce07a-04b5-4a8c-961d-4f78a654da38.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "fa987d7f-7aa9-4a87-92a8-2af2674cfbfd",
+      "title": "蕉叶引商",
+      "pattern": "jiaoye-1",
+      "file": "jiaoye.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/fa987d7f-7aa9-4a87-92a8-2af2674cfbfd.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "1541ad32-c39e-4c75-ac4c-fa9a0a06e7c9",
+      "title": "忍冬不凋",
+      "pattern": "rendong-1",
+      "file": "rendong.png",
+      "series": "唐草",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/1541ad32-c39e-4c75-ac4c-fa9a0a06e7c9.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "dba995c1-7cbf-4e8c-9977-ead296d51489",
+      "title": "联珠环宝",
+      "pattern": "lianzhu-1",
+      "file": "lianzhu.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/dba995c1-7cbf-4e8c-9977-ead296d51489.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "252353fa-85bc-4953-9c4f-d85d624cebf4",
+      "title": "缠枝莲语",
+      "pattern": "chanlian-1",
+      "file": "chanlian.png",
+      "series": "唐草",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/252353fa-85bc-4953-9c4f-d85d624cebf4.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "41f56f38-dd66-45dd-9fed-286d773e5c24",
+      "title": "折枝富贵",
+      "pattern": "zhezhi-1",
+      "file": "zhezhi_mudan.png",
+      "series": "唐草",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/41f56f38-dd66-45dd-9fed-286d773e5c24.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "b85120b0-e70d-4b52-ab19-c80030c6902e",
+      "title": "海崖立波",
+      "pattern": "haishui-1",
+      "file": "haishui_jiangya.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/b85120b0-e70d-4b52-ab19-c80030c6902e.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "3bd25477-9376-484f-90e0-470ce7e0fc46",
+      "title": "云雷回响",
+      "pattern": "yunlei-1",
+      "file": "yunlei_ring.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/3bd25477-9376-484f-90e0-470ce7e0fc46.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "18f15781-c95b-496a-858b-bbfa0ab0555f",
+      "title": "乳钉列阵",
+      "pattern": "ruding-1",
+      "file": "ruding.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/18f15781-c95b-496a-858b-bbfa0ab0555f.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "0859b641-e2c5-42c6-b83d-4e49af62da9b",
+      "title": "窃曲流转",
+      "pattern": "qiequ-1",
+      "file": "qiequ.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/0859b641-e2c5-42c6-b83d-4e49af62da9b.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "343cfe92-bb89-4015-8d00-c507e47b44bd",
+      "title": "垂鳞叠甲",
+      "pattern": "chuiling-1",
+      "file": "chuiling.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/343cfe92-bb89-4015-8d00-c507e47b44bd.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "eff1b92f-7b1c-40b1-90de-501c947c3cd9",
+      "title": "重环相扣",
+      "pattern": "zhonghuan-1",
+      "file": "zhonghuan.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/eff1b92f-7b1c-40b1-90de-501c947c3cd9.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "8d430eec-d6d9-488d-b30b-c5d364a8caea",
+      "title": "瓦纹横陈",
+      "pattern": "wawen-1",
+      "file": "wawen.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/8d430eec-d6d9-488d-b30b-c5d364a8caea.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "23e286ea-3c0a-4d06-af2a-a7cb11fba00e",
+      "title": "双螭对峙",
+      "pattern": "chi-1",
+      "file": "chiwen.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/23e286ea-3c0a-4d06-af2a-a7cb11fba00e.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "155f8330-a5d3-4630-aa02-5755b84f7d14",
+      "title": "玄鸟衔商",
+      "pattern": "feng-1",
+      "file": "feng_shang.png",
+      "series": "青铜器",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/155f8330-a5d3-4630-aa02-5755b84f7d14.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "88bb0891-350e-4a63-bca6-412abe7457c0",
+      "title": "鸾鸟衔绶",
+      "pattern": "luan-1",
+      "file": "luanniao.png",
+      "series": null,
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/88bb0891-350e-4a63-bca6-412abe7457c0.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "ff7aabf0-fb9a-477b-880e-4ffa3d1e50ef",
+      "title": "团鹤延年",
+      "pattern": "tuanhe-1",
+      "file": "tuanhe.png",
+      "series": null,
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/ff7aabf0-fb9a-477b-880e-4ffa3d1e50ef.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "1c2f9c59-f8c4-4936-ae27-5b5c30ad1889",
+      "title": "鱼藻相忘",
+      "pattern": "yuzao-1",
+      "file": "yuzao.png",
+      "series": "青花瓷",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/1c2f9c59-f8c4-4936-ae27-5b5c30ad1889.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "afea4981-b2ad-4bd0-897c-aac9b5597461",
+      "title": "蝠到福来",
+      "pattern": "bianfu-1",
+      "file": "bianfu.png",
+      "series": null,
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/afea4981-b2ad-4bd0-897c-aac9b5597461.webp",
+      "cover_v2": true
+    },
+    {
+      "id": "1882373b-a7b1-403f-adbc-f8278ab2bc87",
+      "title": "宝相缠枝",
+      "pattern": "chanbao-1",
+      "file": "chanbao.png",
+      "series": "唐草",
+      "score": 9,
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/1882373b-a7b1-403f-adbc-f8278ab2bc87.webp",
+      "cover_v2": true
+    }
+  ],
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0YzU1YmYzMS00NmE0LTQ4ODItOWRhYS0wNTZhYTFmMTFlNGEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkzMTE0OTMzLCJpYXQiOjE3OTMxMTEzMzMsImVtYWlsIjoiY29sbGVjdGlvbkB3ZW5tYWkuYXJ0IiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImNvbGxlY3Rpb25Ad2VubWFpLmFydCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6IjRjNTViZjMxLTQ2YTQtNDg4Mi05ZGFhLTA1NmFhMWYxMWU0YSIsInVzZXJuYW1lIjoi57q55qC35ZCI6ZuGIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3OTMxMTEzMzN9XSwic2Vzc2lvbl9pZCI6ImU1ZGQzMzIzLWVjMGMtNDMxZS05NGU5LWMyMTJkMTBhOTdlYSIsImlzX2Fub255bW91cyI6ZmFsc2V9.EtRbRIAucOfouR3ztT0Pw-upVp9Vqm-3_-hVWmgD3RY"
+}
