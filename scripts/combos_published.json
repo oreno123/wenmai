@@ -1,0 +1,1030 @@
+{
+  "works": [
+    {
+      "id": "f9e7acc2-564c-4a97-ae97-88c281e4b800",
+      "title": "青铜威仪",
+      "series": "青铜器",
+      "placements": [
+        {
+          "id": "taotie-1",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/f9e7acc2-564c-4a97-ae97-88c281e4b800.webp"
+    },
+    {
+      "id": "28d8e200-6eac-4186-9d83-f2fef2868148",
+      "title": "周鼎饕餮",
+      "series": "青铜器",
+      "placements": [
+        {
+          "id": "taotie-2",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/28d8e200-6eac-4186-9d83-f2fef2868148.webp"
+    },
+    {
+      "id": "681c6136-f653-441b-bf25-76ce28c1bb3d",
+      "title": "夔龙拱卫",
+      "series": "青铜器",
+      "placements": [
+        {
+          "id": "taotie-3",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-tuanlong-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-tuanlong-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-tuanlong-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-tuanlong-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/681c6136-f653-441b-bf25-76ce28c1bb3d.webp"
+    },
+    {
+      "id": "cc2b32d2-d458-4d33-aa16-edf2fa2b83fd",
+      "title": "团龙献瑞",
+      "series": "团龙",
+      "placements": [
+        {
+          "id": "dragon-4",
+          "x": 512,
+          "y": 512,
+          "size": 360,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/cc2b32d2-d458-4d33-aa16-edf2fa2b83fd.webp"
+    },
+    {
+      "id": "0a97457c-68db-4456-b5ce-c6ed3366689a",
+      "title": "蟠龙镇四方",
+      "series": "团龙",
+      "placements": [
+        {
+          "id": "dragon-1",
+          "x": 512,
+          "y": 512,
+          "size": 360,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-phoenix-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-phoenix-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-phoenix-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-phoenix-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/0a97457c-68db-4456-b5ce-c6ed3366689a.webp"
+    },
+    {
+      "id": "1621a499-34ea-47e1-91a9-a514c03646b7",
+      "title": "双龙戏珠",
+      "series": "团龙",
+      "placements": [
+        {
+          "id": "basic-3",
+          "x": 512,
+          "y": 512,
+          "size": 200,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "dragon-2",
+          "x": 287,
+          "y": 512,
+          "size": 280,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "dragon-2",
+          "x": 737,
+          "y": 512,
+          "size": 280,
+          "rotation": 0,
+          "scaleX": -1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/1621a499-34ea-47e1-91a9-a514c03646b7.webp"
+    },
+    {
+      "id": "f064a1b2-a9f1-477e-aa33-1d1a95e460ab",
+      "title": "升龙对望",
+      "series": "团龙",
+      "placements": [
+        {
+          "id": "scroll-3",
+          "x": 512,
+          "y": 512,
+          "size": 200,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "dragon-3",
+          "x": 287,
+          "y": 512,
+          "size": 280,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "dragon-3",
+          "x": 737,
+          "y": 512,
+          "size": 280,
+          "rotation": 0,
+          "scaleX": -1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/f064a1b2-a9f1-477e-aa33-1d1a95e460ab.webp"
+    },
+    {
+      "id": "09918f59-ec5a-4689-aefe-a4ada1ed0480",
+      "title": "莲池清韵",
+      "series": "唐草",
+      "placements": [
+        {
+          "id": "basic-3",
+          "x": 512,
+          "y": 512,
+          "size": 320,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-geometric-border-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/09918f59-ec5a-4689-aefe-a4ada1ed0480.webp"
+    },
+    {
+      "id": "e36827d8-a02b-4e20-b31c-f10b57814725",
+      "title": "宝相花卷",
+      "series": "唐草",
+      "placements": [
+        {
+          "id": "scroll-3",
+          "x": 512,
+          "y": 512,
+          "size": 340,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/e36827d8-a02b-4e20-b31c-f10b57814725.webp"
+    },
+    {
+      "id": "f3d3fc1e-82f0-4063-8755-4c236e23e45f",
+      "title": "四合祥云",
+      "series": null,
+      "placements": [
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 512,
+          "size": 320,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-huiwen-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/f3d3fc1e-82f0-4063-8755-4c236e23e45f.webp"
+    },
+    {
+      "id": "ae57cb70-6e52-41be-97fc-1a13eefa6165",
+      "title": "应龙布雨",
+      "series": "山海经",
+      "placements": [
+        {
+          "id": "sj-12",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/ae57cb70-6e52-41be-97fc-1a13eefa6165.webp"
+    },
+    {
+      "id": "deba9084-47db-4bbb-afec-1050fd092777",
+      "title": "凤皇来仪",
+      "series": "山海经",
+      "placements": [
+        {
+          "id": "sj-21",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/deba9084-47db-4bbb-afec-1050fd092777.webp"
+    },
+    {
+      "id": "99a3044b-add6-4c4c-8763-3eb4670ded88",
+      "title": "计蒙司雨",
+      "series": "山海经",
+      "placements": [
+        {
+          "id": "sj-10",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-3",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-3",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-3",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-3",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/99a3044b-add6-4c4c-8763-3eb4670ded88.webp"
+    },
+    {
+      "id": "90cbc5cb-a4fb-4cd8-8590-2ef1025f1ad1",
+      "title": "穷奇御风",
+      "series": "山海经",
+      "placements": [
+        {
+          "id": "sj-18",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-1",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/90cbc5cb-a4fb-4cd8-8590-2ef1025f1ad1.webp"
+    },
+    {
+      "id": "b47d863d-6b2f-41ce-a273-73e7a711d304",
+      "title": "文鳐跃浪",
+      "series": "山海经",
+      "placements": [
+        {
+          "id": "sj-8",
+          "x": 512,
+          "y": 512,
+          "size": 380,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 164,
+          "size": 180,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 512,
+          "y": 860,
+          "size": 180,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 164,
+          "y": 512,
+          "size": 180,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "cloud-2",
+          "x": 860,
+          "y": 512,
+          "size": 180,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/b47d863d-6b2f-41ce-a273-73e7a711d304.webp"
+    },
+    {
+      "id": "5e32fcf9-b6c2-4fc8-84ab-a262b6ea9ce5",
+      "title": "青花缠枝",
+      "series": "青花瓷",
+      "placements": [
+        {
+          "id": "chanlian-1",
+          "x": 512,
+          "y": 512,
+          "size": 400,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/5e32fcf9-b6c2-4fc8-84ab-a262b6ea9ce5.webp"
+    },
+    {
+      "id": "adce6941-0454-40b2-aa78-a19bdf952c06",
+      "title": "青花云涌",
+      "series": "青花瓷",
+      "placements": [
+        {
+          "id": "tuanhe-1",
+          "x": 512,
+          "y": 512,
+          "size": 400,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-02",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/adce6941-0454-40b2-aa78-a19bdf952c06.webp"
+    },
+    {
+      "id": "b9175d81-5d6c-4d52-9832-13adc6abeeb4",
+      "title": "宝相庄严",
+      "series": "唐草",
+      "placements": [
+        {
+          "id": "ai-element-baoxianghua-02",
+          "x": 512,
+          "y": 512,
+          "size": 440,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-baoxianghua-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-baoxianghua-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-baoxianghua-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-baoxianghua-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/b9175d81-5d6c-4d52-9832-13adc6abeeb4.webp"
+    },
+    {
+      "id": "f0f13d20-29e6-491f-8834-36444f8fdcff",
+      "title": "龙腾八方",
+      "series": "团龙",
+      "placements": [
+        {
+          "id": "chiwen-1",
+          "x": 512,
+          "y": 512,
+          "size": 400,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-corner-dragon-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/f0f13d20-29e6-491f-8834-36444f8fdcff.webp"
+    },
+    {
+      "id": "ff84e016-0768-47eb-a254-2c780396f249",
+      "title": "缠枝莲意",
+      "series": "唐草",
+      "placements": [
+        {
+          "id": "lianban-1",
+          "x": 512,
+          "y": 512,
+          "size": 400,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-00",
+          "x": 184,
+          "y": 184,
+          "size": 140,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-00",
+          "x": 840,
+          "y": 184,
+          "size": 140,
+          "rotation": 90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-00",
+          "x": 184,
+          "y": 840,
+          "size": 140,
+          "rotation": -90,
+          "scaleX": 1,
+          "scaleY": 1
+        },
+        {
+          "id": "ai-element-juancao-00",
+          "x": 840,
+          "y": 840,
+          "size": 140,
+          "rotation": 180,
+          "scaleX": 1,
+          "scaleY": 1
+        }
+      ],
+      "cover": "https://wenmai-api.ruoziqing.cn/storage/v1/object/public/works/4c55bf31-46a4-4882-9daa-056aa1f11e4a/ff84e016-0768-47eb-a254-2c780396f249.webp"
+    }
+  ],
+  "email": "collection@wenmai.art",
+  "uid": "4c55bf31-46a4-4882-9daa-056aa1f11e4a"
+}
