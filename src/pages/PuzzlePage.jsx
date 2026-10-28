@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from '../components/common/Router'
 import { useApp } from '../store/AppState'
-import { getPatternById, getPatternImage, getAllSeries, getAiPatterns, getAiPurpose } from '../store/patternData'
+import { getPatternById, getPatternImage, getAllSeries, getAiPatterns, getPatternForm, FORM_LABELS } from '../store/patternData'
 import { createOutlinedBlock, extractShapeData } from '../utils/blockOutline'
 import {
   extractContour,
@@ -45,7 +45,7 @@ export default function PuzzlePage() {
   const [outlinedUrls, setOutlinedUrls] = useState({})
   const shapeCache = useRef({}) // patternId -> { mask: Uint8Array(64*64), boundingRadius }
   const [seriesFilter, setSeriesFilter] = useState('all')
-  const [aiPurposeFilter, setAiPurposeFilter] = useState('all') // 二级筛选：all/corner/filler/border/standalone/tile/hero
+  const [formFilter, setFormFilter] = useState('all') // 形态二级筛选：all/medallion/corner/border/tile/motif
   const [showTray, setShowTray] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
   const [completedImage, setCompletedImage] = useState(null)
@@ -53,6 +53,7 @@ export default function PuzzlePage() {
   const [exportSize, setExportSize] = useState(2048)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [activeTemplateId, setActiveTemplateId] = useState(null)
+  const [bgPatternId, setBgPatternId] = useState(null) // 满底形态纹样铺为画布底纹（null=无底纹）
   const [saved, setSaved] = useState(false)
 
   // ── Gallery integration ───────────────────────────────
@@ -80,16 +81,16 @@ export default function PuzzlePage() {
 
   // Tray 显示规则：
   // - 'all'：仅 library + extras（避免 200+ AI 元素淹没日常创作）
-  // - 'ai'：AI 元素，二级 purpose 筛选生效
+  // - 'ai'：AI 元素
   // - 其他 series：对应 series 的 library 元素
+  // 形态筛选（团花/角隅/边饰/满底/单体）对所有来源生效——
+  // 回答"适合放哪个位置"，与题材筛选正交。
   const filteredElements = useMemo(() => {
-    if (seriesFilter === 'all') return libPatterns
-    if (seriesFilter === 'ai') {
-      if (aiPurposeFilter === 'all') return aiPatterns
-      return aiPatterns.filter(p => getAiPurpose(p) === aiPurposeFilter)
-    }
-    return libPatterns.filter(p => p.series === seriesFilter)
-  }, [seriesFilter, aiPurposeFilter, libPatterns, aiPatterns])
+    const byForm = p => formFilter === 'all' || getPatternForm(p) === formFilter
+    if (seriesFilter === 'all') return libPatterns.filter(byForm)
+    if (seriesFilter === 'ai') return aiPatterns.filter(byForm)
+    return libPatterns.filter(p => p.series === seriesFilter).filter(byForm)
+  }, [seriesFilter, formFilter, libPatterns, aiPatterns])
 
   useEffect(() => () => { clearTimeout(publishedTimeoutRef.current) }, [])
 
@@ -271,6 +272,18 @@ export default function PuzzlePage() {
     // Prerendered background (paper + texture + frame)
     ctx.drawImage(getBackground(), 0, 0)
 
+    // 满底纹样铺底：整幅铺满后覆纸色薄纱，底纹若隐若现、前景纹样仍清晰
+    const bgBlock = bgPatternId ? (loadedImages[bgPatternId] || outlinedBlocks[bgPatternId]) : null
+    if (bgBlock) {
+      ctx.drawImage(bgBlock, 0, 0, CANVAS_SIZE, CANVAS_SIZE)
+      ctx.fillStyle = 'rgba(226,217,196,0.72)'
+      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+      // 装裱边框被底纹盖掉了，重描一遍
+      ctx.strokeStyle = 'rgba(160,140,100,0.28)'
+      ctx.lineWidth = 4
+      ctx.strokeRect(8, 8, CANVAS_SIZE - 16, CANVAS_SIZE - 16)
+    }
+
     // Draw each placed element
     placements.forEach((p, idx) => {
       // Empty template slot — dashed outline + label
@@ -357,7 +370,7 @@ export default function PuzzlePage() {
         ctx.globalAlpha = 1
       }
     }
-  }, [placements, selectedIdx, loadedImages, outlinedBlocks, dragging, dragFromTray])
+  }, [placements, selectedIdx, loadedImages, outlinedBlocks, dragging, dragFromTray, bgPatternId])
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current
@@ -422,6 +435,16 @@ export default function PuzzlePage() {
 
     if (hitIdx >= 0) {
       setSelectedIdx(hitIdx)
+      const hit = placements[hitIdx]
+      if (hit.isEmpty) {
+        // 点空槽位：展开 tray 并切到该槽位偏好的形态，引导用户拖入合适素材
+        const tpl = getTemplateById(activeTemplateId)
+        const slot = tpl?.slots.find(s => s.id === hit.slotId)
+        if (slot?.preferredForms?.length) {
+          setFormFilter(slot.preferredForms[0])
+          setShowTray(true)
+        }
+      }
       setDragging({
         idx: hitIdx,
         offsetX: pos.x - placements[hitIdx].x,
@@ -430,7 +453,7 @@ export default function PuzzlePage() {
     } else {
       setSelectedIdx(-1)
     }
-  }, [placements])
+  }, [placements, activeTemplateId])
 
   // RAF throttle: collapse multiple pointermove events per frame into one
   // state update. Without this, high-frequency move events (120Hz on some
@@ -618,7 +641,25 @@ export default function PuzzlePage() {
             }
             newOnes.push(placement)
           }
-          return [...others, ...newOnes]
+          // 清掉被角花组覆盖掉的空槽位虚线框
+          const leftovers = others.filter(o => !o.isEmpty
+            || !newOnes.some(n => Math.abs(n.x - o.x) < o.size / 2 && Math.abs(n.y - o.y) < o.size / 2))
+          return [...leftovers, ...newOnes]
+        }
+
+        // Drop 落在空模板槽位内（且形态合适）→ 直接填槽，继承槽位位置/大小/角度
+        const slotIdx = others.findIndex(o => o.isEmpty
+          && Math.abs(tempBlock.x - o.x) < o.size / 2
+          && Math.abs(tempBlock.y - o.y) < o.size / 2)
+        if (slotIdx >= 0) {
+          const slotP = others[slotIdx]
+          const tpl = getTemplateById(activeTemplateId)
+          const slot = tpl?.slots.find(s => s.id === slotP.slotId)
+          const dropForm = tempPat ? getPatternForm(tempPat) : null
+          if (!slot?.preferredForms?.length || slot.preferredForms.includes(dropForm)) {
+            const filled = { id: tempBlock.id, x: slotP.x, y: slotP.y, size: slotP.size, rotation: slotP.rotation, scaleX: 1, scaleY: 1, slotId: slotP.slotId }
+            return [...others.filter((_, i) => i !== slotIdx), filled]
+          }
         }
 
         // Default: single placement
@@ -763,9 +804,19 @@ export default function PuzzlePage() {
     const newPlacements = template.slots.map(slot => {
       const x = slot.x * CANVAS_SIZE
       const y = slot.y * CANVAS_SIZE
-      const list = patternsByType.get(slot.typeConstraint) || []
+      const rawList = patternsByType.get(slot.typeConstraint) || []
+      // 形态偏好软排序：槽位先拿形态匹配的素材（中心拿团花、角拿角隅），
+      // 没有形态匹配的再退回按序取。cursor 只在形态匹配段内轮转。
+      const prefs = slot.preferredForms || []
+      const ranked = [...rawList].sort((a, b) => {
+        const ra = prefs.indexOf(getPatternForm(a))
+        const rb = prefs.indexOf(getPatternForm(b))
+        return (ra === -1 ? 99 : ra) - (rb === -1 ? 99 : rb)
+      })
+      const matching = ranked.filter(p => prefs.includes(getPatternForm(p)))
+      const pool = matching.length > 0 ? matching : ranked
       const cursor = cursorByType.get(slot.typeConstraint) || 0
-      const pattern = list[cursor] || list[0]
+      const pattern = pool[cursor % pool.length]
       cursorByType.set(slot.typeConstraint, cursor + 1)
 
       if (pattern) {
@@ -922,11 +973,30 @@ export default function PuzzlePage() {
       {/* Canvas */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 16px' }}>
         <div style={{
+          position: 'relative',
           width: '100%', maxWidth: DISPLAY_SIZE, aspectRatio: '1',
           borderRadius: 12, overflow: 'hidden',
           border: '1px solid rgba(160,140,100,0.25)',
           boxShadow: '0 0 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(201,162,75,0.05)',
         }}>
+          {bgPatternId && (
+            <button
+              onClick={() => setBgPatternId(null)}
+              style={{
+                position: 'absolute', top: 10, left: 10, zIndex: 2,
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '4px 10px', borderRadius: 999,
+                background: 'rgba(26,20,8,0.72)', color: '#E8DFC8',
+                border: '1px solid rgba(201,162,75,0.5)',
+                fontSize: 11, fontFamily: 'inherit', cursor: 'pointer',
+                pointerEvents: 'auto',
+              }}
+              title="移除底纹"
+            >
+              底纹 · {getPatternById(bgPatternId)?.name || '满底纹样'}
+              <span style={{ color: '#C9A24B', fontSize: 12, lineHeight: 1 }}>✕</span>
+            </button>
+          )}
           <canvas
             ref={canvasRef}
             width={CANVAS_SIZE}
@@ -1005,27 +1075,22 @@ export default function PuzzlePage() {
         </div>
       )}
 
-      {/* AI purpose 二级筛选（仅 seriesFilter='ai' 时显示） */}
-      {showTray && seriesFilter === 'ai' && (
+      {/* 形态二级筛选：团花/角隅/边饰/满底/单体，对所有系列生效 */}
+      {showTray && (
         <div style={{ display: 'flex', gap: 6, padding: '2px 16px 6px', overflowX: 'auto', opacity: 0.85 }}>
-          {[
-            { id: 'all', label: '全部 AI' },
-            { id: 'corner', label: '角花' },
-            { id: 'filler', label: '填充' },
-            { id: 'border', label: '边饰' },
-            { id: 'standalone', label: '独立' },
-            { id: 'tile', label: '四方连续' },
-            { id: 'hero', label: '主图' },
-          ].map(p => (
+          <button
+            onClick={() => setFormFilter('all')}
+            style={{ ...pillStyle(formFilter === 'all'), fontSize: 11, padding: '4px 10px' }}
+          >
+            全部形态
+          </button>
+          {Object.entries(FORM_LABELS).map(([id, label]) => (
             <button
-              key={p.id}
-              onClick={() => setAiPurposeFilter(p.id)}
-              style={{
-                ...pillStyle(aiPurposeFilter === p.id, '#9b59b6'),
-                fontSize: 11, padding: '4px 10px',
-              }}
+              key={id}
+              onClick={() => setFormFilter(id)}
+              style={{ ...pillStyle(formFilter === id), fontSize: 11, padding: '4px 10px' }}
             >
-              {p.label}
+              {label}
             </button>
           ))}
         </div>
@@ -1068,6 +1133,25 @@ export default function PuzzlePage() {
               }}>
                 {p.name}
               </span>
+              {getPatternForm(p) === 'tile' && (
+                <button
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setBgPatternId(prev => prev === p.id ? null : p.id)
+                  }}
+                  style={{
+                    fontSize: 9, padding: '1px 6px', borderRadius: 4,
+                    fontFamily: 'inherit', cursor: 'pointer', lineHeight: 1.5,
+                    background: bgPatternId === p.id ? 'rgba(201,162,75,0.9)' : 'rgba(201,162,75,0.1)',
+                    color: bgPatternId === p.id ? '#1A1408' : '#C9A24B',
+                    border: `1px solid rgba(201,162,75,${bgPatternId === p.id ? 0.9 : 0.35})`,
+                  }}
+                  title="满底纹样：铺为整幅画布底纹"
+                >
+                  {bgPatternId === p.id ? '底纹 ✓' : '设为底纹'}
+                </button>
+              )}
             </div>
           ))}
           {filteredElements.length === 0 && (

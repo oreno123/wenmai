@@ -2,6 +2,7 @@ import { generatePatternDataURL, PROCEDURAL_GENERATORS } from '../engine/procedu
 import { RARITY_WEIGHTS, PITY_THRESHOLD, SOFT_PITY_START } from '../constants'
 import { QINGHUA_PATTERNS } from '../data/qinghuaPatterns'
 import { AI_ASSETS, AiAsset } from '../data/aiAssets'
+import { JIMENG_PATTERNS } from '../data/jimengPatterns'
 import { RELIC_PATTERNS } from '../data/relicPatterns'
 
 // ── Types ──────────────────────────────────────────────
@@ -31,6 +32,56 @@ export interface Pattern {
   tags: string[]
   image: string
   procedural?: string
+  form?: PatternForm
+}
+
+// ── 形态（适合放哪里）─────────────────────────────────
+// 纹样学构成分类：题材（type）回答"画的是什么"，形态（form）回答
+// "适合放什么位置"。模板槽位按形态推荐，避免角隅件悬空居中这类
+// 构图错误（封面管线 VLM 评审实证：角花放中心只有 5-6 分）。
+export type PatternForm = 'medallion' | 'corner' | 'border' | 'tile' | 'motif'
+
+export const FORM_LABELS: Record<PatternForm, string> = {
+  medallion: '团花',
+  corner: '角隅',
+  border: '边饰',
+  tile: '满底',
+  motif: '单体',
+}
+
+// 抽卡池手工打标（25 件 + 山海 25 件）
+const LIBRARY_FORM: Record<string, PatternForm> = {
+  'basic-1': 'motif', 'basic-2': 'border', 'basic-3': 'medallion',
+  'cloud-1': 'motif', 'cloud-2': 'motif', 'cloud-3': 'motif', 'cloud-4': 'medallion',
+  'taotie-1': 'medallion', 'taotie-2': 'medallion', 'taotie-3': 'medallion',
+  'dragon-1': 'medallion', 'dragon-2': 'motif', 'dragon-3': 'motif', 'dragon-4': 'medallion',
+  'scroll-1': 'border', 'scroll-2': 'border', 'scroll-3': 'medallion',
+  'corner-1': 'corner', 'corner-2': 'corner',
+  'tile-1': 'tile', 'tile-2': 'tile',
+}
+
+// AI 元素 purpose → 形态（hero/filler/standalone 均按单体用）
+const AI_PURPOSE_FORM: Record<string, PatternForm> = {
+  corner: 'corner', border: 'border', tile: 'tile',
+  standalone: 'motif', filler: 'motif', hero: 'motif',
+}
+
+// 青花 335 件按 tags 里的形状词推导（v5 Opus 分类已带）
+const QH_SHAPE_FORM: Array<[string, PatternForm]> = [
+  ['带状条形', 'border'], ['竖幅', 'border'],
+  ['圆形', 'medallion'], ['椭圆形', 'medallion'], ['菱形', 'medallion'],
+  ['方形', 'tile'],
+]
+
+export function getPatternForm(p: Pattern): PatternForm | null {
+  if (p.form) return p.form
+  if (LIBRARY_FORM[p.id]) return LIBRARY_FORM[p.id]
+  const purpose = getAiPurpose(p)
+  if (purpose) return AI_PURPOSE_FORM[purpose]
+  for (const [tag, form] of QH_SHAPE_FORM) {
+    if (p.tags.includes(tag)) return form
+  }
+  return null
 }
 
 export interface SeriesInfo {
@@ -154,13 +205,15 @@ function aiAssetToPattern(asset: AiAsset): Pattern {
 }
 
 // 全部 AI 元素转 Pattern（203 个，覆盖 6 purpose × 多 type）
-const AI_PATTERNS: Pattern[] = AI_ASSETS.map(aiAssetToPattern)
+// + 即梦精选纹样（VLM 打分 ≥9，scripts/export_jimeng_assets.py 生成）
+const AI_PATTERNS: Pattern[] = [...AI_ASSETS.map(aiAssetToPattern), ...JIMENG_PATTERNS]
 
 // 从 Pattern.tags 反推 AI 元素的 purpose（standalone/corner/filler/border/tile/hero）
 // 非 AI 元素返回 null。供 tray 二级筛选使用。
 export type AiPurpose = 'standalone' | 'corner' | 'filler' | 'border' | 'tile' | 'hero'
 export function getAiPurpose(p: Pattern): AiPurpose | null {
-  if (!p.id.startsWith('ai-element-')) return null
+  const isAiAsset = p.id.startsWith('ai-element-') || p.tags.includes('即梦')
+  if (!isAiAsset) return null
   if (p.tags.includes('element-corner')) return 'corner'
   if (p.tags.includes('element-border')) return 'border'
   if (p.tags.includes('element-filler')) return 'filler'
