@@ -4,9 +4,11 @@ import landscape from '../../public/relic/m/qinghua_second/manifest.json'
 import guiZhou from '../../public/relic/m/gui_zhou/manifest.json'
 import shangGui from '../../public/relic/m/shang_gui/manifest.json'
 
-// 鸿蒙 App 的页面 origin 是 http://localhost，rawfile 里只内置了 4 件器物的模型，
-// 青花展开图必须走线上站；桌面 dev 与线上站同源，保持相对路径。
-export const ASSET_BASE = typeof location !== 'undefined' && location.hostname === 'localhost'
+// 鸿蒙 App 的页面 origin 是 http://localhost（80 端口，location.port 为空），
+// rawfile 里只内置了 4 件器物的模型，青花展开图必须走线上站；
+// 桌面 dev/preview 一定带端口（5173/4175），全量素材在本地 public/，走相对路径。
+export const ASSET_BASE = typeof location !== 'undefined'
+  && location.hostname === 'localhost' && location.port === ''
   ? 'https://wenmai.ruoziqing.cn'
   : ''
 

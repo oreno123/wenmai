@@ -10,8 +10,9 @@ import ErrorBoundary from './ErrorBoundary'
 /* ── 镇馆器物：青花为首，青铜为考古扫描组 ── */
 /* tune：摄影测量 GLB 材质缺 metal/rough（glTF 默认 1.0/1.0=全金属全粗糙→贴图变黑绿），
    必须显式覆盖。绿锈=矿物非金属，低 metal 让贴图漫反射出来；错金银鼎保金属度让金银纹闪 */
-/* 鸿蒙只内置兽纹鼎；其余模型必须走可访问的线上静态站，不能落到 rawfile。 */
-const HARMONY_ORIGIN = location.hostname === 'localhost'
+/* 鸿蒙只内置兽纹鼎；其余模型必须走可访问的线上静态站，不能落到 rawfile。
+   鸿蒙 origin 是 http://localhost（无端口）；桌面 dev/preview 带端口且有全量素材。 */
+const HARMONY_ORIGIN = location.hostname === 'localhost' && location.port === ''
 const CLOUD_BASE = 'https://wenmai.ruoziqing.cn'
 const modelUrl = (id) => HARMONY_ORIGIN && id === 'ding_shang'
   ? `/relic/m/${id}/model.glb`

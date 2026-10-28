@@ -1,10 +1,11 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from '../components/common/Router'
+import { useNavigate, useLocation } from '../components/common/Router'
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { ContactShadows, OrbitControls, useGLTF } from '@react-three/drei'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import * as THREE from 'three'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ASSET_BASE } from '../data/relicPatterns'
 
 /* ------------------------------------------------------------------ */
 /* 资产                                                                */
@@ -15,11 +16,12 @@ const DEFAULT_MODEL: ModelInfo = {
   name: '缠枝牡丹纹青花瓶',
   zh: '青',
   dynasty: '真实器物三维采集',
-  // 首屏占位：qinghua_peony 不在鸿蒙 rawfile 里，必须走线上站绝对地址，
-  // 否则 App 内这一帧的 404 会直接把整页顶进 ErrorBoundary。
-  glb: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/model.glb',
-  manifest: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/manifest.json',
-  thumb: 'https://wenmai.ruoziqing.cn/relic/m/qinghua_peony/thumb.jpg',
+  // 首屏占位：qinghua_peony 不在鸿蒙 rawfile 里，鸿蒙（localhost 无端口）必须走线上站
+  // 绝对地址，否则 App 内这一帧的 404 会直接把整页顶进 ErrorBoundary；
+  // 桌面 dev/preview 带端口、线上站同源，均走相对路径本地加载。
+  glb: `${ASSET_BASE}/relic/m/qinghua_peony/model.glb`,
+  manifest: `${ASSET_BASE}/relic/m/qinghua_peony/manifest.json`,
+  thumb: `${ASSET_BASE}/relic/m/qinghua_peony/thumb.jpg`,
   material: 'qinghua',
 }
 const MAX_ELEMS = 32
@@ -50,8 +52,9 @@ interface ModelInfo {
   material?: 'qinghua' | 'bronze'
 }
 
-function useModelIndex(): ModelInfo[] {
+function useModelIndex(): { models: ModelInfo[]; loaded: boolean } {
   const [models, setModels] = useState<ModelInfo[]>([DEFAULT_MODEL])
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}relic/index.json`)
       .then((r) => r.json())
@@ -59,8 +62,9 @@ function useModelIndex(): ModelInfo[] {
         if (Array.isArray(d.models) && d.models.length > 0) setModels(d.models)
       })
       .catch(() => {})
+      .finally(() => setLoaded(true))
   }, [])
-  return models
+  return { models, loaded }
 }
 
 function useManifest(url: string): ElemInfo[] {
@@ -419,13 +423,28 @@ const JADE = '#5ec8ae'
 
 export default function RelicPage() {
   const navigate = useNavigate()
-  const models = useModelIndex()
+  const { search: relicSearch } = useLocation()
+  const { models, loaded: indexLoaded } = useModelIndex()
   const [modelId, setModelId] = useState<string>(() => {
     const h = window.location.hash
     const q = h.indexOf('?')
     return (new URLSearchParams(q >= 0 ? h.slice(q + 1) : '')).get('m') ?? DEFAULT_MODEL.id
   })
+
+  // In-app navigation between ?m= values keeps this component mounted, so
+  // sync the selected model from the router search when it changes.
+  useEffect(() => {
+    const m = new URLSearchParams(relicSearch).get('m')
+    if (m && m !== modelId) {
+      setModelId(m)
+      setPicked(new Set())
+      setHovered(null)
+      setFlash(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [relicSearch])
   const model = models.find((m) => m.id === modelId) ?? models[0]
+  const modelMissing = indexLoaded && model.id !== modelId
   const elems = useManifest(model.manifest)
   const patternMask = usePatternMask(model.manifest)
   const [picked, setPicked] = useState<Set<number>>(new Set())
@@ -487,6 +506,8 @@ export default function RelicPage() {
     <div
       style={{
         minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
         background: 'radial-gradient(1200px 800px at 40% 20%, #2b2317 0%, #171208 65%)',
         color: '#e8dcc0',
         fontFamily: 'inherit',
@@ -525,7 +546,29 @@ export default function RelicPage() {
         </button>
       </header>
 
-      <div style={{ display: 'flex', height: 'calc(100vh - 68px)' }}>
+      {modelMissing && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '7px 32px',
+          background: 'rgba(158,53,48,0.16)',
+          borderBottom: '1px solid rgba(158,53,48,0.35)',
+          color: '#E8B48A', fontSize: 12.5, letterSpacing: 1,
+        }}>
+          <span>未找到器物「{modelId}」，正在展示 {model.name}</span>
+          <button
+            onClick={() => setSwitcherOpen(true)}
+            style={{
+              background: 'transparent', border: '1px solid rgba(201,162,75,0.4)',
+              color: '#C9A24B', borderRadius: 999, padding: '3px 14px',
+              cursor: 'pointer', fontSize: 12,
+            }}
+          >
+            选择其他器物
+          </button>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         {/* 3D 视口 */}
         <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
           <Canvas
