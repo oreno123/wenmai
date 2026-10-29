@@ -1,7 +1,7 @@
 """把 VLM 打分 ≥9 的即梦纹样注册进前端素材库。
 
 输入  scripts/pattern_scores.jsonl（score>=9 & keep，按分数取前 20）
-      public/patterns/*.png
+      patterns-src/*.png
 输出  public/patterns/jimeng/{stem}.webp（1024 边长，q88）
       src/data/jimengPatterns.ts（Pattern[]，由 patternData.ts 并入 AI 元素库）
 """
@@ -15,7 +15,7 @@ from PIL import Image
 sys.stdout.reconfigure(encoding='utf-8')
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / 'public' / 'patterns'
+SRC = ROOT / 'patterns-src'
 OUT_DIR = ROOT / 'public' / 'patterns' / 'jimeng'
 SCORES = ROOT / 'scripts' / 'pattern_scores.jsonl'
 TS_OUT = ROOT / 'src' / 'data' / 'jimengPatterns.ts'

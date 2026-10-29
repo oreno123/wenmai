@@ -1,6 +1,6 @@
 """注册「纹样合集」账号并把高分纹样发布到广场（pending，待管理员审核）。
 
-输入  scripts/pattern_scores.jsonl 中 score>=9 的条目 + public/patterns/*.png
+输入  scripts/pattern_scores.jsonl 中 score>=9 的条目 + patterns-src/*.png
 输出  scripts/pattern_published.json（账号信息 + 每件 work id）
 
 用法  python publish_patterns.py            # 全流程
@@ -26,7 +26,7 @@ import httpx
 sys.stdout.reconfigure(encoding='utf-8')
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-PATTERNS = ROOT / 'public' / 'patterns'
+PATTERNS = ROOT / 'patterns-src'
 SCORES = ROOT / 'scripts' / 'pattern_scores.jsonl'
 PUBLISHED = ROOT / 'scripts' / 'pattern_published.json'
 
@@ -158,7 +158,7 @@ def _combos_mod():
         spec.loader.exec_module(mod)
         # 即梦 20 件全是满底彩纹样：注册进软抠分支
         stems = {v[0]: k.replace('.png', '') for k, v in MANIFEST.items()}
-        mod.LIB_IMG.update({pid: f'/patterns/{stem}.png' for pid, stem in stems.items()})
+        mod.LIB_IMG.update({pid: f'/patterns/jimeng/{stem}.webp' for pid, stem in stems.items()})
         mod.SOFT_IDS.update(stems)
         _CM = mod
     return _CM

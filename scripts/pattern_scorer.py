@@ -18,7 +18,7 @@ from PIL import Image
 sys.stdout.reconfigure(encoding='utf-8')
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / 'public' / 'patterns'
+SRC = ROOT / 'patterns-src'
 OUT = ROOT / 'scripts' / 'pattern_scores.jsonl'
 KEY = os.environ['ZHIPU_API_KEY']
 

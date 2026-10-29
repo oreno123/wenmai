@@ -37,7 +37,7 @@ API_URL = f"https://{API_HOST}"
 SERVICE = "cv"
 REGION = "cn-north-1"
 
-OUTPUT_DIR = Path(r"D:\desktop\纹脉\wenmai\public\patterns")
+OUTPUT_DIR = Path(r"D:\desktop\纹脉\wenmai\patterns-src")
 SOURCE_DIR = Path(r"D:\desktop\纹样照片")
 
 # 轮询间隔和超时
